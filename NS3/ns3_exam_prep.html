@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NS-3 Exam Prep | Ch. 5–9</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f18;
+    --surface: #151824;
+    --surface2: #1e2235;
+    --border: #2a3050;
+    --accent: #5f8bff;
+    --accent2: #ff6b6b;
+    --accent3: #43e97b;
+    --accent4: #f9ca24;
+    --text: #e8eaf0;
+    --text-muted: #7a83a6;
+    --code-bg: #111520;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ---- HEADER ---- */
+  .hero {
+    background: linear-gradient(135deg, #0d1b4b 0%, #0d0f18 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(95,139,255,0.15) 0%, transparent 70%);
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(90deg, #fff 0%, #8ba8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .chapter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+
+  /* ---- LAYOUT ---- */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ---- SECTION HEADER ---- */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 48px 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bg);
+    background: var(--accent);
+    border-radius: 6px;
+    padding: 3px 10px;
+    flex-shrink: 0;
+  }
+  .section-num.red { background: var(--accent2); }
+  .section-num.green { background: var(--accent3); color: #0d0f18; }
+  .section-num.yellow { background: var(--accent4); color: #0d0f18; }
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  /* ---- CHAPTER OVERVIEW CARD ---- */
+  .ch-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+  }
+  .ch-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .ch-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .ch-icon.blue { background: rgba(95,139,255,0.15); }
+  .ch-icon.red { background: rgba(255,107,107,0.15); }
+  .ch-icon.green { background: rgba(67,233,123,0.15); }
+  .ch-icon.yellow { background: rgba(249,202,36,0.15); }
+  .ch-icon.purple { background: rgba(165,100,255,0.15); }
+
+  .ch-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .ch-subtitle { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  .key-points { list-style: none; }
+  .key-points li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .key-points li:last-child { border-bottom: none; }
+  .key-points li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    top: 8px;
+  }
+  .key-points strong { color: #a8c5ff; }
+
+  /* ---- CODE ---- */
+  pre, code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 10px 0;
+  }
+  code {
+    background: rgba(95,139,255,0.12);
+    color: #a8c5ff;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 13px;
+  }
+  pre code {
+    background: none;
+    color: var(--text);
+    padding: 0;
+    font-size: inherit;
+  }
+  .kw { color: #5f8bff; }
+  .cm { color: #4a5580; font-style: italic; }
+  .str { color: #43e97b; }
+  .num { color: #f9ca24; }
+  .fn { color: #ff9f43; }
+  .ty { color: #ffeaa7; }
+
+  /* ---- Q&A ---- */
+  .qa-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .qa-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .qa-q {
+    padding: 14px 18px;
+    background: var(--surface2);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    user-select: none;
+  }
+  .qa-q:hover { background: #222840; }
+  .q-badge {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .q-badge.mcq { background: var(--accent4); }
+  .q-badge.scenario { background: var(--accent2); }
+  .q-badge.code { background: var(--accent3); color: #0d0f18; }
+
+  .qa-a {
+    padding: 16px 18px;
+    font-size: 14px;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+  .qa-item.open .qa-a { display: block; }
+  .qa-item.open .qa-q { background: #1a2050; }
+
+  .answer-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .qa-a p { margin-bottom: 8px; }
+  .qa-a ul { padding-left: 18px; }
+  .qa-a li { margin-bottom: 4px; font-size: 13.5px; }
+  .correct { color: var(--accent3); font-weight: 600; }
+
+  /* ---- MCQ options ---- */
+  .mcq-options { margin: 8px 0; }
+  .mcq-opt {
+    display: flex;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    margin-bottom: 4px;
+  }
+  .mcq-opt.correct-opt { background: rgba(67,233,123,0.1); border: 1px solid rgba(67,233,123,0.3); }
+  .mcq-opt.wrong-opt { background: rgba(255,107,107,0.06); }
+  .opt-label { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+  .mcq-opt.correct-opt .opt-label { color: var(--accent3); }
+
+  /* ---- TOPOLOGY DIAGRAM ---- */
+  .topo-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin: 10px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ---- CHEATSHEET GRID ---- */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 640px) { .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .cheat-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .cheat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    gap: 8px;
+  }
+  .cheat-row:last-child { border-bottom: none; }
+  .cheat-key { color: var(--text-muted); flex-shrink: 0; min-width: 100px; }
+  .cheat-val { color: var(--accent4); text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+
+  /* ---- TOGGLE ALL ---- */
+  .toggle-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ---- ALERT BOX ---- */
+  .tip-box {
+    background: rgba(95,139,255,0.08);
+    border: 1px solid rgba(95,139,255,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    margin: 10px 0;
+  }
+  .tip-box.warn {
+    background: rgba(249,202,36,0.07);
+    border-color: rgba(249,202,36,0.3);
+  }
+  .tip-box b { color: var(--accent4); }
+  .tip-icon { margin-right: 6px; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 30px 0;
+  }
+
+  .fill-blank { 
+    display: inline-block;
+    min-width: 140px;
+    border-bottom: 2px solid var(--accent);
+    margin: 0 4px;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* toggle arrow */
+  .toggle-arrow { margin-left: auto; font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
+  .qa-item.open .toggle-arrow { transform: rotate(180deg); color: var(--accent); }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">📡 Network Simulation · Exam Prep</div>
+  <h1>NS-3 Tutorial<br>Chapters 5 – 9</h1>
+  <p class="hero-sub">Complete Overview + Short Qs, MCQs, Scenario Qs, Code Snippets</p>
+  <div class="chapter-pills">
+    <span class="pill">Ch5: Conceptual Overview</span>
+    <span class="pill">Ch6: Tweaking</span>
+    <span class="pill">Ch7: Building Topologies</span>
+    <span class="pill">Ch8: Tracing</span>
+    <span class="pill">Ch9: Data Collection</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: CHAPTER OVERVIEWS
+═══════════════════════════════════════════ -->
+<div class="section-header">
+  <span class="section-num">OVERVIEW</span>
+  <h2>Chapter-by-Chapter Summary</h2>
+</div>
+
+<!-- CH 5 -->
+<div class="ch-card">
+  <div class="ch-card-header">
+    <div class="ch-icon blue">🧩</div>
+    <div>
+      <div class="ch-title">Chapter 5 — Conceptual Overview</div>
+      <div class="ch-subtitle">first.cc · NodeContainer · Topology Helpers · Simulator</div>
+    </div>
+  </div>
+  <ul class="key-points">
+    <li>NS-3 is a <strong>discrete-event network simulator</strong> written in C++, using the <code>ns3</code> namespace.</li>
+    <li><strong>Module Includes:</strong> <code>#include "ns3/core-module.h"</code>, <code>network-module.h</code>, <code>internet-module.h</code>, <code>point-to-point-module.h</code>, <code>applications-module.h</code></li>
+    <li><strong>NodeContainer</strong> — creates and manages simulation nodes. <code>nodes.Create(2)</code> creates 2 nodes.</li>
+    <li><strong>PointToPointHelper</strong> — sets up P2P link. Attributes: <code>DataRate</code> (device) and <code>Delay</code> (channel). Then <code>pointToPoint.Install(nodes)</code> returns a <code>NetDeviceContainer</code>.</li>
+    <li><strong>InternetStackHelper</strong> — installs TCP/IP stack on nodes with <code>stack.Install(nodes)</code>.</li>
+    <li><strong>Ipv4AddressHelper</strong> — assigns IP addresses. <code>address.SetBase("10.1.1.0","255.255.255.0")</code> then <code>address.Assign(devices)</code>.</li>
+    <li><strong>UdpEchoServerHelper</strong> — installs server on a node with port number. <code>Start(Seconds(1.0))</code> and <code>Stop(Seconds(10.0))</code>.</li>
+    <li><strong>UdpEchoClientHelper</strong> — takes server IP + port. Attributes: <code>MaxPackets</code>, <code>Interval</code>, <code>PacketSize</code>.</li>
+    <li><strong>Simulator::Run()</strong> → runs all events. <strong>Simulator::Destroy()</strong> → cleans up. <strong>Simulator::Stop(t)</strong> → forces stop at time t.</li>
+    <li>Simulation stops when: (a) event queue is empty, or (b) a Stop event is reached. Self-sustaining events (like beacons) require an explicit <code>Simulator::Stop()</code>.</li>
+    <li>Scripts go in <code>scratch/</code> directory and built with <code>./ns3 build</code>, run with <code>./ns3 run scratch/myfirst</code>.</li>
+  </ul>
+</div>
+
+<!-- CH 6 -->
+<div class="ch-card">
+  <div class="ch-card-header">
+    <div class="ch-icon red">⚙️</div>
+    <div>
+      <div class="ch-title">Chapter 6 — Tweaking</div>
+      <div class="ch-subtitle">Logging · Command Line Args · ASCII Tracing · PCAP Tracing</div>
+    </div>
+  </div>
+  <ul class="key-points">
+    <li><strong>7 Log Levels</strong> (increasing verbosity): <code>LOG_ERROR</code>, <code>LOG_WARN</code>, <code>LOG_DEBUG</code>, <code>LOG_INFO</code>, <code>LOG_FUNCTION</code>, <code>LOG_LOGIC</code>, <code>LOG_ALL</code>. Also <code>NS_LOG_UNCOND</code> (always prints).</li>
+    <li><code>LOG_LEVEL_INFO</code> enables INFO + all levels below it (DEBUG, WARN, ERROR).</li>
+    <li>Enable logging in code: <code>LogComponentEnable("UdpEchoClientApplication", LOG_LEVEL_INFO)</code></li>
+    <li>Enable via shell: <code>export NS_LOG=UdpEchoClientApplication=level_all</code></li>
+    <li>Logging is only available in <strong>debug builds</strong> — not in optimized builds.</li>
+    <li><strong>Command Line Arguments:</strong> Use <code>CommandLine cmd; cmd.AddValue("nPackets", "...", nPackets); cmd.Parse(argc, argv);</code> then run with <code>./ns3 run "scratch/myfirst --nPackets=5"</code></li>
+    <li><strong>ASCII Tracing:</strong> <code>AsciiTraceHelper ascii; p2p.EnableAsciiAll(ascii.CreateFileStream("myfirst.tr"))</code></li>
+    <li><strong>PCAP Tracing (all):</strong> <code>pointToPoint.EnablePcapAll("myfirst")</code> — creates <code>myfirst-N-M.pcap</code> files (N=node, M=device).</li>
+    <li><strong>PCAP Tracing (specific):</strong> <code>csma.EnablePcap("second", csmaDevices.Get(1), true)</code> — last arg = promiscuous mode.</li>
+    <li>Use <code>tcpdump -nn -tt -r filename.pcap</code> to read pcap files.</li>
+  </ul>
+</div>
+
+<!-- CH 7 -->
+<div class="ch-card">
+  <div class="ch-card-header">
+    <div class="ch-icon green">🌐</div>
+    <div>
+      <div class="ch-title">Chapter 7 — Building Topologies</div>
+      <div class="ch-subtitle">second.cc (P2P+CSMA) · third.cc (P2P+CSMA+WiFi) · Queues</div>
+    </div>
+  </div>
+  <ul class="key-points">
+    <li><strong>second.cc topology:</strong> P2P link (10.1.1.0) connected to a CSMA bus network (10.1.2.0). Client on P2P node, server on last CSMA node.</li>
+    <li><strong>CsmaHelper:</strong> <code>csma.SetChannelAttribute("DataRate", StringValue("100Mbps"))</code> and <code>Delay</code> set in NanoSeconds. Data rate is a <strong>channel</strong> attribute (not device) in CSMA.</li>
+    <li><strong>Global Routing:</strong> <code>Ipv4GlobalRoutingHelper::PopulateRoutingTables()</code> — acts like OSPF, auto-configures all routing tables.</li>
+    <li><strong>Promiscuous PCAP:</strong> <code>csma.EnablePcap("second", csmaDevices.Get(1), true)</code> — sniffs all traffic like tcpdump. Non-promiscuous sees only that node's traffic.</li>
+    <li>PCAP file naming: <code>&lt;prefix&gt;-&lt;node&gt;-&lt;device&gt;.pcap</code></li>
+    <li>ARP is visible in CSMA traces — node must resolve MAC before sending.</li>
+    <li><strong>third.cc topology:</strong> Adds Wi-Fi network (10.1.3.0) with STAs + AP on top of second.cc topology.</li>
+    <li><strong>Wifi Setup:</strong> <code>YansWifiChannelHelper</code> → <code>YansWifiPhyHelper</code> → <code>WifiMacHelper</code> → <code>WifiHelper</code>. STA uses <code>ns3::StaWifiMac</code>, AP uses <code>ns3::ApWifiMac</code>.</li>
+    <li><strong>Mobility:</strong> <code>GridPositionAllocator</code> for initial placement. STAs use <code>RandomWalk2dMobilityModel</code>; AP uses <code>ConstantPositionMobilityModel</code>.</li>
+    <li>WiFi beacons are self-sustaining → must call <code>Simulator::Stop(Seconds(10.0))</code>.</li>
+    <li><strong>Two queue layers:</strong> (1) Traffic Control Layer (TDL) — device-independent QoS; (2) NetDevice layer — device-specific. Default is <code>PFifoFastQueueDisc</code> (1000 packets).</li>
+    <li>Default NetDevice queue: <strong>DropTail, 100 packets</strong> for P2P, CSMA, WiFi.</li>
+  </ul>
+</div>
+
+<!-- CH 8 -->
+<div class="ch-card">
+  <div class="ch-card-header">
+    <div class="ch-icon yellow">🔍</div>
+    <div>
+      <div class="ch-title">Chapter 8 — Tracing</div>
+      <div class="ch-subtitle">Trace Sources · Trace Sinks · Callbacks · Config Paths</div>
+    </div>
+  </div>
+  <ul class="key-points">
+    <li><strong>Trace Source:</strong> An entity that signals when events happen — e.g., packet received, TCP congestion window change.</li>
+    <li><strong>Trace Sink:</strong> A function that consumes trace events. It must have a matching callback signature.</li>
+    <li><strong>TracedValue&lt;T&gt;:</strong> Wraps a variable so any change triggers a callback with old + new value.</li>
+    <li><strong>TracedCallback&lt;T1,...&gt;:</strong> A list of callbacks, all called when an event fires.</li>
+    <li><strong>Connect without context:</strong> <code>obj->TraceConnectWithoutContext("AttrName", MakeCallback(&amp;MyFunc))</code></li>
+    <li><strong>Connect with context (config path):</strong> <code>Config::Connect("/NodeList/7/$ns3::MobilityModel/CourseChange", MakeCallback(&amp;CourseChange))</code></li>
+    <li><strong>Config Path syntax:</strong> <code>/NodeList/[i]/$ns3::TypeName/TraceSourceName</code>. The <code>$</code> means GetObject (aggregated object).</li>
+    <li><strong>Callback signature for CourseChange (with context):</strong> <code>void fn(std::string context, Ptr&lt;const MobilityModel&gt; model)</code></li>
+    <li><strong>NS_LOG is not tracing</strong> — tracing is stable, API-driven, available in optimized builds. NS_LOG is debug-only.</li>
+    <li>Find all trace sources in ns-3 Doxygen: "All TraceSources" list. Config paths are in the class "Detailed Description".</li>
+  </ul>
+</div>
+
+<!-- CH 9 -->
+<div class="ch-card">
+  <div class="ch-card-header">
+    <div class="ch-icon purple">📊</div>
+    <div>
+      <div class="ch-title">Chapter 9 — Data Collection</div>
+      <div class="ch-subtitle">GnuplotHelper · FileHelper · Probes · Trace Types</div>
+    </div>
+  </div>
+  <ul class="key-points">
+    <li>Data Collection framework introduced in ns-3.18 — provides structured output from simulations.</li>
+    <li><strong>GnuplotHelper:</strong> Auto-generates gnuplot <code>.plt</code>, <code>.dat</code>, and a shell script to produce a <code>.png</code> plot.</li>
+    <li><code>plotHelper.ConfigurePlot("prefix","Title","X-Axis","Y-Axis")</code> sets up the plot.</li>
+    <li><code>plotHelper.PlotProbe(probeType, tracePath, "OutputBytes", "Label", GnuplotAggregator::KEY_BELOW)</code> hooks trace source to plot.</li>
+    <li><strong>FileHelper:</strong> Writes time-stamped data to text files. <code>fileHelper.ConfigureFile("prefix", FileAggregator::FORMATTED)</code>.</li>
+    <li><code>fileHelper.Set2dFormat("Time = %.3e\tBytes = %.0f")</code> sets format. <code>fileHelper.WriteProbe(probeType, tracePath, "OutputBytes")</code> hooks it.</li>
+    <li><strong>Probe types:</strong> <code>ns3::Ipv4PacketProbe</code>, <code>ns3::Ipv6PacketProbe</code>, <code>ns3::PacketProbe</code>, <code>ns3::ApplicationPacketProbe</code>.</li>
+    <li>Wildcard <code>*</code> in trace path matches multiple nodes; GnuplotHelper overlays them on one plot; FileHelper creates separate files per match.</li>
+  </ul>
+</div>
+
+<!-- CHEATSHEET -->
+<div class="section-header">
+  <span class="section-num yellow">CHEAT</span>
+  <h2>Quick Reference Cheatsheet</h2>
+</div>
+<div class="cheat-grid">
+  <div class="cheat-card">
+    <h4>// KEY HELPERS</h4>
+    <div class="cheat-row"><span class="cheat-key">NodeContainer</span><span class="cheat-val">Create nodes</span></div>
+    <div class="cheat-row"><span class="cheat-key">PointToPointHelper</span><span class="cheat-val">P2P link</span></div>
+    <div class="cheat-row"><span class="cheat-key">CsmaHelper</span><span class="cheat-val">Bus (Ethernet) link</span></div>
+    <div class="cheat-row"><span class="cheat-key">WifiHelper</span><span class="cheat-val">802.11 WiFi</span></div>
+    <div class="cheat-row"><span class="cheat-key">InternetStackHelper</span><span class="cheat-val">Install TCP/IP</span></div>
+    <div class="cheat-row"><span class="cheat-key">Ipv4AddressHelper</span><span class="cheat-val">Assign IPs</span></div>
+    <div class="cheat-row"><span class="cheat-key">MobilityHelper</span><span class="cheat-val">Node movement</span></div>
+  </div>
+  <div class="cheat-card">
+    <h4>// LOG LEVELS (low→high)</h4>
+    <div class="cheat-row"><span class="cheat-key">LOG_ERROR</span><span class="cheat-val">Errors only</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_WARN</span><span class="cheat-val">Warnings</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_DEBUG</span><span class="cheat-val">Debug msgs</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_INFO</span><span class="cheat-val">Info messages</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_FUNCTION</span><span class="cheat-val">Function calls</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_LOGIC</span><span class="cheat-val">Logic flow</span></div>
+    <div class="cheat-row"><span class="cheat-key">LOG_ALL</span><span class="cheat-val">Everything</span></div>
+  </div>
+  <div class="cheat-card">
+    <h4>// IP ADDRESSING</h4>
+    <div class="cheat-row"><span class="cheat-key">P2P network</span><span class="cheat-val">10.1.1.0/24</span></div>
+    <div class="cheat-row"><span class="cheat-key">CSMA network</span><span class="cheat-val">10.1.2.0/24</span></div>
+    <div class="cheat-row"><span class="cheat-key">WiFi network</span><span class="cheat-val">10.1.3.0/24</span></div>
+    <div class="cheat-row"><span class="cheat-key">Default P2P rate</span><span class="cheat-val">5Mbps</span></div>
+    <div class="cheat-row"><span class="cheat-key">Default P2P delay</span><span class="cheat-val">2ms</span></div>
+    <div class="cheat-row"><span class="cheat-key">Default CSMA rate</span><span class="cheat-val">100Mbps</span></div>
+    <div class="cheat-row"><span class="cheat-key">Echo server port</span><span class="cheat-val">9</span></div>
+  </div>
+  <div class="cheat-card">
+    <h4>// SIMULATOR CALLS</h4>
+    <div class="cheat-row"><span class="cheat-key">Simulator::Run()</span><span class="cheat-val">Start simulation</span></div>
+    <div class="cheat-row"><span class="cheat-key">Simulator::Destroy()</span><span class="cheat-val">Cleanup objects</span></div>
+    <div class="cheat-row"><span class="cheat-key">Simulator::Stop(t)</span><span class="cheat-val">Force stop at t</span></div>
+    <div class="cheat-row"><span class="cheat-key">Seconds(1.0)</span><span class="cheat-val">Time value</span></div>
+    <div class="cheat-row"><span class="cheat-key">NanoSeconds(6560)</span><span class="cheat-val">Time value ns</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: SHORT QUESTIONS
+═══════════════════════════════════════════ -->
+<div class="section-header">
+  <span class="section-num">SHORT Q</span>
+  <h2>Short Questions & Answers</h2>
+</div>
+
+<button class="toggle-btn" onclick="toggleAll('short')">▶ Expand All Answers</button>
+
+<div class="qa-grid" id="short">
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is ns-3 and what type of simulator is it?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>ns-3 is an open-source <strong>Discrete Event Simulator (DES)</strong> for network simulation. In a discrete-event simulator, each event is associated with a time, and the simulator processes events in chronological order. Events can schedule future events. The simulation stops when the event queue is empty or a Stop event is hit.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is the purpose of the <code>NodeContainer</code> in ns-3?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p><code>NodeContainer</code> is a topology helper that creates, manages, and provides access to <code>Node</code> objects. A Node represents a computer in the simulation. Example:</p>
+      <pre><span class="kw">NodeContainer</span> nodes;
+nodes.Create(<span class="num">2</span>); <span class="cm">// Creates 2 nodes</span></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is the difference between a <code>NetDevice</code> and a <code>Channel</code> in ns-3?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>A <strong>NetDevice</strong> corresponds to a network interface card (NIC) — hardware attached to a node. A <strong>Channel</strong> corresponds to the network cable or medium connecting devices. The <code>PointToPointHelper</code> configures both together: <code>DataRate</code> is a device attribute, <code>Delay</code> is a channel attribute.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What does <code>InternetStackHelper</code> do?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>It installs the Internet protocol stack (TCP, UDP, IP, etc.) on nodes. Without this, nodes cannot communicate using standard internet protocols.</p>
+      <pre><span class="kw">InternetStackHelper</span> stack;
+stack.Install(nodes);</pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What are the 7 logging levels in ns-3? Which is most verbose?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>From least to most verbose: <code>LOG_ERROR</code> → <code>LOG_WARN</code> → <code>LOG_DEBUG</code> → <code>LOG_INFO</code> → <code>LOG_FUNCTION</code> → <code>LOG_LOGIC</code> → <code>LOG_ALL</code>.</p>
+      <p><strong>LOG_ALL</strong> is the most verbose. Using <code>LOG_LEVEL_X</code> enables level X and all levels below it. <code>NS_LOG_UNCOND</code> always prints regardless of level settings.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      When is <code>Simulator::Stop()</code> necessary?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>It is <strong>required</strong> when there are <strong>self-sustaining (recurring) events</strong> that keep rescheduling themselves and would prevent the event queue from ever becoming empty. Examples: Wi-Fi beacons (AP keeps sending them forever), FlowMonitor's periodic checks, RIPng routing table updates. Without <code>Simulator::Stop()</code>, the simulation runs forever.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is the difference between a <strong>trace source</strong> and a <strong>trace sink</strong>?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>A <strong>trace source</strong> is a point in the simulation code that generates events/data (e.g., when a packet is received, when a TCP congestion window changes). A <strong>trace sink</strong> is a user-provided function (callback) that consumes these events and does something with the data (like logging or plotting). Trace sources are producers; trace sinks are consumers.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What does the <code>$</code> symbol mean in a Config path like <code>/NodeList/7/$ns3::MobilityModel/CourseChange</code>?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>The <code>$</code> prefix tells the Config system to call <code>GetObject&lt;TypeName&gt;()</code> to retrieve an aggregated object of that type from the current object. It's how ns-3 switches from one object type to another that was previously aggregated to it (e.g., switching from a <code>Node</code> to its <code>MobilityModel</code>).</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is the difference between promiscuous and non-promiscuous PCAP tracing?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p><strong>Promiscuous mode</strong> (<code>true</code>): The device sniffs <em>all</em> traffic on the network, including packets not addressed to it — like <code>tcpdump</code>. <strong>Non-promiscuous</strong> (<code>false</code>): Only captures packets sent or received by that specific device. In CSMA traces, a bystander node in non-promiscuous mode only sees ARP broadcasts, not unicast packets.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is <code>Ipv4GlobalRoutingHelper::PopulateRoutingTables()</code> and why is it needed in second.cc?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>It automatically computes and installs routing tables on all nodes in the simulation. It works like OSPF but uses global knowledge (it can "see" the entire topology). In <code>second.cc</code> we have an internetwork (P2P + CSMA), so packets need routing between the two subnets — without this, packets cannot be forwarded across network boundaries.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is a <code>TracedValue&lt;T&gt;</code>?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>A <code>TracedValue&lt;T&gt;</code> wraps a primitive data type and overloads the assignment operator so that whenever the value changes, it automatically invokes all registered callbacks with the <strong>old value</strong> and the <strong>new value</strong>. This is the core mechanism behind fine-grained ns-3 tracing.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What is the default queueing discipline installed on a NetDevice in ns-3?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p>The default is <strong>PFifoFastQueueDisc</strong> (Priority FIFO Fast Queue Discipline), with a max size of 1000 packets, installed automatically when an IPv4/IPv6 address is assigned to an interface. At the device level, a <strong>DropTail queue of 100 packets</strong> is the default for P2P, CSMA, and WiFi devices.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge">SHORT</span>
+      What do GnuplotHelper and FileHelper do in Chapter 9?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">ANSWER</div>
+      <p><strong>GnuplotHelper</strong> hooks a trace source to a data collection pipeline and automatically generates gnuplot files (<code>.dat</code>, <code>.plt</code>, <code>.sh</code>) that produce PNG plots of the data over time.</p>
+      <p><strong>FileHelper</strong> is similar but writes timestamped data to formatted text files instead of plots. With a wildcard path, GnuplotHelper overlays all matches on one plot; FileHelper creates a separate file per match.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: MCQs
+═══════════════════════════════════════════ -->
+<div class="section-header">
+  <span class="section-num red">MCQ</span>
+  <h2>Multiple Choice Questions</h2>
+</div>
+
+<button class="toggle-btn" onclick="toggleAll('mcq')">▶ Reveal All Answers</button>
+
+<div class="qa-grid" id="mcq">
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      Which of the following is a <strong>device</strong> attribute (not a channel attribute) in PointToPointHelper?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> Delay</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">B)</span> DataRate ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">C)</span> MTU</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> EncapsulationMode</div>
+      </div>
+      <p><span class="correct">Answer: B</span> — <code>DataRate</code> is set on the <code>PointToPointNetDevice</code> (device attribute). <code>Delay</code> is set on the <code>PointToPointChannel</code> (channel attribute).</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      In ns-3, which method is called to clean up all created objects after a simulation?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> Simulator::Stop()</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">B)</span> Simulator::Run()</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">C)</span> Simulator::Destroy() ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> Simulator::Reset()</div>
+      </div>
+      <p><span class="correct">Answer: C</span> — <code>Simulator::Destroy()</code> cleans up all objects created during the simulation by calling all registered destruction hooks.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      What does <code>LOG_LEVEL_INFO</code> enable?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> Only INFO messages</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">B)</span> INFO, DEBUG, WARN, and ERROR messages ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">C)</span> All log messages including FUNCTION and LOGIC</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> INFO and FUNCTION only</div>
+      </div>
+      <p><span class="correct">Answer: B</span> — <code>LOG_LEVEL_X</code> enables X and all levels below it (less verbose). INFO enables: INFO, DEBUG, WARN, ERROR.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      Which class is used to set Wi-Fi station MAC type in third.cc?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> YansWifiChannelHelper</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">B)</span> WifiMacHelper ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">C)</span> WifiHelper</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> YansWifiPhyHelper</div>
+      </div>
+      <p><span class="correct">Answer: B</span> — <code>WifiMacHelper</code> is used to set the MAC type via <code>mac.SetType("ns3::StaWifiMac", ...)</code> for stations and <code>"ns3::ApWifiMac"</code> for access points.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      In CSMA (second.cc), the <code>DataRate</code> attribute is set on which object?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> CsmaNetDevice (device)</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">B)</span> CsmaChannel (channel) ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">C)</span> NodeContainer</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> InternetStackHelper</div>
+      </div>
+      <p><span class="correct">Answer: B</span> — Unlike P2P where DataRate is a device attribute, in CSMA it is a <strong>channel</strong> attribute. This is because a shared CSMA medium must have one data rate for all attached devices (you can't mix 10Base-T and 100Base-T on the same bus).</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      NS_LOG output is available in which build type?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> Optimized builds only</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">B)</span> Debug builds only ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">C)</span> Both debug and optimized builds</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> Release builds only</div>
+      </div>
+      <p><span class="correct">Answer: B</span> — NS_LOG output is only available in debug builds. Tracing (not logging) is the mechanism to use in optimized builds for stable output.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      What mobility model is used for Wi-Fi STA nodes in third.cc?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> ConstantPositionMobilityModel</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">B)</span> GridPositionAllocator</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">C)</span> RandomWalk2dMobilityModel ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> ConstantVelocityMobilityModel</div>
+      </div>
+      <p><span class="correct">Answer: C</span> — STAs use <code>RandomWalk2dMobilityModel</code> (move randomly within a bounding box). The AP uses <code>ConstantPositionMobilityModel</code> to stay fixed. <code>GridPositionAllocator</code> is used for initial placement only.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge mcq">MCQ</span>
+      The PCAP filename <code>second-2-0.pcap</code> corresponds to which node and device?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="mcq-options">
+        <div class="mcq-opt wrong-opt"><span class="opt-label">A)</span> Node 0, Device 2</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">B)</span> Node 0, Device 0 — second script</div>
+        <div class="mcq-opt correct-opt"><span class="opt-label">C)</span> Node 2, Device 0 ✓</div>
+        <div class="mcq-opt wrong-opt"><span class="opt-label">D)</span> Second simulation, Node 2</div>
+      </div>
+      <p><span class="correct">Answer: C</span> — PCAP files are named <code>&lt;prefix&gt;-&lt;node&gt;-&lt;device&gt;.pcap</code>. So <code>second-2-0.pcap</code> = prefix "second", node 2, device 0.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: SCENARIO BASED
+═══════════════════════════════════════════ -->
+<div class="section-header">
+  <span class="section-num red">SCENARIO</span>
+  <h2>Scenario-Based Questions (Output + Why)</h2>
+</div>
+
+<button class="toggle-btn" onclick="toggleAll('scenario')">▶ Show All Answers</button>
+
+<div class="qa-grid" id="scenario">
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      What is the output when you run <code>first.cc</code> with default settings? Explain each line.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <pre>At time +2s client sent 1024 bytes to 10.1.1.2 port 9
+At time +2.00369s server received 1024 bytes from 10.1.1.1 port 49153
+At time +2.00369s server sent 1024 bytes to 10.1.1.1 port 49153
+At time +2.00737s client received 1024 bytes from 10.1.1.2 port 9</pre>
+      <ul>
+        <li><strong>Line 1:</strong> Client (10.1.1.1, node 0) starts at t=2s (not t=1s — server starts at 1s, client at 2s). It sends 1024 bytes to server at 10.1.1.2.</li>
+        <li><strong>Line 2:</strong> Server receives it at t≈2.00369s. The delay is propagation (2ms) + transmission time over 5Mbps link. Server logs source address (client IP) and ephemeral port.</li>
+        <li><strong>Line 3:</strong> Server immediately echoes the packet back at the same time.</li>
+        <li><strong>Line 4:</strong> Client receives the echoed packet at t≈2.00737s (roughly 2× the one-way delay added to t=2s).</li>
+      </ul>
+      <p>The simulation ends after t=10s when both Start/Stop events fire. The total round-trip is ~7.37ms.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      You add <code>Simulator::Stop(Seconds(1.0))</code> before <code>Simulator::Run()</code> in first.cc. What happens? Why?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <p><strong>Output:</strong> <em>No output is printed at all.</em></p>
+      <p><strong>Why:</strong> The Stop event fires at t=1.0s. The client starts at t=2.0s and the server starts at t=1.0s — but since the Stop event at t=1.0s terminates the simulation before t=2.0s, the echo client never gets to send its packet. No packets are sent, so no log messages are printed. The simulation exits immediately after the stop event.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      In second.cc, when you run <code>tcpdump -nn -tt -r second-2-0.pcap</code>, you see ARP requests. Why?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <pre>2.007698 ARP, Request who-has 10.1.2.4 (ff:ff:ff:ff:ff:ff) tell 10.1.2.1, length 50
+2.007710 ARP, Reply 10.1.2.4 is-at 00:00:00:00:00:06, length 50
+2.007803 IP 10.1.1.1.49153 → 10.1.2.4.9: UDP, length 1024
+...</pre>
+      <p><strong>Why ARP appears:</strong> The CSMA network uses Ethernet (MAC addresses). When node 1 wants to forward the packet to 10.1.2.4, it knows the IP but not the MAC address. It broadcasts an ARP Request to the entire CSMA bus (<code>ff:ff:ff:ff:ff:ff</code> = broadcast). Node 4 (which has 10.1.2.4) replies with its MAC. This is standard Ethernet ARP behavior — IP alone is not enough for layer-2 delivery on a bus network.</p>
+      <p>Node 2 is captured here because it is in <strong>promiscuous mode</strong> — it sees all traffic including ARP broadcasts and unicast packets it's not the target of.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      You set <code>export NS_LOG=UdpEchoClientApplication=level_all</code> and run first.cc. How does the output change compared to the default?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <p><strong>Default output:</strong> Only 4 lines (sent/received messages at INFO level).</p>
+      <p><strong>With level_all:</strong> Many additional lines appear showing every function call within the UdpEchoClientApplication, e.g.:</p>
+      <pre>UdpEchoClientApplication:UdpEchoClient(0xef90d0)
+UdpEchoClientApplication:SetDataSize(0xef90d0, 1024)
+UdpEchoClientApplication:StartApplication(0xef90d0)
+...</pre>
+      <p><strong>Why:</strong> <code>level_all</code> enables ALL log levels including <code>LOG_FUNCTION</code> which logs every method call. The <code>NS_LOG</code> environment variable overrides what was set by <code>LogComponentEnable()</code> in code, giving more verbosity at runtime without recompiling.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      In third.cc, why must you call <code>Simulator::Stop(Seconds(10.0))</code> explicitly?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">EXPLANATION</div>
+      <p>The Wi-Fi Access Point continuously generates <strong>beacon frames</strong> at regular intervals (e.g., every ~102ms). Each beacon schedules the next beacon — this creates a <strong>self-sustaining (recurring) event</strong>. The event queue never becomes empty on its own.</p>
+      <p>Without <code>Simulator::Stop()</code>, <code>Simulator::Run()</code> would <strong>never return</strong> — it would loop forever processing beacon events into infinite simulated time. The explicit stop forces the simulation to terminate at t=10s regardless of pending events.</p>
+      <p><strong>Note:</strong> <code>Simulator::Stop()</code> must be called <em>before</em> <code>Simulator::Run()</code>.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      In fourth.cc (tracing example), after running <code>myObject->m_myInt = 1234</code>, what is printed and why?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <pre>Traced 0 to 1234</pre>
+      <p><strong>Why:</strong> <code>m_myInt</code> is a <code>TracedValue&lt;int32_t&gt;</code>, initialized to 0. When assigned 1234, the overloaded <code>operator=</code> fires the callback. The connected trace sink <code>IntTrace</code> receives the old value (0) and new value (1234) and prints them.</p>
+      <p>The connection was made via: <code>myObject->TraceConnectWithoutContext("MyInteger", MakeCallback(&amp;IntTrace))</code></p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge scenario">SCENARIO</span>
+      You run second.cc with <code>--nCsma=4</code>. How does the server IP change? Where does the server now reside?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">OUTPUT + EXPLANATION</div>
+      <pre>At time +2s client sent 1024 bytes to 10.1.2.5 port 9
+...</pre>
+      <p><strong>Why:</strong> With <code>nCsma=4</code> extra nodes, the CSMA subnet has 5 nodes (indices 0–4 in csmaNodes). The server is always installed on <code>csmaNodes.Get(nCsma)</code> = the 4th extra node (index 4). This gets assigned IP <code>10.1.2.5</code> (starting from 10.1.2.1 for node 0). With default <code>nCsma=3</code>, server is at 10.1.2.4; with <code>nCsma=4</code>, it's at 10.1.2.5.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: CODE COMPLETION
+═══════════════════════════════════════════ -->
+<div class="section-header">
+  <span class="section-num green">CODE</span>
+  <h2>Code Completion / Topology Building</h2>
+</div>
+
+<div class="tip-box">
+  <span class="tip-icon">💡</span><b>Exam tip:</b> These are the most likely "fill in the blank" or "complete the code" type questions. Master the sequence: Nodes → Link → Devices → Stack → IPs → Apps → Simulate.
+</div>
+
+<button class="toggle-btn" onclick="toggleAll('code')">▶ Show All Answers</button>
+
+<div class="qa-grid" id="code">
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      Complete the basic point-to-point topology (first.cc pattern). Fill the blanks for a 2-node echo simulation.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">COMPLETE CODE — first.cc</div>
+      <pre><span class="cm">// 1. Include modules</span>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+
+<span class="kw">using namespace</span> ns3;
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">int</span> argc, <span class="kw">char</span>* argv[]) {
+  <span class="cm">// 2. Create nodes</span>
+  <span class="ty">NodeContainer</span> nodes;
+  nodes.<span class="fn">Create</span>(<span class="num">2</span>);
+
+  <span class="cm">// 3. Set up P2P link</span>
+  <span class="ty">PointToPointHelper</span> pointToPoint;
+  pointToPoint.<span class="fn">SetDeviceAttribute</span>(<span class="str">"DataRate"</span>, <span class="ty">StringValue</span>(<span class="str">"5Mbps"</span>));
+  pointToPoint.<span class="fn">SetChannelAttribute</span>(<span class="str">"Delay"</span>, <span class="ty">StringValue</span>(<span class="str">"2ms"</span>));
+
+  <span class="cm">// 4. Install devices</span>
+  <span class="ty">NetDeviceContainer</span> devices;
+  devices = pointToPoint.<span class="fn">Install</span>(nodes);
+
+  <span class="cm">// 5. Install Internet stack</span>
+  <span class="ty">InternetStackHelper</span> stack;
+  stack.<span class="fn">Install</span>(nodes);
+
+  <span class="cm">// 6. Assign IP addresses</span>
+  <span class="ty">Ipv4AddressHelper</span> address;
+  address.<span class="fn">SetBase</span>(<span class="str">"10.1.1.0"</span>, <span class="str">"255.255.255.0"</span>);
+  <span class="ty">Ipv4InterfaceContainer</span> interfaces = address.<span class="fn">Assign</span>(devices);
+
+  <span class="cm">// 7. Install server on node 1</span>
+  <span class="ty">UdpEchoServerHelper</span> echoServer(<span class="num">9</span>);
+  <span class="ty">ApplicationContainer</span> serverApps = echoServer.<span class="fn">Install</span>(nodes.<span class="fn">Get</span>(<span class="num">1</span>));
+  serverApps.<span class="fn">Start</span>(<span class="fn">Seconds</span>(<span class="num">1.0</span>));
+  serverApps.<span class="fn">Stop</span>(<span class="fn">Seconds</span>(<span class="num">10.0</span>));
+
+  <span class="cm">// 8. Install client on node 0 pointing to node 1</span>
+  <span class="ty">UdpEchoClientHelper</span> echoClient(interfaces.<span class="fn">GetAddress</span>(<span class="num">1</span>), <span class="num">9</span>);
+  echoClient.<span class="fn">SetAttribute</span>(<span class="str">"MaxPackets"</span>, <span class="ty">UintegerValue</span>(<span class="num">1</span>));
+  echoClient.<span class="fn">SetAttribute</span>(<span class="str">"Interval"</span>, <span class="ty">TimeValue</span>(<span class="fn">Seconds</span>(<span class="num">1.0</span>)));
+  echoClient.<span class="fn">SetAttribute</span>(<span class="str">"PacketSize"</span>, <span class="ty">UintegerValue</span>(<span class="num">1024</span>));
+  <span class="ty">ApplicationContainer</span> clientApps = echoClient.<span class="fn">Install</span>(nodes.<span class="fn">Get</span>(<span class="num">0</span>));
+  clientApps.<span class="fn">Start</span>(<span class="fn">Seconds</span>(<span class="num">2.0</span>));
+  clientApps.<span class="fn">Stop</span>(<span class="fn">Seconds</span>(<span class="num">10.0</span>));
+
+  <span class="cm">// 9. Run simulation</span>
+  Simulator::<span class="fn">Run</span>();
+  Simulator::<span class="fn">Destroy</span>();
+  <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      How do you add a CSMA network to a P2P topology? Write the key code snippet for second.cc.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">KEY SNIPPET — second.cc CSMA setup</div>
+      <div class="topo-box">// Topology: P2P node0 --- node1 === csmaNode2, csmaNode3, csmaNode4
+//           10.1.1.0                   10.1.2.0</div>
+      <pre><span class="cm">// Create P2P nodes</span>
+<span class="ty">NodeContainer</span> p2pNodes;
+p2pNodes.<span class="fn">Create</span>(<span class="num">2</span>);
+
+<span class="cm">// Create CSMA nodes: p2pNodes.Get(1) + 3 extra</span>
+<span class="ty">NodeContainer</span> csmaNodes;
+csmaNodes.<span class="fn">Add</span>(p2pNodes.<span class="fn">Get</span>(<span class="num">1</span>));   <span class="cm">// node1 is shared</span>
+csmaNodes.<span class="fn">Create</span>(nCsma);           <span class="cm">// nCsma extra nodes</span>
+
+<span class="cm">// CSMA helper - DataRate is a CHANNEL attribute</span>
+<span class="ty">CsmaHelper</span> csma;
+csma.<span class="fn">SetChannelAttribute</span>(<span class="str">"DataRate"</span>, <span class="ty">StringValue</span>(<span class="str">"100Mbps"</span>));
+csma.<span class="fn">SetChannelAttribute</span>(<span class="str">"Delay"</span>, <span class="ty">TimeValue</span>(<span class="fn">NanoSeconds</span>(<span class="num">6560</span>)));
+
+<span class="ty">NetDeviceContainer</span> csmaDevices = csma.<span class="fn">Install</span>(csmaNodes);
+
+<span class="cm">// Install stacks (node1 already in csmaNodes, skip p2pNodes.Get(1))</span>
+<span class="ty">InternetStackHelper</span> stack;
+stack.<span class="fn">Install</span>(p2pNodes.<span class="fn">Get</span>(<span class="num">0</span>));
+stack.<span class="fn">Install</span>(csmaNodes);
+
+<span class="cm">// Assign IPs</span>
+<span class="ty">Ipv4AddressHelper</span> address;
+address.<span class="fn">SetBase</span>(<span class="str">"10.1.1.0"</span>, <span class="str">"255.255.255.0"</span>);
+<span class="ty">Ipv4InterfaceContainer</span> p2pInterfaces = address.<span class="fn">Assign</span>(p2pDevices);
+
+address.<span class="fn">SetBase</span>(<span class="str">"10.1.2.0"</span>, <span class="str">"255.255.255.0"</span>);
+<span class="ty">Ipv4InterfaceContainer</span> csmaInterfaces = address.<span class="fn">Assign</span>(csmaDevices);
+
+<span class="cm">// Global routing (required for multi-network)</span>
+Ipv4GlobalRoutingHelper::<span class="fn">PopulateRoutingTables</span>();
+
+<span class="cm">// Enable promiscuous PCAP on CSMA node 1</span>
+csma.<span class="fn">EnablePcap</span>(<span class="str">"second"</span>, csmaDevices.<span class="fn">Get</span>(<span class="num">1</span>), <span class="kw">true</span>);</pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      Write the Wi-Fi setup code for third.cc — creating STA nodes and AP node with mobility.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">KEY SNIPPET — third.cc WiFi setup</div>
+      <pre><span class="cm">// Create STA nodes; AP reuses leftmost P2P node</span>
+<span class="ty">NodeContainer</span> wifiStaNodes;
+wifiStaNodes.<span class="fn">Create</span>(nWifi);
+<span class="ty">NodeContainer</span> wifiApNode = p2pNodes.<span class="fn">Get</span>(<span class="num">0</span>);
+
+<span class="cm">// PHY and Channel setup</span>
+<span class="ty">YansWifiChannelHelper</span> channel = YansWifiChannelHelper::<span class="fn">Default</span>();
+<span class="ty">YansWifiPhyHelper</span> phy = YansWifiPhyHelper::<span class="fn">Default</span>();
+phy.<span class="fn">SetChannel</span>(channel.<span class="fn">Create</span>());
+
+<span class="cm">// MAC setup</span>
+<span class="ty">WifiMacHelper</span> mac;
+<span class="ty">Ssid</span> ssid = <span class="fn">Ssid</span>(<span class="str">"ns-3-ssid"</span>);
+<span class="ty">WifiHelper</span> wifi;
+
+<span class="cm">// Install STA devices</span>
+mac.<span class="fn">SetType</span>(<span class="str">"ns3::StaWifiMac"</span>,
+            <span class="str">"Ssid"</span>, <span class="ty">SsidValue</span>(ssid),
+            <span class="str">"ActiveProbing"</span>, <span class="ty">BooleanValue</span>(<span class="kw">false</span>));
+<span class="ty">NetDeviceContainer</span> staDevices = wifi.<span class="fn">Install</span>(phy, mac, wifiStaNodes);
+
+<span class="cm">// Install AP device</span>
+mac.<span class="fn">SetType</span>(<span class="str">"ns3::ApWifiMac"</span>, <span class="str">"Ssid"</span>, <span class="ty">SsidValue</span>(ssid));
+<span class="ty">NetDeviceContainer</span> apDevices = wifi.<span class="fn">Install</span>(phy, mac, wifiApNode);
+
+<span class="cm">// Mobility: STA nodes move randomly, AP stays fixed</span>
+<span class="ty">MobilityHelper</span> mobility;
+mobility.<span class="fn">SetPositionAllocator</span>(<span class="str">"ns3::GridPositionAllocator"</span>,
+    <span class="str">"MinX"</span>, <span class="ty">DoubleValue</span>(<span class="num">0.0</span>), <span class="str">"MinY"</span>, <span class="ty">DoubleValue</span>(<span class="num">0.0</span>),
+    <span class="str">"DeltaX"</span>, <span class="ty">DoubleValue</span>(<span class="num">5.0</span>), <span class="str">"DeltaY"</span>, <span class="ty">DoubleValue</span>(<span class="num">10.0</span>),
+    <span class="str">"GridWidth"</span>, <span class="ty">UintegerValue</span>(<span class="num">3</span>),
+    <span class="str">"LayoutType"</span>, <span class="ty">StringValue</span>(<span class="str">"RowFirst"</span>));
+mobility.<span class="fn">SetMobilityModel</span>(<span class="str">"ns3::RandomWalk2dMobilityModel"</span>,
+    <span class="str">"Bounds"</span>, <span class="ty">RectangleValue</span>(<span class="fn">Rectangle</span>(-<span class="num">50</span>, <span class="num">50</span>, -<span class="num">50</span>, <span class="num">50</span>)));
+mobility.<span class="fn">Install</span>(wifiStaNodes);
+
+mobility.<span class="fn">SetMobilityModel</span>(<span class="str">"ns3::ConstantPositionMobilityModel"</span>);
+mobility.<span class="fn">Install</span>(wifiApNode);
+
+<span class="cm">// Assign WiFi IPs (10.1.3.0)</span>
+address.<span class="fn">SetBase</span>(<span class="str">"10.1.3.0"</span>, <span class="str">"255.255.255.0"</span>);
+address.<span class="fn">Assign</span>(staDevices);
+address.<span class="fn">Assign</span>(apDevices);
+
+<span class="cm">// WiFi beacons are recurring → MUST stop explicitly</span>
+Simulator::<span class="fn">Stop</span>(<span class="fn">Seconds</span>(<span class="num">10.0</span>));</pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      Write a trace sink function and connect it to the CourseChange trace source using a Config path.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">TRACING CODE PATTERN</div>
+      <pre><span class="cm">// Trace sink function — must match callback signature</span>
+<span class="kw">void</span>
+<span class="fn">CourseChange</span>(std::string context, Ptr&lt;<span class="kw">const</span> <span class="ty">MobilityModel</span>&gt; model)
+{
+  <span class="ty">Vector</span> position = model-&gt;<span class="fn">GetPosition</span>();
+  NS_LOG_UNCOND(context &lt;&lt; <span class="str">" x = "</span> &lt;&lt; position.x
+                        &lt;&lt; <span class="str">", y = "</span> &lt;&lt; position.y);
+}
+
+<span class="cm">// In main(): build config path and connect</span>
+std::ostringstream oss;
+oss &lt;&lt; <span class="str">"/NodeList/"</span>
+    &lt;&lt; wifiStaNodes.<span class="fn">Get</span>(nWifi - <span class="num">1</span>)-&gt;<span class="fn">GetId</span>()
+    &lt;&lt; <span class="str">"/$ns3::MobilityModel/CourseChange"</span>;
+
+Config::<span class="fn">Connect</span>(oss.<span class="fn">str</span>(), <span class="fn">MakeCallback</span>(&amp;CourseChange));
+<span class="cm">// Config::ConnectWithoutContext omits the context string parameter</span></pre>
+      <p>The path structure: <code>/NodeList/[nodeId]/$ns3::MobilityModel/CourseChange</code></p>
+      <ul>
+        <li><code>NodeList</code> — global list of all nodes</li>
+        <li><code>[nodeId]</code> — index (from GetId())</li>
+        <li><code>$ns3::MobilityModel</code> — GetObject call to retrieve aggregated mobility model</li>
+        <li><code>CourseChange</code> — the trace source name</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      How do you change the default queue size on a P2P link to 50 packets? Write the code.
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">QUEUE CONFIGURATION</div>
+      <pre><span class="ty">NodeContainer</span> nodes;
+nodes.<span class="fn">Create</span>(<span class="num">2</span>);
+
+<span class="ty">PointToPointHelper</span> p2p;
+p2p.<span class="fn">SetDeviceAttribute</span>(<span class="str">"DataRate"</span>, <span class="ty">StringValue</span>(<span class="str">"5Mbps"</span>));
+p2p.<span class="fn">SetChannelAttribute</span>(<span class="str">"Delay"</span>, <span class="ty">StringValue</span>(<span class="str">"2ms"</span>));
+
+<span class="cm">// Change queue size on the device</span>
+p2p.<span class="fn">SetQueue</span>(<span class="str">"ns3::DropTailQueue"</span>, <span class="str">"MaxSize"</span>, <span class="ty">StringValue</span>(<span class="str">"50p"</span>));
+
+<span class="ty">NetDeviceContainer</span> devices = p2p.<span class="fn">Install</span>(nodes);
+
+<span class="cm">// Optionally change the traffic control queue discipline</span>
+<span class="ty">InternetStackHelper</span> stack;
+stack.<span class="fn">Install</span>(nodes);
+
+<span class="ty">TrafficControlHelper</span> tch;
+tch.<span class="fn">SetRootQueueDisc</span>(<span class="str">"ns3::CoDelQueueDisc"</span>,
+                     <span class="str">"MaxSize"</span>, <span class="ty">StringValue</span>(<span class="str">"1000p"</span>));
+tch.<span class="fn">Install</span>(devices);</pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggleQA(this)">
+      <span class="q-badge code">CODE</span>
+      How do you enable ASCII and PCAP tracing in ns-3?
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="qa-a">
+      <div class="answer-label">TRACING SETUP</div>
+      <pre><span class="cm">// ASCII Tracing — human-readable .tr file</span>
+<span class="ty">AsciiTraceHelper</span> ascii;
+pointToPoint.<span class="fn">EnableAsciiAll</span>(ascii.<span class="fn">CreateFileStream</span>(<span class="str">"myfirst.tr"</span>));
+
+<span class="cm">// PCAP Tracing — all P2P devices (creates myfirst-N-M.pcap)</span>
+pointToPoint.<span class="fn">EnablePcapAll</span>(<span class="str">"myfirst"</span>);
+
+<span class="cm">// PCAP — specific CSMA device in promiscuous mode</span>
+csma.<span class="fn">EnablePcap</span>(<span class="str">"second"</span>, csmaDevices.<span class="fn">Get</span>(<span class="num">1</span>), <span class="kw">true</span>);
+<span class="cm">//                                              ^^^^ promiscuous=true</span>
+
+<span class="cm">// PCAP — specific node + device number</span>
+pointToPoint.<span class="fn">EnablePcap</span>(<span class="str">"second"</span>, p2pNodes.<span class="fn">Get</span>(<span class="num">0</span>)-&gt;<span class="fn">GetId</span>(), <span class="num">0</span>);
+
+<span class="cm">// WiFi PCAP — AP device (monitor/promiscuous mode)</span>
+phy.<span class="fn">EnablePcap</span>(<span class="str">"third"</span>, apDevices.<span class="fn">Get</span>(<span class="num">0</span>));</pre>
+      <p>Read pcap with: <code>tcpdump -nn -tt -r filename.pcap</code></p>
+    </div>
+  </div>
+
+</div>
+
+<hr class="divider">
+
+<!-- EXTRA TIPS -->
+<div class="tip-box warn">
+  <p>⚠️ <b>Exam Reminders:</b></p>
+  <ul style="margin-top:8px; padding-left:18px;">
+    <li>CSMA <code>DataRate</code> → channel attribute. P2P <code>DataRate</code> → device attribute.</li>
+    <li>Server starts at <code>Seconds(1.0)</code>, client at <code>Seconds(2.0)</code> — client always starts AFTER server.</li>
+    <li><code>InternetStackHelper</code> must be installed BEFORE assigning IP addresses.</li>
+    <li>In multi-network topologies, call <code>PopulateRoutingTables()</code> or packets won't route.</li>
+    <li>WiFi simulations need explicit <code>Simulator::Stop()</code> — beacons are self-sustaining events.</li>
+    <li>A shared node (like p2pNodes.Get(1) in csmaNodes) must NOT have stack installed twice.</li>
+    <li>Config path <code>$TypeName</code> = <code>GetObject&lt;TypeName&gt;()</code> call.</li>
+    <li>Trace sinks with <code>Config::Connect</code> get a context string; with <code>ConnectWithoutContext</code> they don't.</li>
+  </ul>
+</div>
+
+</div><!-- container -->
+
+<footer>
+  ns-3 Tutorial v39 · Chapters 5–9 · Exam Prep Guide · Generated for you 🎯
+</footer>
+
+<script>
+function toggleQA(btn) {
+  const item = btn.closest('.qa-item');
+  item.classList.toggle('open');
+}
+
+function toggleAll(sectionId) {
+  const section = document.getElementById(sectionId);
+  const items = section.querySelectorAll('.qa-item');
+  const anyOpen = [...items].some(i => i.classList.contains('open'));
+  items.forEach(i => {
+    if (anyOpen) i.classList.remove('open');
+    else i.classList.add('open');
+  });
+  const btn = section.previousElementSibling;
+  if (btn && btn.classList.contains('toggle-btn')) {
+    btn.textContent = anyOpen ? '▶ Expand All Answers' : '▼ Collapse All Answers';
+  }
+}
+</script>
+</body>
+</html>
