@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSE 322 — Advanced Networking Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700&family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1320;
+    --surface2: #111827;
+    --border: #1e2d45;
+    --green: #00ff88;
+    --cyan: #00d4ff;
+    --yellow: #ffd700;
+    --red: #ff4757;
+    --orange: #ff6b35;
+    --purple: #a855f7;
+    --text: #c9d6e8;
+    --text-dim: #6b7fa3;
+    --code-bg: #050810;
+    --card: #0e1929;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID NOISE BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,12,16,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-badge {
+    background: var(--green);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .logo-text {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .header-right {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SIDEBAR */
+  nav.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    padding: 1.5rem 0;
+  }
+
+  nav.sidebar::-webkit-scrollbar { width: 4px; }
+  nav.sidebar::-webkit-scrollbar-track { background: transparent; }
+  nav.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .nav-section-title {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 0.5rem 1.5rem 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.65rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    background: rgba(0,255,136,0.05);
+    border-left-color: var(--green);
+    color: var(--green);
+  }
+
+  .nav-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    min-width: 20px;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    flex: 1;
+    padding: 2.5rem 3rem;
+    max-width: 960px;
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 span { color: var(--green); }
+
+  .hero p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 1rem;
+  }
+
+  .topic-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+  }
+
+  .chip {
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .chip.g { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.05); }
+  .chip.c { border-color: var(--cyan); color: var(--cyan); background: rgba(0,212,255,0.05); }
+  .chip.y { border-color: var(--yellow); color: var(--yellow); background: rgba(255,215,0,0.05); }
+  .chip.p { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.05); }
+  .chip.o { border-color: var(--orange); color: var(--orange); background: rgba(255,107,53,0.05); }
+
+  /* TOPIC SECTION */
+  .topic-section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green);
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* BANGLA EXPLANATION BOX */
+  .bangla-box {
+    background: rgba(0,255,136,0.04);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 1.02rem;
+    line-height: 1.85;
+    color: #b8d4b8;
+  }
+
+  .bangla-box .bangla-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  /* CONCEPT CARD */
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .concept-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cyan);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .concept-card h3::before {
+    content: '▶';
+    font-size: 0.6rem;
+    color: var(--cyan);
+  }
+
+  .concept-card p, .concept-card li {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .concept-card ul { padding-left: 1.2rem; }
+  .concept-card ul li { margin-bottom: 4px; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    background: var(--surface2);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+
+  .code-block pre {
+    padding: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #e2e8f0;
+  }
+
+  .code-block pre .cmd { color: var(--green); }
+  .code-block pre .out { color: #64748b; }
+  .code-block pre .comment { color: #4a5568; font-style: italic; }
+  .code-block pre .highlight { color: var(--yellow); }
+  .code-block pre .keyword { color: var(--cyan); }
+  .code-block pre .string { color: var(--orange); }
+  .code-block pre .num { color: var(--purple); }
+
+  /* STEP LIST */
+  .step-list {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .step-list li {
+    counter-increment: step;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-list li::before {
+    content: counter(step);
+    min-width: 28px;
+    height: 28px;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.4);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-list li p {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+  }
+
+  .data-table th {
+    background: var(--surface2);
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+
+  .badge.open { background: rgba(0,255,136,0.15); color: var(--green); }
+  .badge.closed { background: rgba(255,71,87,0.15); color: var(--red); }
+  .badge.filtered { background: rgba(255,215,0,0.15); color: var(--yellow); }
+  .badge.unfiltered { background: rgba(0,212,255,0.15); color: var(--cyan); }
+  .badge.of { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .badge.cf { background: rgba(255,107,53,0.15); color: var(--orange); }
+
+  /* Q&A SECTION */
+  .qa-section {
+    margin-top: 2rem;
+  }
+
+  .qa-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+
+  .qa-header::before { content: '// '; color: var(--text-dim); }
+
+  .qa-item {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .qa-q {
+    padding: 1rem 1.25rem;
+    background: var(--surface2);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    transition: background 0.2s;
+  }
+
+  .qa-q:hover { background: rgba(255,215,0,0.05); }
+
+  .qa-q-text {
+    font-size: 0.88rem;
+    color: #fff;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .qa-level {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .level-easy { background: rgba(0,255,136,0.15); color: var(--green); }
+  .level-medium { background: rgba(255,215,0,0.15); color: var(--yellow); }
+  .level-hard { background: rgba(255,71,87,0.15); color: var(--red); }
+  .level-adv { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+  .qa-a {
+    display: none;
+    padding: 1rem 1.25rem;
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid var(--border);
+    font-size: 0.86rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  .qa-a.show { display: block; }
+
+  .qa-a strong { color: var(--cyan); }
+  .qa-a code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--green);
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--green), transparent);
+    margin: 2rem 0;
+    opacity: 0.3;
+  }
+
+  /* DR COMPARISON */
+  .dr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .dr-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .dr-card-head {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .cold .dr-card-head { background: rgba(0,212,255,0.1); color: var(--cyan); border-bottom: 1px solid rgba(0,212,255,0.2); }
+  .warm .dr-card-head { background: rgba(255,215,0,0.1); color: var(--yellow); border-bottom: 1px solid rgba(255,215,0,0.2); }
+  .hot .dr-card-head { background: rgba(255,71,87,0.1); color: var(--red); border-bottom: 1px solid rgba(255,71,87,0.2); }
+
+  .dr-card-body {
+    padding: 1rem;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .dr-card-body li { list-style: none; padding-left: 0; margin-bottom: 4px; }
+  .dr-card-body li::before { content: '→ '; color: var(--text-dim); font-size: 0.8rem; }
+
+  /* ALERT BOX */
+  .alert {
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .alert.warning { background: rgba(255,215,0,0.07); border: 1px solid rgba(255,215,0,0.25); }
+  .alert.danger { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.25); }
+  .alert.info { background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.25); }
+  .alert.success { background: rgba(0,255,136,0.07); border: 1px solid rgba(0,255,136,0.25); }
+
+  .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .topic-section { animation: fadeIn 0.4s ease forwards; }
+
+  /* INLINE TAG */
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0,212,255,0.1);
+    color: var(--cyan);
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+
+  .highlight-text { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    nav.sidebar { display: none; }
+    main { padding: 1.5rem; }
+    .dr-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-badge">CSE 322</span>
+    <span class="logo-text">Advanced Networking</span>
+  </div>
+  <div class="header-right">[ SESSIONAL STUDY GUIDE ] ← Quiz Prep</div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar">
+    <div class="nav-section-title">Topics</div>
+    <a class="nav-item active" href="#tcp-cca"><span class="nav-num">01</span> TCP Congestion Control</a>
+    <a class="nav-item" href="#traceroute"><span class="nav-num">02</span> Traceroute</a>
+    <a class="nav-item" href="#nmap"><span class="nav-num">03</span> Nmap & Port Scanning</a>
+    <a class="nav-item" href="#load-balancing"><span class="nav-num">04</span> Load Balancing</a>
+    <a class="nav-item" href="#vrrp"><span class="nav-num">05</span> VRRP / High Availability</a>
+    <a class="nav-item" href="#sdn"><span class="nav-num">06</span> SDN</a>
+    <a class="nav-item" href="#virt"><span class="nav-num">07</span> Network Virtualization</a>
+    <a class="nav-item" href="#dcdr"><span class="nav-num">08</span> Data Center & DR</a>
+    <div class="nav-section-title" style="margin-top:1rem;">Quick Ref</div>
+    <a class="nav-item" href="#commands"><span class="nav-num">★</span> All Commands</a>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">// CSE 322 — Sessional Quiz Preparation</div>
+      <h1>Advanced Topics in <span>Networking</span></h1>
+      <p>এই guide-এ TCP CCA, Traceroute, Nmap, Load Balancing, VRRP, SDN, Network Virtualization এবং DC-DR সব topics Bangla-তে explain করা হয়েছে। Easy থেকে Advanced পর্যন্ত questions আছে।</p>
+      <div class="topic-chips">
+        <span class="chip g">TCP CCA</span>
+        <span class="chip c">Traceroute</span>
+        <span class="chip y">Nmap</span>
+        <span class="chip p">Load Balancing</span>
+        <span class="chip o">VRRP</span>
+        <span class="chip g">SDN</span>
+        <span class="chip c">VXLAN</span>
+        <span class="chip y">DC-DR</span>
+      </div>
+    </div>
+
+    <!-- ===================== TOPIC 1: TCP CCA ===================== -->
+    <div class="topic-section" id="tcp-cca">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2>TCP Congestion Control Algorithms (CCA)</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        TCP Congestion Control মানে হলো — নেটওয়ার্কে যখন অনেক বেশি data যায়, তখন congestion (ভিড়) হয়ে packet drop হয়। এই সমস্যা সামলাতে Linux-এ বিভিন্ন Algorithm আছে যেগুলোকে CCA বলে। সহজ কথায়: <strong>নেটওয়ার্কে "ট্র্যাফিক জ্যাম" এড়াতে TCP কতটুকু data পাঠাবে সেটা control করাই CCA-র কাজ।</strong> সবচেয়ে popular CCA হলো <span class="highlight-text">Cubic</span> (Ubuntu-র default), <span class="highlight-text">Reno</span>, এবং <span class="highlight-text">BBR</span> (Google-এর তৈরি, fastest)।
+      </div>
+
+      <div class="concept-card">
+        <h3>Linux Commands — Step by Step</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+            <span>Terminal — TCP CCA Commands</span>
+          </div>
+          <pre>
+<span class="comment"># Step 1: বর্তমান CCA কোনটা চলছে দেখো</span>
+<span class="cmd">$ sysctl net.ipv4.tcp_congestion_control</span>
+<span class="out">net.ipv4.tcp_congestion_control = cubic</span>
+
+<span class="comment"># Step 2: Available (installed) CCA-গুলো দেখো</span>
+<span class="cmd">$ sysctl net.ipv4.tcp_available_congestion_control</span>
+<span class="out">net.ipv4.tcp_available_congestion_control = reno cubic</span>
+
+<span class="comment"># Step 3: Kernel-এ installed কিন্তু load হয়নি এমন সব CCA দেখো</span>
+<span class="cmd">$ ls -al /lib/modules/`uname -r`/kernel/net/ipv4/tcp*</span>
+<span class="out">... tcp_bbr.ko  tcp_cubic.ko  tcp_reno.ko  tcp_vegas.ko  tcp_westwood.ko ...</span>
+
+<span class="comment"># Step 4: নতুন CCA module load করো (bbr example)</span>
+<span class="cmd">$ sudo /sbin/modprobe tcp_bbr</span>
+
+<span class="comment"># Step 5: Verify করো — এখন bbr available হয়েছে</span>
+<span class="cmd">$ sysctl net.ipv4.tcp_available_congestion_control</span>
+<span class="out">net.ipv4.tcp_available_congestion_control = reno cubic bbr</span>
+
+<span class="comment"># Step 6: Temporarily CCA পরিবর্তন করো bbr-এ (-w = write)</span>
+<span class="cmd">$ sudo /sbin/sysctl -w net.ipv4.tcp_congestion_control=bbr</span>
+<span class="out">net.ipv4.tcp_congestion_control = bbr</span>
+          </pre>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <div class="alert-icon">ℹ️</div>
+        <div><strong>Key Point:</strong> <code>sysctl -w</code> দিয়ে যে change করা হয় তা <strong>temporary</strong> — reboot করলে আগের setting ফিরে আসবে। Permanent করতে <code>/etc/sysctl.conf</code> edit করতে হবে।</div>
+      </div>
+
+      <div class="concept-card">
+        <h3>Common CCAs — Comparison</h3>
+        <table class="data-table">
+          <tr><th>CCA Name</th><th>Type</th><th>Key Feature</th></tr>
+          <tr><td><span class="tag">Cubic</span></td><td>Loss-based</td><td>Ubuntu default — cubic function দিয়ে window বাড়ায়</td></tr>
+          <tr><td><span class="tag">Reno</span></td><td>Loss-based</td><td>Classic algorithm — packet loss হলে window কমায়</td></tr>
+          <tr><td><span class="tag">BBR</span></td><td>Model-based</td><td>Google-এর — bandwidth ও RTT measure করে, high-speed network-এ best</td></tr>
+          <tr><td><span class="tag">Vegas</span></td><td>Delay-based</td><td>RTT monitor করে congestion আগেই detect করে</td></tr>
+          <tr><td><span class="tag">Westwood</span></td><td>Loss-based</td><td>Wireless network-এ ভালো কাজ করে</td></tr>
+        </table>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. TCP Congestion Control কি? এটা কেন দরকার?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            <strong>Answer:</strong> TCP Congestion Control হলো এমন একটা mechanism যা নেটওয়ার্কে data পাঠানোর হার নিয়ন্ত্রণ করে যাতে network overload না হয়।<br><br>
+            <strong>কেন দরকার?</strong> যদি সব sender একসাথে অনেক data পাঠায়, তাহলে router-এর buffer full হয়ে packet drop হয়। CCA এটা prevent করে window size (কতটুকু data একসাথে পাঠানো যাবে) control করে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. Linux-এ currently কোন CCA চলছে সেটা কিভাবে দেখবে? Command লেখো।</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            <strong>Answer:</strong><br>
+            <code>sysctl net.ipv4.tcp_congestion_control</code><br><br>
+            এই command টি kernel parameter check করে। Output হবে:<br>
+            <code>net.ipv4.tcp_congestion_control = cubic</code><br><br>
+            এখানে <code>sysctl</code> = system control (kernel parameters manage করার tool), <code>net.ipv4</code> = IPv4 network subsystem।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. <code>modprobe</code> এবং <code>sysctl -w</code> এর মধ্যে পার্থক্য কি?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <strong>Answer:</strong><br>
+            <strong><code>modprobe tcp_bbr</code></strong> — একটা kernel module (যেমন tcp_bbr.ko) memory-তে <strong>load</strong> করে। Module load না হলে সেই CCA use করা যাবে না।<br><br>
+            <strong><code>sysctl -w net.ipv4.tcp_congestion_control=bbr</code></strong> — Already loaded module-কে <strong>active/use</strong> করার জন্য। এটা temporary (reboot করলে পূর্বের setting ফিরে আসে)।<br><br>
+            সহজ ভাষায়: modprobe দিয়ে "install" করো, sysctl দিয়ে "select" করো।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q4. <code>ls -al /lib/modules/`uname -r`/kernel/net/ipv4/tcp*</code> — এই command-এ backtick (`) কেন ব্যবহার করা হয়েছে? এটা কি করে?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>Answer:</strong> Backtick (`) দিয়ে <strong>command substitution</strong> করা হয়। <code>`uname -r`</code> first execute হয় এবং current kernel version (যেমন <code>5.15.0-88-generic</code>) return করে। তারপর সেই value path-এ বসে।<br><br>
+            ফলে পুরো command হয়: <code>ls -al /lib/modules/5.15.0-88-generic/kernel/net/ipv4/tcp*</code><br><br>
+            এটা dynamic — যেকোনো kernel version-এ কাজ করবে hardcode না করেও।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q5. BBR vs Cubic — কোথায় কোনটা বেশি উপযুক্ত এবং কেন? (Advanced)</div>
+            <span class="qa-level level-adv">Advanced</span>
+          </div>
+          <div class="qa-a">
+            <strong>Answer:</strong><br>
+            <strong>Cubic:</strong> Loss-based — packet drop হলে তবেই window কমায়। High bandwidth-delay product (BDP) network-এ efficient। Local/datacenter network-এ ভালো।<br><br>
+            <strong>BBR (Bottleneck Bandwidth and RTT):</strong> Model-based — continuously bandwidth এবং RTT measure করে। Packet loss ছাড়াও congestion detect করতে পারে। Long-fat network (high bandwidth, high latency), satellite links, cross-continent connections-এ Cubic-এর চেয়ে 2-25x faster হতে পারে।<br><br>
+            <strong>মূল পার্থক্য:</strong> Cubic "loss signal" দেখে react করে। BBR "bandwidth model" maintain করে proactively।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 2: TRACEROUTE ===================== -->
+    <div class="topic-section" id="traceroute">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2>Traceroute — An Advanced Command</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        Traceroute হলো এমন একটা command যা দিয়ে জানা যায় — আমার computer থেকে কোনো destination (যেমন google.com) পর্যন্ত packet যেতে মাঝে কত কত router (hop) পার করে যায়। ধরো তুমি ঢাকা থেকে কোথাও চিঠি পাঠাচ্ছো — traceroute দিয়ে জানতে পারবে চিঠি কোন কোন ডাকঘর হয়ে গেছে এবং প্রতিটায় কতক্ষণ সময় লেগেছে। <br><br>
+        Windows-এ: <strong>tracert</strong> | Linux/Unix-এ: <strong>traceroute</strong>
+      </div>
+
+      <div class="concept-card">
+        <h3>Traceroute কিভাবে কাজ করে? (TTL Trick)</h3>
+        <ol class="step-list">
+          <li><p>Source থেকে <strong>TTL=1</strong> দিয়ে probe packet পাঠায় destination-এর দিকে।</p></li>
+          <li><p>প্রতিটা router packet receive করে TTL থেকে <strong>1 কমিয়ে</strong> দেয়।</p></li>
+          <li><p>TTL = 0 হলে router ওই packet <strong>drop</strong> করে দেয় এবং Source-কে <strong>ICMP "TTL Exceeded"</strong> message পাঠায়।</p></li>
+          <li><p>Source সেই ICMP message দেখে বুঝতে পারে hop-টা কোন router। তার IP address ও response time দেখায়।</p></li>
+          <li><p>আবার TTL=2 দিয়ে পাঠায় — এভাবে পরবর্তী router পাওয়া যায়।</p></li>
+          <li><p>Destination-এ পৌঁছালে সে <strong>ICMP "Destination Unreachable"</strong> পাঠায় (কারণ সে ওই port-এ কোনো app expect করছিল না)।</p></li>
+        </ol>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <span>tracert google.com (Windows output)</span>
+        </div>
+        <pre>
+C:\Users\User><span class="cmd">tracert google.com</span>
+
+Tracing route to google.com [<span class="highlight">142.251.10.102</span>]
+over a maximum of 30 hops:
+
+  <span class="num">1</span>   3 ms   2 ms   1 ms  <span class="highlight">192.168.0.1</span>     <span class="comment">← তোমার Router (Default Gateway)</span>
+  <span class="num">2</span>  10 ms   4 ms   2 ms  <span class="highlight">10.0.2.1</span>        <span class="comment">← ISP এর First Router</span>
+  <span class="num">3</span>   5 ms  13 ms   2 ms  <span class="highlight">10.100.0.1</span>
+  <span class="num">4</span>  44 ms  30 ms   3 ms  <span class="highlight">43.224.112.136</span>
+  <span class="num">5</span>   4 ms   5 ms   6 ms  <span class="highlight">103.124.224.10</span>
+  <span class="num">7</span>   *      *      *    <span class="out">Request timed out.</span>  <span class="comment">← Firewall drop করছে</span>
+ <span class="num">24</span>  51 ms  58 ms  53 ms  <span class="highlight">sd-in-f102.1e100.net [142.251.10.102]</span>  <span class="comment">← Google!</span>
+
+Trace complete.
+        </pre>
+      </div>
+
+      <div class="concept-card">
+        <h3>Traceroute-এর গুরুত্বপূর্ণ তথ্য</h3>
+        <ul>
+          <li><strong>3 Time values:</strong> প্রতি hop-এ ৩টা time দেখায় (৩টা probe পাঠানো হয়) — এগুলো Round Trip Time (RTT) in milliseconds।</li>
+          <li><strong>"Request timed out" / * * *:</strong> মানে ওই router ICMP reply দেয়নি — সাধারণত firewall block করছে।</li>
+          <li><strong>ICMP src address:</strong> Traceroute যে IP দেখায় সেটা হলো router-এর <strong>ingress interface</strong> IP — egress interface দেখা যায় না।</li>
+          <li><strong>Latency:</strong> Traceroute শুধু <strong>round-trip</strong> দেখায় (forward + reverse path)। তাই reverse path-এ delay থাকলে সেটাও latency-তে add হয়।</li>
+          <li><strong>UDP port:</strong> Traceroute normally একটা pseudorandom high port-এ UDP packet পাঠায় (যেখানে কোনো app listen করছে না) — তাই destination থেকে "Dest Unreachable" আসে।</li>
+        </ul>
+      </div>
+
+      <div class="alert warning">
+        <div class="alert-icon">⚠️</div>
+        <div><strong>Exam Trap:</strong> Traceroute "hops on forward path" দেখায়, কিন্তু "latency based on forward PLUS reverse path" measure করে। Reverse path-এ যদি asymmetric routing থাকে তাহলে latency misleading হতে পারে।</div>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. Traceroute কি? Windows ও Linux-এ command কি?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            Traceroute হলো একটা network diagnostic tool যা source থেকে destination পর্যন্ত packet-এর path trace করে — মাঝের প্রতিটা router (hop) এবং তাদের latency দেখায়।<br><br>
+            <strong>Windows:</strong> <code>tracert google.com</code><br>
+            <strong>Linux/Unix:</strong> <code>traceroute google.com</code>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. Traceroute-এ TTL কিভাবে ব্যবহার হয়? Step by step বলো।</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <strong>Step 1:</strong> Src থেকে TTL=1 দিয়ে packet পাঠায়।<br>
+            <strong>Step 2:</strong> Router 1 packet পায়, TTL decrements (1→0), packet drop করে, src-কে <strong>ICMP TTL Exceeded</strong> পাঠায়।<br>
+            <strong>Step 3:</strong> Src সেই ICMP-এর source IP (Router 1-এর ingress IP) display করে — এটাই hop 1।<br>
+            <strong>Step 4:</strong> এবার TTL=2 দিয়ে আবার পাঠায়। Router 2-এ একই ঘটনা।<br>
+            <strong>Step 5:</strong> এভাবে TTL বাড়াতে থাকে যতক্ষণ না destination পায়।<br>
+            <strong>Final:</strong> Destination থেকে <strong>ICMP Dest Unreachable</strong> আসে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. Traceroute output-এ "* * *" মানে কি? এর কারণ কি?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <strong>মানে:</strong> ওই hop-এ কোনো response পাওয়া যায়নি — "Request timed out"।<br><br>
+            <strong>কারণ হতে পারে:</strong>
+            <ul style="margin-top:8px;">
+              <li>Firewall ICMP TTL Exceeded reply block করছে</li>
+              <li>Router configured করা আছে ICMP না পাঠাতে</li>
+              <li>Packet lost হয়েছে</li>
+            </ul>
+            Note: Intermediate hop-এ * দেখালেই মানে নয় destination unreachable — পরের hop-এ response আসতে পারে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q4. Traceroute কোন port-এ কোন protocol use করে? Last hop কি return করে এবং কেন?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>Protocol:</strong> UDP (Unix-এ default), ICMP (Windows-এ tracert), বা TCP (option দিয়ে).<br><br>
+            <strong>Port:</strong> UDP traceroute একটা <strong>pseudorandom high port</strong> (যেমন 33434+) use করে — এই port-এ সাধারণত কোনো application listen করে না।<br><br>
+            <strong>Last hop কি return করে:</strong> <strong>ICMP Destination Port Unreachable</strong> — কারণ destination সেই port-এ packet পেয়েছে কিন্তু কোনো app সেখানে নেই, তাই "port unreachable" error পাঠায়। এটাই traceroute-এর termination signal।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q5. Traceroute latency কিভাবে calculate করে? Asymmetric routing কিভাবে result-কে affect করে?</div>
+            <span class="qa-level level-adv">Advanced</span>
+          </div>
+          <div class="qa-a">
+            <strong>Calculation:</strong><br>
+            1. Probe packet পাঠানোর সময় timestamp নেয়<br>
+            2. ICMP response পাওয়ার সময় timestamp নেয়<br>
+            3. পার্থক্যই হলো Round-Trip Time (RTT)<br><br>
+            <strong>Asymmetric Routing Problem:</strong> Forward path আর reverse path different হতে পারে (different routers হয়ে)। Traceroute শুধু forward path-এর hops দেখায় কিন্তু RTT = forward delay + reverse delay। তাই:<br>
+            → Hop 5-এ high latency দেখালে সেটা hop 5-এর forward delay নাও হতে পারে — reverse path-এর delay-ও থাকতে পারে।<br>
+            → Egress interface-এর IP দেখা যায় না — শুধু ingress দেখা যায়।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 3: NMAP ===================== -->
+    <div class="topic-section" id="nmap">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2>Nmap — Network Mapper (Advanced Tool)</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        Nmap (Network Mapper) হলো একটা অত্যন্ত powerful network scanning tool। এটা দিয়ে জানা যায়: কোন host আছে নেটওয়ার্কে, কোন ports open আছে, কোন services চলছে, OS কি, network topology কেমন। Nmap এতটাই powerful যে <strong>অনুমতি ছাড়া অন্যের network-এ use করলে illegal</strong>। Zenmap হলো Nmap-এর GUI version।
+      </div>
+
+      <div class="alert danger">
+        <div class="alert-icon">🚨</div>
+        <div><strong>Warning:</strong> Nmap is "Extremely powerful, Extremely invasive, Extremely obvious, and Extremely illegal if not done correctly." শুধু নিজের network বা explicit permission পাওয়া network-এ use করো।</div>
+      </div>
+
+      <div class="concept-card">
+        <h3>Nmap-এর 6টি Port States</h3>
+        <table class="data-table">
+          <tr>
+            <th>State</th>
+            <th>মানে কি?</th>
+            <th>কারণ</th>
+          </tr>
+          <tr>
+            <td><span class="badge open">Open</span></td>
+            <td>Port খোলা আছে</td>
+            <td>কোনো application TCP/UDP connection accept করছে</td>
+          </tr>
+          <tr>
+            <td><span class="badge closed">Closed</span></td>
+            <td>Port বন্ধ আছে</td>
+            <td>Host alive কিন্তু কোনো app listen করছে না। পরে try করা যাবে।</td>
+          </tr>
+          <tr>
+            <td><span class="badge filtered">Filtered</span></td>
+            <td>Filtered হচ্ছে</td>
+            <td>Firewall probe packet drop করছে — no response. Nmap বারবার retry করে।</td>
+          </tr>
+          <tr>
+            <td><span class="badge unfiltered">Unfiltered</span></td>
+            <td>Accessible কিন্তু অনিশ্চিত</td>
+            <td>Port পাওয়া যাচ্ছে কিন্তু open না closed বলা যাচ্ছে না</td>
+          </tr>
+          <tr>
+            <td><span class="badge of">Open|Filtered</span></td>
+            <td>Open বা Filtered — অজানা</td>
+            <td>UDP scan-এ হয়, কোনো response না এলে</td>
+          </tr>
+          <tr>
+            <td><span class="badge cf">Closed|Filtered</span></td>
+            <td>Closed বা Filtered — অজানা</td>
+            <td>IP ID idle scan-এ হয়</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="concept-card">
+        <h3>Nmap Intense Scan Command</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+            <span>nmap — Command Line</span>
+          </div>
+          <pre>
+<span class="comment"># Regular Scan (simple)</span>
+<span class="cmd">nmap google.com</span>
+
+<span class="comment"># Intense Scan (Zenmap default intense profile)</span>
+<span class="cmd">nmap -T4 -A -v google.com</span>
+<span class="comment">#   -T4    = Timing template (4 = aggressive, fast)</span>
+<span class="comment">#   -A     = OS detection + version detection + script scan + traceroute</span>
+<span class="comment">#   -v     = Verbose output</span>
+
+<span class="comment"># Scan specific port range</span>
+<span class="cmd">nmap -p 1-1000 192.168.1.1</span>
+
+<span class="comment"># SYN Stealth Scan (most common)</span>
+<span class="cmd">nmap -sS 192.168.1.1</span>
+          </pre>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <h3>Nmap Zenmap Tabs — কি কি দেখা যায়</h3>
+        <table class="data-table">
+          <tr><th>Tab</th><th>কি দেখায়</th></tr>
+          <tr><td><span class="tag">Nmap Output</span></td><td>পুরো scan-এর detailed text output — ports, services, OS detection</td></tr>
+          <tr><td><span class="tag">Ports/Hosts</span></td><td>Open ports list — Port number, Protocol, State, Service, Version</td></tr>
+          <tr><td><span class="tag">Topology</span></td><td>Graphical network map — কোন router হয়ে কোথায় গেছে (fisheye view)</td></tr>
+          <tr><td><span class="tag">Host Details</span></td><td>OS guess, open/closed/filtered port count, MAC, hostname, uptime</td></tr>
+          <tr><td><span class="tag">Scans</span></td><td>সব scan history</td></tr>
+        </table>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">💡 Google.com scan result বোঝা</span>
+        Google scan করলে দেখা যাবে: <strong>Open ports: 2</strong> (80/tcp = HTTP, 443/tcp = HTTPS), <strong>Filtered: 998</strong> (Google-এর firewall বাকি সব block করছে)। 1000টা port scan হয়েছে।
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. Nmap কি? এটা দিয়ে কি কি জানা যায়?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            Nmap (Network Mapper) একটা open-source network discovery ও security auditing tool।<br><br>
+            <strong>Nmap দিয়ে জানা যায়:</strong>
+            <ul style="margin-top:8px; padding-left:1.2rem;">
+              <li>নেটওয়ার্কে কোন hosts active আছে</li>
+              <li>কোন ports open/closed/filtered</li>
+              <li>কোন services ও কোন version চলছে</li>
+              <li>Target-এর Operating System কি</li>
+              <li>Network topology (traceroute সহ)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. Nmap-এর 6টি port state-এর নাম এবং প্রতিটার মানে লেখো।</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            1. <strong>Open</strong> — Application actively TCP connection বা UDP packet accept করছে<br>
+            2. <strong>Closed</strong> — Host reachable কিন্তু কোনো application port-এ listen করছে না<br>
+            3. <strong>Filtered</strong> — Firewall probe block করছে, Nmap response পাচ্ছে না<br>
+            4. <strong>Unfiltered</strong> — Port accessible কিন্তু open না closed নিশ্চিত করা যাচ্ছে না<br>
+            5. <strong>Open|Filtered</strong> — Open বা filtered নির্ধারণ করা যাচ্ছে না<br>
+            6. <strong>Closed|Filtered</strong> — Closed বা filtered নির্ধারণ করা যাচ্ছে না
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. <code>nmap -T4 -A -v google.com</code> — প্রতিটা flag কি করে?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <code>-T4</code> → Timing template 4 (Aggressive) — scan দ্রুত করে। T0=paranoid (slowest), T5=insane (fastest)<br>
+            <code>-A</code> → All-in-one: OS detection + version detection + script scanning + traceroute একসাথে<br>
+            <code>-v</code> → Verbose — scan চলার সময় detailed output দেখায়<br>
+            <code>google.com</code> → Target host (domain name বা IP দেওয়া যায়)
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q4. Google-এর scan-এ 998 ports filtered দেখায় কেন?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            Google-এর infrastructure-এ enterprise-grade firewall আছে। ওই firewall নেটওয়ার্কের edge-এ বসে আছে এবং যেসব port-এ actual service নেই (অর্থাৎ 80 ও 443 ছাড়া) সেসব port-এর probe packet <strong>silently drop</strong> করে দেয়। "Stealth drop" করলে Nmap-এর কাছে কোনো response আসে না — তাই state হয় "Filtered"।<br><br>
+            Open ports (80 HTTP, 443 HTTPS) এ Google-এর GWS (Google Web Server) actively listen করে তাই সেগুলো "Open"।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q5. Filtered এবং Closed-এর মধ্যে গুরুত্বপূর্ণ পার্থক্য কি? কোনটা attacker-এর জন্য বেশি useful?</div>
+            <span class="qa-level level-adv">Advanced</span>
+          </div>
+          <div class="qa-a">
+            <strong>Closed port:</strong> Host RST (Reset) packet পাঠায় — মানে host alive এবং সেখানে কোনো service নেই। Host-এর existence confirm হয়।<br><br>
+            <strong>Filtered port:</strong> Firewall packet drop করে — কোনো response নেই। Host alive কিনা সেটাও uncertain। Nmap retry করে, scan অনেক slow হয়।<br><br>
+            <strong>Attacker-এর দৃষ্টিকোণ:</strong> "Closed" state বেশি useful কারণ এটা confirm করে যে host exists এবং সেই port-এ future service আসতে পারে। "Filtered" মানে firewall আছে — attack কঠিন।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 4: LOAD BALANCING ===================== -->
+    <div class="topic-section" id="load-balancing">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2>Load Balancing</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        Load Balancing মানে হলো — অনেক client একসাথে service request করলে সেই load (কাজ) একটা single server-এ না দিয়ে multiple servers-এ ভাগ করে দেওয়া। যেমন Google-এ লক্ষ লক্ষ মানুষ request করে — একটা server দিয়ে possible না। তাই একটা <strong>Load Balancer</strong> মাঝে বসে সব request গ্রহণ করে এবং পেছনের বিভিন্ন server-এ distribute করে দেয়।<br><br>
+        <strong>Analogy:</strong> ব্যাংকে অনেক customer এলে একটা token system করে বিভিন্ন counter-এ পাঠানো হয় — এটাই Load Balancing।
+      </div>
+
+      <div class="concept-card">
+        <h3>Load Balancing Architecture</h3>
+        <p style="font-size:0.88rem; line-height:1.7; margin-bottom:12px;">
+          Clients → Internet → <strong>Load Balancer</strong> → Multiple Backend Servers
+        </p>
+        <ul>
+          <li>Client সরাসরি জানে না কোন server handle করছে</li>
+          <li>Load Balancer একটা single IP/domain দেখায় (Virtual IP)</li>
+          <li>Backend server fail করলে Load Balancer অন্য server-এ redirect করে</li>
+          <li>এটা <strong>High Availability</strong> এবং <strong>Scalability</strong> নিশ্চিত করে</li>
+        </ul>
+      </div>
+
+      <div class="concept-card">
+        <h3>Load Balancing Algorithms</h3>
+        <table class="data-table">
+          <tr><th>Algorithm</th><th>কিভাবে কাজ করে</th></tr>
+          <tr><td>Round Robin</td><td>একের পর এক server-এ পাঠায় (1→2→3→1→2→3...)</td></tr>
+          <tr><td>Least Connections</td><td>সবচেয়ে কম active connection যে server-এ সেখানে পাঠায়</td></tr>
+          <tr><td>IP Hash</td><td>Client IP দিয়ে hash করে same server-এ পাঠায় (session sticky)</td></tr>
+          <tr><td>Weighted</td><td>শক্তিশালী server বেশি load নেয়</td></tr>
+        </table>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. Load Balancing কি এবং কেন দরকার?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            Load Balancing হলো incoming network traffic বা client requests-কে multiple servers-এর মধ্যে distribute করার process।<br><br>
+            <strong>কেন দরকার:</strong>
+            <ul style="margin-top:8px; padding-left:1.2rem;">
+              <li>Single server overload prevent করতে</li>
+              <li>High Availability নিশ্চিত করতে (একটা fail হলে অন্যটা নেয়)</li>
+              <li>Response time কমাতে ও performance বাড়াতে</li>
+              <li>Scalability — traffic বাড়লে নতুন server যোগ করা যায়</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. Load Balancer ও Default Gateway-এর মধ্যে পার্থক্য কি?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>Default Gateway:</strong> একটি router যা local network থেকে unknown/external network-এ packet পাঠায়। প্রতিটা device একটাই default gateway use করে। Default gateway fail করলে বাইরে যাওয়া বন্ধ।<br><br>
+            <strong>Load Balancer:</strong> Specifically client requests distribute করার জন্য। Multiple backend servers manage করে। Application layer (L7) বা Transport layer (L4)-এ কাজ করতে পারে।<br><br>
+            একটা Load Balancer ব্যবহার করে Default Gateway-র single point of failure সমস্যা solve করা হয় (VRRP দিয়ে multiple gateway রাখা যায়)।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 5: VRRP ===================== -->
+    <div class="topic-section" id="vrrp">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2>VRRP — Virtual Router Redundancy Protocol</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        সমস্যা: প্রতিটা device এর একটাই Default Gateway থাকে। সেই gateway (router) যদি fail করে, তাহলে পুরো নেটওয়ার্ক বাইরের সাথে যোগাযোগ হারিয়ে ফেলে।<br><br>
+        সমাধান: VRRP — দুটো (বা বেশি) Physical Router মিলে একটা <strong>Virtual Router</strong> তৈরি করে। Client একটাই IP (Virtual IP) জানে। একটা router হয় <strong>Active (Master)</strong> এবং বাকি router হয় <strong>Passive (Backup)</strong>। Active fail করলে automatically Passive active হয়ে যায় — client কিছুই টের পায় না!
+      </div>
+
+      <div class="concept-card">
+        <h3>VRRP Architecture</h3>
+        <ul>
+          <li><strong>Virtual IP (VIP):</strong> 10.1.1.100 — Clients এই IP-কে Default Gateway হিসেবে জানে</li>
+          <li><strong>R1 (Active/Master):</strong> 10.1.1.1/24 — VIP handle করছে</li>
+          <li><strong>R2 (Passive/Backup):</strong> 10.1.1.2/24 — Monitor করছে, ready আছে</li>
+          <li><strong>Failover:</strong> R1 fail → R2 automatically VIP নিয়ে Master হয়</li>
+          <li><strong>Router-এর 2 plane:</strong> Control Plane (routing decision) + Data Plane (actual packet forwarding)</li>
+        </ul>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. VRRP কি? কেন use করা হয়?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            VRRP (Virtual Router Redundancy Protocol) একটা network protocol যা multiple physical routers-কে একটা virtual router হিসেবে present করে। এটা default gateway-র redundancy নিশ্চিত করে।<br><br>
+            <strong>কেন use করা:</strong> Default gateway fail হলে network connectivity হারানো prevent করতে। VRRP active router fail হলে backup automatically takeover করে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. VRRP-এ Control Plane এবং Data Plane কি?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <strong>Control Plane:</strong> Router-এর "brain" — routing decisions নেয়। Routing table maintain করা, neighbor discovery, protocol processing (OSPF, BGP, VRRP)।<br><br>
+            <strong>Data Plane:</strong> Actual packet forwarding — Control plane-এর decision অনুযায়ী packet কোন interface দিয়ে forward করতে হবে সেটা execute করে।<br><br>
+            Analogy: Control Plane = GPS (রাস্তা ঠিক করে), Data Plane = Driver (সেই রাস্তায় গাড়ি চালায়)।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. Load Balancing এবং VRRP কিভাবে complement করে?</div>
+            <span class="qa-level level-adv">Advanced</span>
+          </div>
+          <div class="qa-a">
+            <strong>VRRP</strong> gateway-level redundancy দেয় — multiple routers থেকে একটা Virtual Gateway।<br>
+            <strong>Load Balancing</strong> server-level distribution দেয় — multiple backend servers-এ traffic distribute।<br><br>
+            একসাথে use করলে: Client → VRRP Virtual Gateway (High Availability) → Load Balancer → Multiple Servers (Scalability)।<br>
+            Full high availability architecture-এ দুটোই লাগে।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 6: SDN ===================== -->
+    <div class="topic-section" id="sdn">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2>SDN — Software Defined Networking</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        Traditional networking-এ প্রতিটা router নিজেই সব decision নেয় (Control Plane + Data Plane একসাথে থাকে)। তাই অনেক router configure করতে হলে একটা একটা করে login করে setting পরিবর্তন করতে হয় — অনেক সময়সাপেক্ষ।<br><br>
+        SDN এটা বদলে দিয়েছে। SDN-এ সব router-এর Control Plane (intelligence) তুলে নিয়ে একটা central <strong>SDN Controller</strong>-এ দেওয়া হয়। Router শুধু Data Plane করে (packet forward করে) — "Dumb router" বলা হয়। Controller API-র মাধ্যমে সব router-কে একসাথে control করে।<br><br>
+        <strong>API to Data Plane:</strong> OpenFlow (সবচেয়ে popular protocol)
+      </div>
+
+      <div class="concept-card">
+        <h3>Traditional vs SDN</h3>
+        <table class="data-table">
+          <tr><th>Aspect</th><th>Traditional Networking</th><th>SDN</th></tr>
+          <tr><td>Control Plane</td><td>প্রতিটা router-এ আলাদা</td><td>Central SDN Controller-এ</td></tr>
+          <tr><td>Data Plane</td><td>প্রতিটা router-এ</td><td>প্রতিটা router-এ (same)</td></tr>
+          <tr><td>Configuration</td><td>Per-device, manual</td><td>Centralized, programmatic</td></tr>
+          <tr><td>Flexibility</td><td>কম — proprietary hardware</td><td>বেশি — software-driven</td></tr>
+          <tr><td>Protocol</td><td>OSPF, BGP, etc.</td><td>OpenFlow (CP→DP API)</td></tr>
+          <tr><td>Programmability</td><td>Limited</td><td>Full — Apps via northbound API</td></tr>
+        </table>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. SDN কি? Traditional networking থেকে কিভাবে আলাদা?</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            SDN (Software Defined Networking) একটা networking approach যেখানে Control Plane-কে Data Plane থেকে আলাদা করে একটা central controller-এ রাখা হয়।<br><br>
+            <strong>Traditional:</strong> প্রতিটা router নিজেই সব decision নেয় — distributed control।<br>
+            <strong>SDN:</strong> Central SDN Controller সব decision নেয়, router শুধু packet forward করে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. SDN-এ "Northbound API" এবং "Southbound API" কি?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>Northbound API:</strong> SDN Controller ↔ Applications। Applications (যেমন network management apps, security apps) Controller-এর সাথে communicate করে এই API দিয়ে। Programmer এখানে code লিখে network control করে।<br><br>
+            <strong>Southbound API:</strong> SDN Controller ↔ Network Devices (routers/switches)। Controller device-কে flow rules inject করে এই API দিয়ে। Most common protocol: <strong>OpenFlow</strong>।<br><br>
+            মনে রাখার উপায়: North (উপরে) = Apps, South (নিচে) = Hardware devices।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. SDN-এ router-কে "Dumb router" বলা হয় কেন?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            Traditional router-এ Control Plane থাকে — সে নিজেই routing decision নিতে পারে (OSPF route calculate করে, routing table maintain করে)। তাই সে "intelligent"।<br><br>
+            SDN-এ router-এর Control Plane তুলে নেওয়া হয়েছে — সে শুধু Controller-এর instructions অনুযায়ী packet forward করে। নিজে কোনো intelligence নেই — তাই "Dumb" (বোকা)।<br><br>
+            Benefit: Cheap commodity hardware use করা যায়, software-এ সব intelligence।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 7: NETWORK VIRTUALIZATION ===================== -->
+    <div class="topic-section" id="virt">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2>Network Virtualization — Overlay, Underlay & VXLAN</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        Network Virtualization মানে হলো — physical network-এর উপরে আলাদা আলাদা virtual network তৈরি করা। দুটো end device যদি physically আলাদা জায়গায় থাকে, তারা যেন মনে করে একই local network-এ আছে।<br><br>
+        <strong>Server Virtualization</strong> (আগে এসেছিল): একটা Physical Server-কে ভাগ করে অনেক Virtual Machines (VM) তৈরি। তাদের মধ্যে communicate করার জন্য vSwitch ব্যবহার হয়।<br><br>
+        <strong>Underlay:</strong> Physical network (real routers, switches, cables)<br>
+        <strong>Overlay:</strong> Physical network-এর উপরে তৈরি virtual network — actual physical topology দেখা যায় না।<br><br>
+        <strong>VLAN limitation:</strong> VLAN ID 12-bit → maximum 4096টা VLAN। Large datacenter-এর জন্য যথেষ্ট না।<br>
+        <strong>VXLAN solution:</strong> 24-bit ID → 16 million+ virtual networks।
+      </div>
+
+      <div class="concept-card">
+        <h3>VXLAN — Virtual Extensible LAN</h3>
+        <ul>
+          <li><strong>VXLAN ID:</strong> 24-bit (VLAN-এর 12-bit এর বদলে) → ~16 million networks possible</li>
+          <li><strong>Tunnel:</strong> Layer 2 frames কে Layer 3 (IP) packet-এর ভেতরে encapsulate করে পাঠায়</li>
+          <li><strong>VTEP:</strong> VXLAN Tunnel End Point — tunnel-এর starting ও ending point</li>
+          <li><strong>Leaf switch:</strong> Server-এর directly connected switch (bottom layer)</li>
+          <li><strong>Spine switch:</strong> Leaf switches-এর interconnect (top layer)</li>
+          <li><strong>L2 VXLAN Gateway:</strong> Same layer-এর VMs communicate করে</li>
+          <li><strong>L3 VXLAN Gateway:</strong> Different subnet-এর VMs communicate করে</li>
+          <li>IPv6 payload-ও VXLAN tunnel-এর মাধ্যমে পাঠানো যায়</li>
+        </ul>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. Network Virtualization কি? Overlay ও Underlay এর পার্থক্য বলো।</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            Network Virtualization হলো physical network infrastructure-এর উপরে multiple logical/virtual networks তৈরির process।<br><br>
+            <strong>Underlay:</strong> Physical infrastructure — real routers, switches, cables, actual IP network।<br>
+            <strong>Overlay:</strong> Underlay-এর উপরে তৈরি virtual network — end devices underlay-এর জটিলতা দেখতে পায় না, মনে হয় সরাসরি connected।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. VLAN 4096টা limit কেন এবং VXLAN কিভাবে এটা solve করে?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            <strong>VLAN limit:</strong> VLAN ID field হলো 12-bit। 2¹² = 4096। তাই সর্বোচ্চ 4096টা VLAN হতে পারে। বড় cloud datacenter-এ হাজার হাজার tenant (customer) থাকে — 4096 যথেষ্ট না।<br><br>
+            <strong>VXLAN solution:</strong> VXLAN Network Identifier (VNI) হলো 24-bit। 2²⁴ = 16,777,216 (16 million+)। এত বেশি virtual network তৈরি করা যায় — cloud-scale datacenter support করে।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. VTEP কি? VXLAN-এ এর role কি?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>VTEP (VXLAN Tunnel End Point):</strong> VXLAN tunnel-এর starting ও ending device। এটা source-এ L2 frame নিয়ে L3 UDP packet-এর ভেতরে encapsulate করে (VXLAN header add করে) পাঠায়। Destination-এ আরেকটা VTEP decapsulate করে original L2 frame বের করে দেয়।<br><br>
+            সাধারণত VTEP হয় Leaf switch বা vSwitch (hypervisor-এ)। VTEP দুটো কাজ করে: encapsulation (সময়: send) এবং decapsulation (সময়: receive)।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ===================== TOPIC 8: DC-DR ===================== -->
+    <div class="topic-section" id="dcdr">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <h2>Data Centers & Disaster Recovery (DC-DR)</h2>
+      </div>
+
+      <div class="bangla-box">
+        <span class="bangla-label">🇧🇩 বাংলায় ব্যাখ্যা</span>
+        যেকোনো organization-এর Data Center হলো তার মূল IT infrastructure। কিন্তু disaster (earthquake, flood, fire) হলে? তাই আলাদা একটা <strong>Disaster Recovery (DR)</strong> site রাখা হয়। DR site হলো একটা backup datacenter যেখানে main datacenter fail হলে operations চালু রাখা যায়।<br><br>
+        DR site develop করার সময় <strong>earthquake zone</strong> একটা গুরুত্বপূর্ণ বিষয়। Main DC ও DR site একই earthquake zone-এ থাকলে দুটোই একসাথে ক্ষতিগ্রস্ত হতে পারে। বাংলাদেশে Zone I, II, III আছে।
+      </div>
+
+      <div class="dr-grid">
+        <div class="dr-card cold">
+          <div class="dr-card-head">❄️ Cold Site</div>
+          <div class="dr-card-body">
+            <ul>
+              <li>Little/no equipment</li>
+              <li>No network connectivity</li>
+              <li>No automatic failover</li>
+              <li>No data synchronization</li>
+              <li>High risk of data loss</li>
+              <li><strong>Cheapest option</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div class="dr-card warm">
+          <div class="dr-card-head">🌡️ Warm Site</div>
+          <div class="dr-card-body">
+            <ul>
+              <li>Partially redundant equipment</li>
+              <li>Network connectivity enabled</li>
+              <li>Failover within hours</li>
+              <li>Daily/weekly sync</li>
+              <li>Minimum data loss</li>
+              <li><strong>Cost-effective ✓</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div class="dr-card hot">
+          <div class="dr-card-head">🔥 Hot Site</div>
+          <div class="dr-card-body">
+            <ul>
+              <li>Fully redundant equipment</li>
+              <li>Network connectivity enabled</li>
+              <li>Failover within hours/days</li>
+              <li>Near real-time data sync</li>
+              <li>Zero data loss</li>
+              <li><strong>Most expensive</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="concept-card" style="margin-top:1rem;">
+        <h3>DR Planning — Key Metrics</h3>
+        <table class="data-table">
+          <tr><th>Metric</th><th>Full Form</th><th>মানে কি</th></tr>
+          <tr><td><span class="tag">RTO</span></td><td>Recovery Time Objective</td><td>Disaster-এর পরে কত দ্রুত services restore করতে হবে</td></tr>
+          <tr><td><span class="tag">RPO</span></td><td>Recovery Point Objective</td><td>সর্বোচ্চ কতটুকু data loss acceptable (কতক্ষণ আগের backup)</td></tr>
+          <tr><td><span class="tag">MTTR</span></td><td>Mean Time to Recover</td><td>Average recovery সময়</td></tr>
+          <tr><td><span class="tag">MTBF</span></td><td>Mean Time Between Failures</td><td>দুটো failure-এর মাঝে average সময়</td></tr>
+        </table>
+      </div>
+
+      <div class="qa-section">
+        <div class="qa-header">Questions & Answers</div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q1. Cold Site, Warm Site, Hot Site-এর পার্থক্য table আকারে লেখো।</div>
+            <span class="qa-level level-easy">Easy</span>
+          </div>
+          <div class="qa-a">
+            <strong>Cold Site:</strong> Equipment নেই, connectivity নেই, data sync নেই। Failover: days/weeks। Data loss: High। Cost: Cheapest।<br><br>
+            <strong>Warm Site:</strong> Partial equipment, network enabled, daily/weekly sync। Failover: hours। Data loss: Minimum। Cost: Moderate (Cost-effective)।<br><br>
+            <strong>Hot Site:</strong> Full redundant equipment, network enabled, near real-time sync। Failover: minutes/hours। Data loss: Zero। Cost: Most expensive।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q2. DR site develop করার সময় earthquake zone কেন consider করা হয়?</div>
+            <span class="qa-level level-medium">Medium</span>
+          </div>
+          <div class="qa-a">
+            Disaster Recovery-র মূল উদ্দেশ্য হলো — যদি Primary datacenter destroy হয় তাহলেও operations চালু রাখা। কিন্তু যদি Primary DC ও DR site একই seismic/earthquake zone-এ থাকে, তাহলে একটা বড় earthquake উভয়কে ক্ষতিগ্রস্ত করতে পারে।<br><br>
+            তাই DR site আলাদা earthquake zone-এ রাখা হয়। বাংলাদেশে Zone I (0.08g), Zone II (0.05g), Zone III (0.04g) — Sylhet Zone I-এ (সবচেয়ে বেশি risk)। DR site সাধারণত different zone-এ রাখা হয়।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q3. RPO এবং RTO এর মধ্যে পার্থক্য কি? একটি bank-এর জন্য ideal values কত হওয়া উচিত?</div>
+            <span class="qa-level level-hard">Hard</span>
+          </div>
+          <div class="qa-a">
+            <strong>RTO (Recovery Time Objective):</strong> Disaster-এর পর থেকে systems restore হওয়া পর্যন্ত সর্বোচ্চ acceptable time। যেমন RTO = 4 hours মানে 4 ঘণ্টার মধ্যে সব service চালু করতে হবে।<br><br>
+            <strong>RPO (Recovery Point Objective):</strong> সর্বোচ্চ কতটুকু data loss acceptable। যেমন RPO = 1 hour মানে disaster-এর আগের 1 ঘণ্টার data হারানো acceptable।<br><br>
+            <strong>Bank-এর জন্য:</strong> RTO = near zero (minutes), RPO = near zero (seconds) — কারণ financial transactions এ data loss বা downtime catastrophic। তাই Hot Site mandatory।
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-q" onclick="toggleQA(this)">
+            <div class="qa-q-text">Q4. (Advanced) একটি organization কেন Warm Site পছন্দ করে Hot Site-এর বদলে?</div>
+            <span class="qa-level level-adv">Advanced</span>
+          </div>
+          <div class="qa-a">
+            <strong>Cost vs Risk tradeoff:</strong><br><br>
+            Hot Site maintain করতে প্রায় Primary DC-এর সমান খরচ — fully redundant hardware, real-time data replication, 24/7 staffing। বেশিরভাগ organization-এর জন্য এই খরচ justify করা কঠিন।<br><br>
+            <strong>Warm Site advantages:</strong>
+            <ul style="margin-top:8px; padding-left:1.2rem;">
+              <li>Cost significantly কম (Hot site-এর 30-50%)</li>
+              <li>Most scenarios-এ hours-level failover acceptable</li>
+              <li>Daily backup দিয়ে acceptable RPO achieve করা যায়</li>
+              <li>Hardware partially ready — setup সময় moderate</li>
+            </ul>
+            Critical financial/healthcare sectors Hot site নেয়, অন্যরা Warm site prefer করে।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ALL COMMANDS QUICK REF -->
+    <div class="topic-section" id="commands">
+      <div class="section-header">
+        <span class="section-num">★</span>
+        <h2>All Commands — Quick Reference</h2>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <span>All Commands — Exam Ready Cheatsheet</span>
+        </div>
+        <pre>
+<span class="comment">═══════════ TCP CONGESTION CONTROL ═══════════</span>
+
+<span class="keyword">sysctl net.ipv4.tcp_congestion_control</span>
+<span class="comment">→ বর্তমান active CCA দেখাও</span>
+
+<span class="keyword">sysctl net.ipv4.tcp_available_congestion_control</span>
+<span class="comment">→ Available CCA list দেখাও</span>
+
+<span class="keyword">ls -al /lib/modules/`uname -r`/kernel/net/ipv4/tcp*</span>
+<span class="comment">→ Installed TCP modules list করো</span>
+
+<span class="keyword">sudo /sbin/modprobe tcp_bbr</span>
+<span class="comment">→ BBR module load করো</span>
+
+<span class="keyword">sudo /sbin/sysctl -w net.ipv4.tcp_congestion_control=bbr</span>
+<span class="comment">→ CCA temporarily bbr-এ change করো</span>
+
+<span class="comment">═══════════ TRACEROUTE ═══════════</span>
+
+<span class="keyword">tracert google.com</span>
+<span class="comment">→ Windows traceroute</span>
+
+<span class="keyword">traceroute google.com</span>
+<span class="comment">→ Linux/Unix traceroute</span>
+
+<span class="keyword">traceroute -T google.com</span>
+<span class="comment">→ TCP SYN mode traceroute</span>
+
+<span class="comment">═══════════ NMAP ═══════════</span>
+
+<span class="keyword">nmap google.com</span>
+<span class="comment">→ Regular scan</span>
+
+<span class="keyword">nmap -T4 -A -v google.com</span>
+<span class="comment">→ Intense scan: aggressive timing + all detection + verbose</span>
+
+<span class="keyword">nmap -sS 192.168.1.1</span>
+<span class="comment">→ SYN Stealth scan</span>
+
+<span class="keyword">nmap -p 1-1000 192.168.1.0/24</span>
+<span class="comment">→ Port range scan on subnet</span>
+
+<span class="keyword">nmap -O 192.168.1.1</span>
+<span class="comment">→ OS detection only</span>
+        </pre>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Toggle Q&A
+  function toggleQA(el) {
+    const answer = el.nextElementSibling;
+    answer.classList.toggle('show');
+  }
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('.topic-section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.getBoundingClientRect().top;
+      if (top < 120) current = sec.id;
+    });
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('href') === '#' + current) {
+        item.classList.add('active');
+      }
+    });
+  });
+
+  // Smooth scroll
+  navItems.forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(item.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NS-3 Topology Builder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+:root {
+  --bg: #0a0c14;
+  --s1: #111520;
+  --s2: #181c2e;
+  --s3: #1f2440;
+  --border: #252d4a;
+  --blue: #4d8bff;
+  --cyan: #00d4ff;
+  --green: #2ecc71;
+  --yellow: #f7b731;
+  --red: #ff6b6b;
+  --purple: #a55eea;
+  --text: #dde4f0;
+  --muted: #6b7599;
+  --node-fill: #1a2240;
+  --node-stroke: #4d8bff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* HERO */
+.hero {
+  padding: 50px 40px 40px;
+  background: linear-gradient(160deg, #0a1030 0%, #0a0c14 70%);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(77,139,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hero h1 {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.1;
+  background: linear-gradient(90deg, #fff 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+.hero p { color: var(--muted); font-size: 15px; max-width: 540px; }
+
+/* NAV PILLS */
+.nav-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 18px 40px;
+  background: var(--s1);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--s2);
+  color: var(--muted);
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.nav-pill:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(0,212,255,0.06); }
+
+/* MAIN LAYOUT */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* TOPO SECTION */
+.topo-section {
+  margin-top: 52px;
+}
+.topo-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.topo-num {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--blue);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.topo-num.c { background: var(--cyan); color: #0a0c14; }
+.topo-num.g { background: var(--green); color: #0a0c14; }
+.topo-num.y { background: var(--yellow); color: #0a0c14; }
+.topo-num.p { background: var(--purple); }
+.topo-num.r { background: var(--red); }
+
+.topo-header-text h2 { font-size: 22px; font-weight: 700; }
+.topo-header-text p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* SPLIT LAYOUT */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media(max-width: 700px) { .split { grid-template-columns: 1fr; } }
+
+/* DIAGRAM PANEL */
+.diagram-panel {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.panel-label {
+  background: var(--s2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.panel-label.blue { color: var(--cyan); }
+.panel-label.green { color: var(--green); }
+.diagram-body {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+svg text { font-family: 'JetBrains Mono', monospace; }
+
+/* CODE PANEL */
+.code-panel {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.code-body {
+  padding: 0;
+  max-height: 480px;
+  overflow-y: auto;
+}
+pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  padding: 20px 22px;
+  white-space: pre;
+  overflow-x: auto;
+  background: transparent;
+}
+/* syntax */
+.kw { color: #569cd6; }
+.ty { color: #4ec9b0; }
+.fn { color: #dcdcaa; }
+.str { color: #6a9955; }
+.cm { color: #3d5173; font-style: italic; }
+.num { color: #b5cea8; }
+.ip { color: #ce9178; }
+.punct { color: #808080; }
+
+/* INFO BOXES */
+.info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.info-chip {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+.info-chip .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.info-chip .val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.info-chip .val.blue { color: var(--blue); }
+.info-chip .val.green { color: var(--green); }
+.info-chip .val.cyan { color: var(--cyan); }
+.info-chip .val.yellow { color: var(--yellow); }
+
+/* KEY THINGS BOX */
+.key-box {
+  background: rgba(77,139,255,0.07);
+  border: 1px solid rgba(77,139,255,0.25);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+.key-box b { color: var(--cyan); }
+.key-box ul { padding-left: 16px; margin-top: 6px; }
+.key-box li { margin-bottom: 5px; }
+.key-box.warn { background: rgba(247,183,49,0.07); border-color: rgba(247,183,49,0.25); }
+.key-box.warn b { color: var(--yellow); }
+
+/* COPY BTN */
+.copy-btn {
+  float: right;
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  cursor: pointer;
+  margin: 8px 12px 0 0;
+  transition: all 0.2s;
+}
+.copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* DIVIDER */
+.section-divider {
+  margin: 60px 0 0;
+  border: none;
+  border-top: 1px dashed var(--border);
+}
+
+/* ASCII art box */
+.ascii-topo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+  white-space: pre;
+  line-height: 1.5;
+  padding: 20px 24px;
+  background: var(--s2);
+  border-radius: 10px;
+  overflow-x: auto;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">🔧 NS-3 Simulation</div>
+  <h1>Topology Builder<br>Reference Guide</h1>
+  <p>6 common topologies with SVG diagrams + complete ns-3 code. Exam-ready.</p>
+</div>
+
+<div class="nav-bar">
+  <a class="nav-pill" href="#t1">01 · P2P (2 nodes)</a>
+  <a class="nav-pill" href="#t2">02 · Linear Chain</a>
+  <a class="nav-pill" href="#t3">03 · P2P + CSMA Bus</a>
+  <a class="nav-pill" href="#t4">04 · Star</a>
+  <a class="nav-pill" href="#t5">05 · P2P+CSMA+WiFi</a>
+  <a class="nav-pill" href="#t6">06 · Dumbbell</a>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 1: Simple P2P
+═══════════════════════════════════ -->
+<div class="topo-section" id="t1">
+  <div class="topo-header">
+    <div class="topo-num">01</div>
+    <div class="topo-header-text">
+      <h2>Simple Point-to-Point (2 Nodes)</h2>
+      <p>The most basic topology — first.cc. Two nodes connected by a direct P2P link.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="340" height="160" viewBox="0 0 340 160">
+            <!-- Link -->
+            <line x1="85" y1="80" x2="255" y2="80" stroke="#4d8bff" stroke-width="2.5" stroke-dasharray="6,3"/>
+            <!-- Link labels -->
+            <text x="170" y="68" fill="#f7b731" font-size="9.5" text-anchor="middle">5Mbps / 2ms delay</text>
+            <text x="170" y="98" fill="#3d5173" font-size="9" text-anchor="middle">10.1.1.0/24</text>
+
+            <!-- Node 0 -->
+            <rect x="15" y="52" width="70" height="56" rx="10" fill="#1a2240" stroke="#4d8bff" stroke-width="2"/>
+            <text x="50" y="76" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">n0</text>
+            <text x="50" y="93" fill="#4d8bff" font-size="9.5" text-anchor="middle">10.1.1.1</text>
+            <text x="50" y="105" fill="#6b7599" font-size="8.5" text-anchor="middle">Client</text>
+
+            <!-- Node 1 -->
+            <rect x="255" y="52" width="70" height="56" rx="10" fill="#1a2240" stroke="#4d8bff" stroke-width="2"/>
+            <text x="290" y="76" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">n1</text>
+            <text x="290" y="93" fill="#4d8bff" font-size="9.5" text-anchor="middle">10.1.1.2</text>
+            <text x="290" y="105" fill="#6b7599" font-size="8.5" text-anchor="middle">Server</text>
+
+            <!-- Direction arrow -->
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#4d8bff"/>
+              </marker>
+            </defs>
+            <line x1="120" y1="80" x2="220" y2="80" stroke="transparent"/>
+          </svg>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-chip"><div class="label">Nodes</div><div class="val blue">2</div></div>
+        <div class="info-chip"><div class="label">Link Type</div><div class="val cyan">Point-to-Point</div></div>
+        <div class="info-chip"><div class="label">Network</div><div class="val yellow">10.1.1.0/24</div></div>
+        <div class="info-chip"><div class="label">Script</div><div class="val green">first.cc</div></div>
+      </div>
+      <div class="key-box">
+        <b>Key Points:</b>
+        <ul>
+          <li><b>DataRate</b> is a <b>device</b> attribute → set via <code>SetDeviceAttribute</code></li>
+          <li><b>Delay</b> is a <b>channel</b> attribute → set via <code>SetChannelAttribute</code></li>
+          <li>Server starts at <b>t=1s</b>, client at <b>t=2s</b> (always)</li>
+          <li>No need for <code>Simulator::Stop()</code> — queue empties naturally</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// COMPLETE CODE — first.cc pattern</div>
+      <div class="code-body">
+<pre>
+<span class="cm">// ── INCLUDES ─────────────────────────────</span>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+
+  <span class="cm">// ── STEP 1: Create 2 nodes ────────────</span>
+  <span class="ty">NodeContainer</span> nodes<span class="punct">;</span>
+  nodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span><span class="num">2</span><span class="punct">);</span>
+
+  <span class="cm">// ── STEP 2: Configure P2P link ────────</span>
+  <span class="ty">PointToPointHelper</span> p2p<span class="punct">;</span>
+  p2p<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"5Mbps"</span><span class="punct">));</span>
+  p2p<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"2ms"</span><span class="punct">));</span>
+
+  <span class="cm">// ── STEP 3: Install on nodes ──────────</span>
+  <span class="ty">NetDeviceContainer</span> devices<span class="punct">;</span>
+  devices <span class="punct">=</span> p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">);</span>
+
+  <span class="cm">// ── STEP 4: Install TCP/IP stack ──────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">);</span>
+
+  <span class="cm">// ── STEP 5: Assign IP addresses ───────</span>
+  <span class="ty">Ipv4AddressHelper</span> address<span class="punct">;</span>
+  address<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+    <span class="ip">"10.1.1.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> ifaces <span class="punct">=</span>
+    address<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>devices<span class="punct">);</span>
+  <span class="cm">// n0 → 10.1.1.1  |  n1 → 10.1.1.2</span>
+
+  <span class="cm">// ── STEP 6: Install server on n1 ─────</span>
+  <span class="ty">UdpEchoServerHelper</span> server<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+  <span class="ty">ApplicationContainer</span> sApps <span class="punct">=</span>
+    server<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── STEP 7: Install client on n0 ─────</span>
+  <span class="ty">UdpEchoClientHelper</span> client<span class="punct">(</span>
+    ifaces<span class="punct">.</span><span class="fn">GetAddress</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"MaxPackets"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"Interval"</span><span class="punct">,</span> <span class="ty">TimeValue</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">)));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"PacketSize"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1024</span><span class="punct">));</span>
+  <span class="ty">ApplicationContainer</span> cApps <span class="punct">=</span>
+    client<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── STEP 8: PCAP + Run ────────────────</span>
+  p2p<span class="punct">.</span><span class="fn">EnablePcapAll</span><span class="punct">(</span><span class="str">"first"</span><span class="punct">);</span>
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 2: Linear Chain
+═══════════════════════════════════ -->
+<div class="topo-section" id="t2">
+  <div class="topo-header">
+    <div class="topo-num c">02</div>
+    <div class="topo-header-text">
+      <h2>Linear Chain (4 Nodes)</h2>
+      <p>Nodes connected end-to-end: n0 — n1 — n2 — n3. Good for studying multi-hop routing.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="340" height="160" viewBox="0 0 340 160">
+            <!-- Links -->
+            <line x1="65" y1="80" x2="120" y2="80" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,3"/>
+            <line x1="155" y1="80" x2="210" y2="80" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,3"/>
+            <line x1="245" y1="80" x2="300" y2="80" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,3"/>
+
+            <!-- Subnet labels -->
+            <text x="92" y="70" fill="#3d5173" font-size="8" text-anchor="middle">10.1.1.0</text>
+            <text x="182" y="70" fill="#3d5173" font-size="8" text-anchor="middle">10.1.2.0</text>
+            <text x="272" y="70" fill="#3d5173" font-size="8" text-anchor="middle">10.1.3.0</text>
+
+            <!-- Nodes -->
+            <rect x="5"  y="58" width="60" height="44" rx="8" fill="#1a2240" stroke="#00d4ff" stroke-width="2"/>
+            <text x="35" y="77" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n0</text>
+            <text x="35" y="92" fill="#00d4ff" font-size="8" text-anchor="middle">Client</text>
+
+            <rect x="120" y="58" width="35" height="44" rx="8" fill="#1a2240" stroke="#00d4ff" stroke-width="2"/>
+            <text x="137" y="82" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n1</text>
+
+            <rect x="210" y="58" width="35" height="44" rx="8" fill="#1a2240" stroke="#00d4ff" stroke-width="2"/>
+            <text x="227" y="82" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n2</text>
+
+            <rect x="300" y="58" width="35" height="44" rx="8" fill="#1a2240" stroke="#00d4ff" stroke-width="2"/>
+            <text x="317" y="77" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n3</text>
+            <text x="317" y="92" fill="#00d4ff" font-size="8" text-anchor="middle">Server</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ascii-topo">n0 ——[10.1.1.0]—— n1 ——[10.1.2.0]—— n2 ——[10.1.3.0]—— n3
+│                                                             │
+Client                                                     Server</div>
+
+      <div class="key-box">
+        <b>Key Points:</b>
+        <ul>
+          <li>Each P2P link is a <b>separate subnet</b> (10.1.1.0, 10.1.2.0, 10.1.3.0)</li>
+          <li>Must call <code>PopulateRoutingTables()</code> — packet crosses multiple subnets</li>
+          <li>Middle nodes (n1, n2) act as <b>routers</b></li>
+          <li>Use loop to build N-node chains easily</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// LINEAR CHAIN — 4 nodes</div>
+      <div class="code-body">
+<pre>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+
+  <span class="cm">// ── 4 nodes in a chain ────────────────</span>
+  <span class="ty">NodeContainer</span> nodes<span class="punct">;</span>
+  nodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span><span class="num">4</span><span class="punct">);</span>     <span class="cm">// n0, n1, n2, n3</span>
+
+  <span class="ty">PointToPointHelper</span> p2p<span class="punct">;</span>
+  p2p<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"10Mbps"</span><span class="punct">));</span>
+  p2p<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"1ms"</span><span class="punct">));</span>
+
+  <span class="cm">// ── 3 separate P2P links ─────────────</span>
+  <span class="ty">NetDeviceContainer</span> d01<span class="punct">,</span> d12<span class="punct">,</span> d23<span class="punct">;</span>
+  d01 <span class="punct">=</span> p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>
+    nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">),</span> nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>  <span class="cm">// n0—n1</span>
+  d12 <span class="punct">=</span> p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>
+    nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">2</span><span class="punct">));</span>  <span class="cm">// n1—n2</span>
+  d23 <span class="punct">=</span> p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>
+    nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">2</span><span class="punct">),</span> nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">3</span><span class="punct">));</span>  <span class="cm">// n2—n3</span>
+
+  <span class="cm">// ── Install stack on ALL nodes ────────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">);</span>
+
+  <span class="cm">// ── Each link gets its own subnet ─────</span>
+  <span class="ty">Ipv4AddressHelper</span> addr<span class="punct">;</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span><span class="ip">"10.1.1.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> i01 <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>d01<span class="punct">);</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span><span class="ip">"10.1.2.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> i12 <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>d12<span class="punct">);</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span><span class="ip">"10.1.3.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> i23 <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>d23<span class="punct">);</span>
+
+  <span class="cm">// ── Routing (REQUIRED! multi-subnet) ──</span>
+  Ipv4GlobalRoutingHelper<span class="punct">::</span>
+    <span class="fn">PopulateRoutingTables</span><span class="punct">();</span>
+
+  <span class="cm">// ── Server on n3, client on n0 ────────</span>
+  <span class="ty">UdpEchoServerHelper</span> server<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+  <span class="ty">ApplicationContainer</span> sApps <span class="punct">=</span>
+    server<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">3</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// Client connects to n3's IP on link i23</span>
+  <span class="ty">UdpEchoClientHelper</span> client<span class="punct">(</span>
+    i23<span class="punct">.</span><span class="fn">GetAddress</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"MaxPackets"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">3</span><span class="punct">));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"PacketSize"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">512</span><span class="punct">));</span>
+  <span class="ty">ApplicationContainer</span> cApps <span class="punct">=</span>
+    client<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>nodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  p2p<span class="punct">.</span><span class="fn">EnablePcapAll</span><span class="punct">(</span><span class="str">"chain"</span><span class="punct">);</span>
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 3: P2P + CSMA
+═══════════════════════════════════ -->
+<div class="topo-section" id="t3">
+  <div class="topo-header">
+    <div class="topo-num g">03</div>
+    <div class="topo-header-text">
+      <h2>P2P + CSMA Bus Network</h2>
+      <p>second.cc pattern — a P2P backbone with a bus (Ethernet/CSMA) LAN attached.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="340" height="180" viewBox="0 0 340 180">
+            <!-- P2P link -->
+            <line x1="65" y1="65" x2="155" y2="65" stroke="#2ecc71" stroke-width="2.5" stroke-dasharray="6,3"/>
+            <text x="110" y="55" fill="#f7b731" font-size="8.5" text-anchor="middle">5Mbps / 2ms</text>
+            <text x="110" y="82" fill="#3d5173" font-size="8" text-anchor="middle">10.1.1.0/24</text>
+
+            <!-- CSMA bus -->
+            <rect x="160" y="120" width="170" height="8" rx="4" fill="#2ecc71" opacity="0.3"/>
+            <line x1="160" y1="124" x2="330" y2="124" stroke="#2ecc71" stroke-width="2.5"/>
+            <text x="245" y="148" fill="#3d5173" font-size="8" text-anchor="middle">10.1.2.0/24  (CSMA 100Mbps)</text>
+
+            <!-- Verticals from bus -->
+            <line x1="185" y1="96" x2="185" y2="120" stroke="#2ecc71" stroke-width="1.5"/>
+            <line x1="245" y1="96" x2="245" y2="120" stroke="#2ecc71" stroke-width="1.5"/>
+            <line x1="305" y1="96" x2="305" y2="120" stroke="#2ecc71" stroke-width="1.5"/>
+
+            <!-- n0 -->
+            <rect x="5" y="45" width="60" height="40" rx="8" fill="#1a2240" stroke="#2ecc71" stroke-width="2"/>
+            <text x="35" y="63" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n0</text>
+            <text x="35" y="78" fill="#2ecc71" font-size="8" text-anchor="middle">Client</text>
+
+            <!-- n1 (shared) -->
+            <rect x="155" y="45" width="60" height="40" rx="8" fill="#1a2240" stroke="#2ecc71" stroke-width="2.5"/>
+            <text x="185" y="63" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n1</text>
+            <text x="185" y="78" fill="#f7b731" font-size="8" text-anchor="middle">P2P+CSMA</text>
+
+            <!-- n2, n3 CSMA nodes -->
+            <rect x="215" y="60" width="60" height="36" rx="8" fill="#1a2240" stroke="#2ecc71" stroke-width="2"/>
+            <text x="245" y="82" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n2</text>
+
+            <rect x="275" y="60" width="60" height="36" rx="8" fill="#1a2240" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="305" y="78" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n3</text>
+            <text x="305" y="89" fill="#ff6b6b" font-size="7.5" text-anchor="middle">Server</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ascii-topo">n0 ——[P2P 10.1.1.0]—— n1 ===CSMA BUS 10.1.2.0=== n2   n3
+                            │                    │         │    │
+                           P2P               shared    bystander Server</div>
+
+      <div class="key-box">
+        <b>Key Points:</b>
+        <ul>
+          <li><b>n1 is shared</b> — added to both p2pNodes and csmaNodes. Install stack only once!</li>
+          <li>CSMA <code>DataRate</code> → channel attribute (not device)</li>
+          <li><b>ARP</b> will appear in CSMA PCAP — Ethernet needs MAC resolution</li>
+          <li>Last CSMA node = <code>csmaNodes.Get(nCsma)</code></li>
+          <li>Promiscuous PCAP → 3rd arg = <code>true</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// P2P + CSMA — second.cc pattern</div>
+      <div class="code-body">
+<pre>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/csma-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+
+  <span class="kw">uint32_t</span> nCsma <span class="punct">=</span> <span class="num">3</span><span class="punct">;</span> <span class="cm">// extra CSMA nodes</span>
+
+  <span class="cm">// ── P2P nodes ─────────────────────────</span>
+  <span class="ty">NodeContainer</span> p2pNodes<span class="punct">;</span>
+  p2pNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span><span class="num">2</span><span class="punct">);</span>  <span class="cm">// n0, n1</span>
+
+  <span class="cm">// ── CSMA nodes (n1 is shared!) ────────</span>
+  <span class="ty">NodeContainer</span> csmaNodes<span class="punct">;</span>
+  csmaNodes<span class="punct">.</span><span class="fn">Add</span><span class="punct">(</span>p2pNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>  <span class="cm">// n1</span>
+  csmaNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nCsma<span class="punct">);</span>          <span class="cm">// n2,n3</span>
+
+  <span class="cm">// ── P2P link setup ────────────────────</span>
+  <span class="ty">PointToPointHelper</span> p2p<span class="punct">;</span>
+  p2p<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"5Mbps"</span><span class="punct">));</span>
+  p2p<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"2ms"</span><span class="punct">));</span>
+  <span class="ty">NetDeviceContainer</span> p2pDevs <span class="punct">=</span>
+    p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>p2pNodes<span class="punct">);</span>
+
+  <span class="cm">// ── CSMA link setup ───────────────────</span>
+  <span class="cm">// NOTE: DataRate on CHANNEL (not device!)</span>
+  <span class="ty">CsmaHelper</span> csma<span class="punct">;</span>
+  csma<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"100Mbps"</span><span class="punct">));</span>
+  csma<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span>
+    <span class="ty">TimeValue</span><span class="punct">(</span><span class="fn">NanoSeconds</span><span class="punct">(</span><span class="num">6560</span><span class="punct">)));</span>
+  <span class="ty">NetDeviceContainer</span> csmaDevs <span class="punct">=</span>
+    csma<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>csmaNodes<span class="punct">);</span>
+
+  <span class="cm">// ── Internet stack ────────────────────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>p2pNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>  <span class="cm">// n0</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>csmaNodes<span class="punct">);</span>        <span class="cm">// n1,n2,n3</span>
+  <span class="cm">// n1 is in csmaNodes → don't Install twice</span>
+
+  <span class="cm">// ── IP addresses ─────────────────────</span>
+  <span class="ty">Ipv4AddressHelper</span> addr<span class="punct">;</span>
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span><span class="ip">"10.1.1.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> p2pIf <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>p2pDevs<span class="punct">);</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span><span class="ip">"10.1.2.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> csmaIf <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>csmaDevs<span class="punct">);</span>
+
+  <span class="cm">// ── Global routing (REQUIRED!) ────────</span>
+  Ipv4GlobalRoutingHelper<span class="punct">::</span>
+    <span class="fn">PopulateRoutingTables</span><span class="punct">();</span>
+
+  <span class="cm">// ── Server on last CSMA node ──────────</span>
+  <span class="ty">UdpEchoServerHelper</span> server<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+  <span class="ty">ApplicationContainer</span> sApps <span class="punct">=</span>
+    server<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>csmaNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>nCsma<span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── Client on n0 (P2P node) ───────────</span>
+  <span class="ty">UdpEchoClientHelper</span> client<span class="punct">(</span>
+    csmaIf<span class="punct">.</span><span class="fn">GetAddress</span><span class="punct">(</span>nCsma<span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"MaxPackets"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"PacketSize"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1024</span><span class="punct">));</span>
+  <span class="ty">ApplicationContainer</span> cApps <span class="punct">=</span>
+    client<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>p2pNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── Tracing ───────────────────────────</span>
+  p2p<span class="punct">.</span><span class="fn">EnablePcapAll</span><span class="punct">(</span><span class="str">"second"</span><span class="punct">);</span>
+  <span class="cm">// Promiscuous sniff on CSMA node index 1</span>
+  csma<span class="punct">.</span><span class="fn">EnablePcap</span><span class="punct">(</span>
+    <span class="str">"second"</span><span class="punct">,</span> csmaDevs<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> <span class="kw">true</span><span class="punct">);</span>
+
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 4: STAR
+═══════════════════════════════════ -->
+<div class="topo-section" id="t4">
+  <div class="topo-header">
+    <div class="topo-num y">04</div>
+    <div class="topo-header-text">
+      <h2>Star Topology (Hub + 4 Spokes)</h2>
+      <p>Central hub node connected to multiple leaf nodes via P2P links.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="320" height="200" viewBox="0 0 320 200">
+            <!-- Center -->
+            <rect x="125" y="75" width="70" height="50" rx="10" fill="#2a1f10" stroke="#f7b731" stroke-width="2.5"/>
+            <text x="160" y="98" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">n0</text>
+            <text x="160" y="113" fill="#f7b731" font-size="9" text-anchor="middle">HUB</text>
+
+            <!-- Spokes -->
+            <line x1="125" y1="100" x2="65" y2="50" stroke="#f7b731" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="195" y1="100" x2="255" y2="50" stroke="#f7b731" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="160" y1="75"  x2="160" y2="20" stroke="#f7b731" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="125" y1="120" x2="65" y2="165" stroke="#f7b731" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="195" y1="120" x2="255" y2="165" stroke="#f7b731" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+            <!-- Leaf nodes -->
+            <rect x="20"  y="30"  width="45" height="36" rx="7" fill="#1a2240" stroke="#f7b731" stroke-width="1.5"/>
+            <text x="42"  y="53"  fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n1</text>
+
+            <rect x="255" y="30"  width="45" height="36" rx="7" fill="#1a2240" stroke="#f7b731" stroke-width="1.5"/>
+            <text x="277" y="53"  fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n2</text>
+
+            <rect x="135" y="2"   width="50" height="36" rx="7" fill="#1a2240" stroke="#f7b731" stroke-width="1.5"/>
+            <text x="160" y="25"  fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n3</text>
+
+            <rect x="20"  y="150" width="45" height="36" rx="7" fill="#1a2240" stroke="#f7b731" stroke-width="1.5"/>
+            <text x="42"  y="173" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n4</text>
+
+            <rect x="255" y="150" width="45" height="36" rx="7" fill="#1a2240" stroke="#f7b731" stroke-width="1.5"/>
+            <text x="277" y="173" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n5</text>
+
+            <!-- Subnet labels -->
+            <text x="82"  y="62"  fill="#3d5173" font-size="8" text-anchor="middle">10.1.1.0</text>
+            <text x="237" y="62"  fill="#3d5173" font-size="8" text-anchor="middle">10.1.2.0</text>
+            <text x="178" y="46"  fill="#3d5173" font-size="8" text-anchor="middle">10.1.3.0</text>
+            <text x="82"  y="148" fill="#3d5173" font-size="8" text-anchor="middle">10.1.4.0</text>
+            <text x="237" y="148" fill="#3d5173" font-size="8" text-anchor="middle">10.1.5.0</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ascii-topo">         n3
+         |
+   n1 — HUB(n0) — n2
+         |
+         n4       n5
+ (each link = separate /24 subnet)</div>
+
+      <div class="key-box">
+        <b>Key Points:</b>
+        <ul>
+          <li>Hub node n0 gets <b>one interface per link</b> — N spokes = N devices on hub</li>
+          <li>Each P2P link = separate subnet. Hub needs stack installed once.</li>
+          <li><code>PopulateRoutingTables()</code> required — all traffic routes via hub</li>
+          <li>Use loop for many spokes: <code>p2p.Install(hub, nodes.Get(i))</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// STAR — hub n0, leaves n1..n4</div>
+      <div class="code-body">
+<pre>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+
+  <span class="kw">uint32_t</span> nLeaves <span class="punct">=</span> <span class="num">4</span><span class="punct">;</span>
+
+  <span class="cm">// ── Hub node + leaf nodes ─────────────</span>
+  <span class="ty">Ptr</span><span class="punct">&lt;</span><span class="ty">Node</span><span class="punct">&gt;</span> hub <span class="punct">=</span> <span class="fn">CreateObject</span><span class="punct">&lt;</span><span class="ty">Node</span><span class="punct">&gt;();</span>
+  <span class="ty">NodeContainer</span> leaves<span class="punct">;</span>
+  leaves<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nLeaves<span class="punct">);</span>
+
+  <span class="ty">PointToPointHelper</span> p2p<span class="punct">;</span>
+  p2p<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"10Mbps"</span><span class="punct">));</span>
+  p2p<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"1ms"</span><span class="punct">));</span>
+
+  <span class="cm">// ── Install stacks ────────────────────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>hub<span class="punct">);</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>leaves<span class="punct">);</span>
+
+  <span class="cm">// ── Connect hub to each leaf (loop) ───</span>
+  <span class="ty">Ipv4AddressHelper</span> addr<span class="punct">;</span>
+  std<span class="punct">::</span>vector<span class="punct">&lt;</span><span class="ty">Ipv4InterfaceContainer</span><span class="punct">&gt;</span> ifaces<span class="punct">;</span>
+
+  <span class="kw">for</span> <span class="punct">(</span><span class="kw">uint32_t</span> i <span class="punct">=</span> <span class="num">0</span><span class="punct">;</span> i <span class="punct">&lt;</span> nLeaves<span class="punct">;</span> i<span class="punct">++) {</span>
+
+    <span class="ty">NodeContainer</span> pair<span class="punct">(</span>hub<span class="punct">,</span> leaves<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>i<span class="punct">));</span>
+    <span class="ty">NetDeviceContainer</span> devs <span class="punct">=</span>
+      p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>pair<span class="punct">);</span>
+
+    <span class="cm">// Each spoke gets a /24 subnet</span>
+    std<span class="punct">::</span>ostringstream base<span class="punct">;</span>
+    base <span class="punct">&lt;&lt;</span> <span class="str">"10.1."</span> <span class="punct">&lt;&lt;</span> <span class="punct">(</span>i<span class="punct">+</span><span class="num">1</span><span class="punct">)</span> <span class="punct">&lt;&lt;</span> <span class="str">".0"</span><span class="punct">;</span>
+    addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+      base<span class="punct">.</span><span class="fn">str</span><span class="punct">().</span><span class="fn">c_str</span><span class="punct">(),</span>
+      <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+    ifaces<span class="punct">.</span><span class="fn">push_back</span><span class="punct">(</span>
+      addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>devs<span class="punct">));</span>
+  <span class="punct">}</span>
+
+  <span class="cm">// ── Routing ───────────────────────────</span>
+  Ipv4GlobalRoutingHelper<span class="punct">::</span>
+    <span class="fn">PopulateRoutingTables</span><span class="punct">();</span>
+
+  <span class="cm">// ── Server on leaf 3, client on leaf 0</span>
+  <span class="ty">UdpEchoServerHelper</span> server<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+  <span class="ty">ApplicationContainer</span> sApps <span class="punct">=</span>
+    server<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>leaves<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">3</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ifaces[3].GetAddress(1) = leaf3's IP</span>
+  <span class="ty">UdpEchoClientHelper</span> client<span class="punct">(</span>
+    ifaces<span class="punct">[</span><span class="num">3</span><span class="punct">].</span><span class="fn">GetAddress</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"MaxPackets"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"PacketSize"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">512</span><span class="punct">));</span>
+  <span class="ty">ApplicationContainer</span> cApps <span class="punct">=</span>
+    client<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>leaves<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 5: P2P + CSMA + WiFi
+═══════════════════════════════════ -->
+<div class="topo-section" id="t5">
+  <div class="topo-header">
+    <div class="topo-num p">05</div>
+    <div class="topo-header-text">
+      <h2>P2P + CSMA + WiFi (third.cc)</h2>
+      <p>Full mixed topology — WiFi STAs → AP (P2P backbone) → CSMA LAN with server.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="340" height="210" viewBox="0 0 340 210">
+            <!-- WiFi cloud -->
+            <ellipse cx="80" cy="80" rx="68" ry="45" fill="rgba(165,94,234,0.08)" stroke="#a55eea" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <text x="80" y="24" fill="#a55eea" font-size="9" text-anchor="middle">WiFi 10.1.3.0</text>
+
+            <!-- STAs -->
+            <rect x="8"  y="55" width="34" height="28" rx="6" fill="#1a2240" stroke="#a55eea" stroke-width="1.5"/>
+            <text x="25" y="73" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">n4</text>
+
+            <rect x="48" y="40" width="34" height="28" rx="6" fill="#1a2240" stroke="#a55eea" stroke-width="1.5"/>
+            <text x="65" y="58" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">n5</text>
+
+            <rect x="90" y="40" width="34" height="28" rx="6" fill="#1a2240" stroke="#a55eea" stroke-width="1.5"/>
+            <text x="107" y="58" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">n6</text>
+
+            <!-- AP = n0 -->
+            <rect x="48" y="88" width="48" height="40" rx="8" fill="#1f1040" stroke="#a55eea" stroke-width="2.5"/>
+            <text x="72" y="107" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n0</text>
+            <text x="72" y="120" fill="#a55eea" font-size="8" text-anchor="middle">AP</text>
+
+            <!-- P2P link -->
+            <line x1="96" y1="108" x2="170" y2="108" stroke="#4d8bff" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="133" y="100" fill="#f7b731" font-size="8" text-anchor="middle">P2P 10.1.1.0</text>
+
+            <!-- n1 hub -->
+            <rect x="170" y="88" width="48" height="40" rx="8" fill="#1a2240" stroke="#4d8bff" stroke-width="2"/>
+            <text x="194" y="107" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n1</text>
+            <text x="194" y="120" fill="#4d8bff" font-size="8" text-anchor="middle">P2P+CSMA</text>
+
+            <!-- CSMA bus -->
+            <line x1="190" y1="128" x2="335" y2="128" stroke="#2ecc71" stroke-width="3"/>
+            <text x="262" y="148" fill="#3d5173" font-size="8" text-anchor="middle">CSMA 10.1.2.0</text>
+
+            <!-- Verticals -->
+            <line x1="218" y1="128" x2="218" y2="150" stroke="#2ecc71" stroke-width="1.5"/>
+            <line x1="275" y1="128" x2="275" y2="150" stroke="#2ecc71" stroke-width="1.5"/>
+            <line x1="330" y1="128" x2="330" y2="150" stroke="#2ecc71" stroke-width="1.5"/>
+
+            <!-- CSMA nodes -->
+            <rect x="195" y="150" width="46" height="32" rx="6" fill="#1a2240" stroke="#2ecc71" stroke-width="1.5"/>
+            <text x="218" y="171" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">n2</text>
+
+            <rect x="252" y="150" width="46" height="32" rx="6" fill="#1a2240" stroke="#2ecc71" stroke-width="1.5"/>
+            <text x="275" y="171" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">n3</text>
+
+            <rect x="308" y="150" width="30" height="32" rx="6" fill="#1a2240" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="323" y="168" fill="#fff" font-size="9" font-weight="700" text-anchor="middle">n4</text>
+            <text x="323" y="179" fill="#ff6b6b" font-size="7" text-anchor="middle">SRV</text>
+
+            <!-- n1 to CSMA bus -->
+            <line x1="194" y1="128" x2="194" y2="128" stroke="#4d8bff" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ascii-topo">WiFi(10.1.3.0)          CSMA(10.1.2.0)
+STA(n4,n5,n6) ← → AP(n0) —P2P(10.1.1.0)— n1 ===BUS=== n2  n3  Server
+                                              ↑
+                                          shared node</div>
+
+      <div class="key-box warn">
+        <b>⚠ Critical for this topology:</b>
+        <ul>
+          <li>WiFi beacons are self-sustaining → <b>must call <code>Simulator::Stop(Seconds(10))</code></b></li>
+          <li>n0 is the AP — uses <code>ConstantPositionMobilityModel</code></li>
+          <li>STAs use <code>RandomWalk2dMobilityModel</code></li>
+          <li>3 networks → 3 <code>SetBase()</code> calls</li>
+          <li><code>ActiveProbing = false</code> on STAs (listen for beacons, don't send probes)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// P2P+CSMA+WiFi — third.cc pattern</div>
+      <div class="code-body">
+<pre>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/csma-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/wifi-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/mobility-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+  <span class="kw">uint32_t</span> nCsma <span class="punct">=</span> <span class="num">3</span><span class="punct">,</span> nWifi <span class="punct">=</span> <span class="num">3</span><span class="punct">;</span>
+
+  <span class="cm">// ── P2P backbone ──────────────────────</span>
+  <span class="ty">NodeContainer</span> p2pNodes<span class="punct">;</span>
+  p2pNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span><span class="num">2</span><span class="punct">);</span>   <span class="cm">// n0(AP), n1</span>
+
+  <span class="ty">PointToPointHelper</span> p2p<span class="punct">;</span>
+  p2p<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"5Mbps"</span><span class="punct">));</span>
+  p2p<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"2ms"</span><span class="punct">));</span>
+  <span class="ty">NetDeviceContainer</span> p2pDevs <span class="punct">=</span>
+    p2p<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>p2pNodes<span class="punct">);</span>
+
+  <span class="cm">// ── CSMA network ─────────────────────</span>
+  <span class="ty">NodeContainer</span> csmaNodes<span class="punct">;</span>
+  csmaNodes<span class="punct">.</span><span class="fn">Add</span><span class="punct">(</span>p2pNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  csmaNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nCsma<span class="punct">);</span>
+  <span class="ty">CsmaHelper</span> csma<span class="punct">;</span>
+  csma<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"100Mbps"</span><span class="punct">));</span>
+  csma<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span>
+    <span class="ty">TimeValue</span><span class="punct">(</span><span class="fn">NanoSeconds</span><span class="punct">(</span><span class="num">6560</span><span class="punct">)));</span>
+  <span class="ty">NetDeviceContainer</span> csmaDevs <span class="punct">=</span>
+    csma<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>csmaNodes<span class="punct">);</span>
+
+  <span class="cm">// ── WiFi network ──────────────────────</span>
+  <span class="ty">NodeContainer</span> wifiSta<span class="punct">;</span>
+  wifiSta<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nWifi<span class="punct">);</span>
+  <span class="ty">NodeContainer</span> wifiAp <span class="punct">=</span>
+    p2pNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">);</span>     <span class="cm">// n0 is AP</span>
+
+  <span class="ty">YansWifiChannelHelper</span> ch <span class="punct">=</span>
+    YansWifiChannelHelper<span class="punct">::</span><span class="fn">Default</span><span class="punct">();</span>
+  <span class="ty">YansWifiPhyHelper</span> phy <span class="punct">=</span>
+    YansWifiPhyHelper<span class="punct">::</span><span class="fn">Default</span><span class="punct">();</span>
+  phy<span class="punct">.</span><span class="fn">SetChannel</span><span class="punct">(</span>ch<span class="punct">.</span><span class="fn">Create</span><span class="punct">());</span>
+
+  <span class="ty">WifiHelper</span> wifi<span class="punct">;</span>
+  <span class="ty">WifiMacHelper</span> mac<span class="punct">;</span>
+  <span class="ty">Ssid</span> ssid <span class="punct">=</span> <span class="fn">Ssid</span><span class="punct">(</span><span class="str">"ns-3-ssid"</span><span class="punct">);</span>
+
+  <span class="cm">// STA devices</span>
+  mac<span class="punct">.</span><span class="fn">SetType</span><span class="punct">(</span><span class="str">"ns3::StaWifiMac"</span><span class="punct">,</span>
+    <span class="str">"Ssid"</span><span class="punct">,</span> <span class="ty">SsidValue</span><span class="punct">(</span>ssid<span class="punct">),</span>
+    <span class="str">"ActiveProbing"</span><span class="punct">,</span>
+    <span class="ty">BooleanValue</span><span class="punct">(</span><span class="kw">false</span><span class="punct">));</span>
+  <span class="ty">NetDeviceContainer</span> staDevs <span class="punct">=</span>
+    wifi<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>phy<span class="punct">,</span> mac<span class="punct">,</span> wifiSta<span class="punct">);</span>
+
+  <span class="cm">// AP device</span>
+  mac<span class="punct">.</span><span class="fn">SetType</span><span class="punct">(</span><span class="str">"ns3::ApWifiMac"</span><span class="punct">,</span>
+    <span class="str">"Ssid"</span><span class="punct">,</span> <span class="ty">SsidValue</span><span class="punct">(</span>ssid<span class="punct">));</span>
+  <span class="ty">NetDeviceContainer</span> apDevs <span class="punct">=</span>
+    wifi<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>phy<span class="punct">,</span> mac<span class="punct">,</span> wifiAp<span class="punct">);</span>
+
+  <span class="cm">// ── Mobility ──────────────────────────</span>
+  <span class="ty">MobilityHelper</span> mob<span class="punct">;</span>
+  mob<span class="punct">.</span><span class="fn">SetPositionAllocator</span><span class="punct">(</span>
+    <span class="str">"ns3::GridPositionAllocator"</span><span class="punct">,</span>
+    <span class="str">"MinX"</span><span class="punct">,</span> <span class="ty">DoubleValue</span><span class="punct">(</span><span class="num">0.0</span><span class="punct">),</span>
+    <span class="str">"MinY"</span><span class="punct">,</span> <span class="ty">DoubleValue</span><span class="punct">(</span><span class="num">0.0</span><span class="punct">),</span>
+    <span class="str">"DeltaX"</span><span class="punct">,</span> <span class="ty">DoubleValue</span><span class="punct">(</span><span class="num">5.0</span><span class="punct">),</span>
+    <span class="str">"GridWidth"</span><span class="punct">,</span>
+    <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">3</span><span class="punct">));</span>
+  mob<span class="punct">.</span><span class="fn">SetMobilityModel</span><span class="punct">(</span>
+    <span class="str">"ns3::RandomWalk2dMobilityModel"</span><span class="punct">,</span>
+    <span class="str">"Bounds"</span><span class="punct">,</span>
+    <span class="ty">RectangleValue</span><span class="punct">(</span>
+      <span class="fn">Rectangle</span><span class="punct">(</span>-<span class="num">50</span><span class="punct">,</span><span class="num">50</span><span class="punct">,</span>-<span class="num">50</span><span class="punct">,</span><span class="num">50</span><span class="punct">)));</span>
+  mob<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>wifiSta<span class="punct">);</span>
+  mob<span class="punct">.</span><span class="fn">SetMobilityModel</span><span class="punct">(</span>
+    <span class="str">"ns3::ConstantPositionMobilityModel"</span><span class="punct">);</span>
+  mob<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>wifiAp<span class="punct">);</span>
+
+  <span class="cm">// ── Internet stack ────────────────────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>csmaNodes<span class="punct">);</span>  <span class="cm">// n1 + extra</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>wifiAp<span class="punct">);</span>    <span class="cm">// n0 (AP)</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>wifiSta<span class="punct">);</span>   <span class="cm">// STAs</span>
+
+  <span class="cm">// ── IP addresses ─────────────────────</span>
+  <span class="ty">Ipv4AddressHelper</span> addr<span class="punct">;</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+    <span class="ip">"10.1.1.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> p2pIf <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>p2pDevs<span class="punct">);</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+    <span class="ip">"10.1.2.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  <span class="ty">Ipv4InterfaceContainer</span> csmaIf <span class="punct">=</span>
+    addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>csmaDevs<span class="punct">);</span>
+
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+    <span class="ip">"10.1.3.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>staDevs<span class="punct">);</span>
+  addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>apDevs<span class="punct">);</span>
+
+  <span class="cm">// ── Routing ───────────────────────────</span>
+  Ipv4GlobalRoutingHelper<span class="punct">::</span>
+    <span class="fn">PopulateRoutingTables</span><span class="punct">();</span>
+
+  <span class="cm">// ── Apps: server on CSMA, client on STA</span>
+  <span class="ty">UdpEchoServerHelper</span> server<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+  <span class="ty">ApplicationContainer</span> sApps <span class="punct">=</span>
+    server<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>
+      csmaNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>nCsma<span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+  sApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="ty">UdpEchoClientHelper</span> client<span class="punct">(</span>
+    csmaIf<span class="punct">.</span><span class="fn">GetAddress</span><span class="punct">(</span>nCsma<span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"MaxPackets"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1</span><span class="punct">));</span>
+  client<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+    <span class="str">"PacketSize"</span><span class="punct">,</span> <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1024</span><span class="punct">));</span>
+  <span class="ty">ApplicationContainer</span> cApps <span class="punct">=</span>
+    client<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>
+      wifiSta<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>nWifi<span class="punct">-</span><span class="num">1</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+  cApps<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── MUST STOP — WiFi beacons! ─────────</span>
+  Simulator<span class="punct">::</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+  <span class="cm">// ── Tracing ───────────────────────────</span>
+  p2p<span class="punct">.</span><span class="fn">EnablePcapAll</span><span class="punct">(</span><span class="str">"third"</span><span class="punct">);</span>
+  phy<span class="punct">.</span><span class="fn">EnablePcap</span><span class="punct">(</span>
+    <span class="str">"third"</span><span class="punct">,</span> apDevs<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>
+  csma<span class="punct">.</span><span class="fn">EnablePcap</span><span class="punct">(</span>
+    <span class="str">"third"</span><span class="punct">,</span> csmaDevs<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">),</span> <span class="kw">true</span><span class="punct">);</span>
+
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════
+     TOPOLOGY 6: DUMBBELL
+═══════════════════════════════════ -->
+<div class="topo-section" id="t6">
+  <div class="topo-header">
+    <div class="topo-num r">06</div>
+    <div class="topo-header-text">
+      <h2>Dumbbell Topology</h2>
+      <p>Two groups of nodes connected through a bottleneck P2P link. Classic for congestion control testing.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <div class="diagram-panel">
+        <div class="panel-label blue">// TOPOLOGY DIAGRAM</div>
+        <div class="diagram-body">
+          <svg width="340" height="200" viewBox="0 0 340 200">
+            <!-- Left nodes -->
+            <rect x="5"  y="30"  width="46" height="32" rx="7" fill="#1a2240" stroke="#ff6b6b" stroke-width="1.5"/>
+            <text x="28" y="50"  fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n0</text>
+
+            <rect x="5"  y="84"  width="46" height="32" rx="7" fill="#1a2240" stroke="#ff6b6b" stroke-width="1.5"/>
+            <text x="28" y="104" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n1</text>
+
+            <rect x="5"  y="138" width="46" height="32" rx="7" fill="#1a2240" stroke="#ff6b6b" stroke-width="1.5"/>
+            <text x="28" y="158" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n2</text>
+
+            <!-- Left router -->
+            <rect x="90" y="74" width="55" height="52" rx="10" fill="#2a1010" stroke="#ff6b6b" stroke-width="2.5"/>
+            <text x="117" y="98"  fill="#fff" font-size="12" font-weight="700" text-anchor="middle">R0</text>
+            <text x="117" y="113" fill="#ff6b6b" font-size="8.5" text-anchor="middle">Router</text>
+
+            <!-- Right router -->
+            <rect x="195" y="74" width="55" height="52" rx="10" fill="#102a10" stroke="#2ecc71" stroke-width="2.5"/>
+            <text x="222" y="98"  fill="#fff" font-size="12" font-weight="700" text-anchor="middle">R1</text>
+            <text x="222" y="113" fill="#2ecc71" font-size="8.5" text-anchor="middle">Router</text>
+
+            <!-- Right nodes -->
+            <rect x="289" y="30"  width="46" height="32" rx="7" fill="#1a2240" stroke="#2ecc71" stroke-width="1.5"/>
+            <text x="312" y="50"  fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n3</text>
+
+            <rect x="289" y="84"  width="46" height="32" rx="7" fill="#1a2240" stroke="#2ecc71" stroke-width="1.5"/>
+            <text x="312" y="104" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n4</text>
+
+            <rect x="289" y="138" width="46" height="32" rx="7" fill="#1a2240" stroke="#2ecc71" stroke-width="1.5"/>
+            <text x="312" y="158" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">n5</text>
+
+            <!-- Left spokes -->
+            <line x1="51"  y1="46"  x2="90"  y2="90"  stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="51"  y1="100" x2="90"  y2="100" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="51"  y1="154" x2="90"  y2="110" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+            <!-- Bottleneck -->
+            <line x1="145" y1="100" x2="195" y2="100" stroke="#f7b731" stroke-width="3" stroke-dasharray="5,2"/>
+            <text x="170" y="90" fill="#f7b731" font-size="8.5" text-anchor="middle">BOTTLENECK</text>
+            <text x="170" y="116" fill="#3d5173" font-size="8" text-anchor="middle">1Mbps / 10ms</text>
+
+            <!-- Right spokes -->
+            <line x1="250" y1="90"  x2="289" y2="46"  stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="250" y1="100" x2="289" y2="100" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="250" y1="110" x2="289" y2="154" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+            <!-- Labels -->
+            <text x="28"  y="180" fill="#3d5173" font-size="8" text-anchor="middle">Senders</text>
+            <text x="312" y="180" fill="#3d5173" font-size="8" text-anchor="middle">Receivers</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ascii-topo">n0 ─┐                    ┌─ n3
+n1 ─┤── R0 ══BOTTLENECK══ R1 ─┤─ n4
+n2 ─┘  (1Mbps/10ms)           └─ n5
+    Senders              Receivers</div>
+
+      <div class="key-box">
+        <b>Key Points:</b>
+        <ul>
+          <li>Used to study <b>congestion control</b>, queue behavior, bottleneck bandwidth</li>
+          <li>Bottleneck link has <b>low bandwidth + high delay</b> — all traffic must cross it</li>
+          <li>Left spokes: fast links (10Mbps). Bottleneck: slow (1Mbps). Right spokes: fast.</li>
+          <li>6 subnets total: 3 left spokes + 1 bottleneck + 3 right spokes</li>
+          <li>All senders → R0 → bottleneck → R1 → receivers</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-label green">// DUMBBELL — R0 &lt;--bottleneck--&gt; R1</div>
+      <div class="code-body">
+<pre>
+<span class="kw">#include</span> <span class="str">"ns3/core-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/network-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/internet-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/point-to-point-module.h"</span>
+<span class="kw">#include</span> <span class="str">"ns3/applications-module.h"</span>
+<span class="kw">using namespace</span> ns3<span class="punct">;</span>
+
+<span class="kw">int</span> <span class="fn">main</span><span class="punct">(</span><span class="kw">int</span> argc<span class="punct">,</span> <span class="kw">char</span><span class="punct">*</span> argv[]<span class="punct">) {</span>
+
+  <span class="kw">uint32_t</span> nLeft <span class="punct">=</span> <span class="num">3</span><span class="punct">,</span> nRight <span class="punct">=</span> <span class="num">3</span><span class="punct">;</span>
+
+  <span class="cm">// ── Routers ───────────────────────────</span>
+  <span class="ty">NodeContainer</span> routers<span class="punct">;</span>
+  routers<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span><span class="num">2</span><span class="punct">);</span>    <span class="cm">// R0, R1</span>
+
+  <span class="cm">// ── Left & right nodes ────────────────</span>
+  <span class="ty">NodeContainer</span> leftNodes<span class="punct">,</span> rightNodes<span class="punct">;</span>
+  leftNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nLeft<span class="punct">);</span>   <span class="cm">// n0,n1,n2</span>
+  rightNodes<span class="punct">.</span><span class="fn">Create</span><span class="punct">(</span>nRight<span class="punct">);</span> <span class="cm">// n3,n4,n5</span>
+
+  <span class="cm">// ── Bottleneck link (slow!) ───────────</span>
+  <span class="ty">PointToPointHelper</span> bottleneck<span class="punct">;</span>
+  bottleneck<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"1Mbps"</span><span class="punct">));</span>
+  bottleneck<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"10ms"</span><span class="punct">));</span>
+  <span class="ty">NetDeviceContainer</span> rDevs <span class="punct">=</span>
+    bottleneck<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>routers<span class="punct">);</span>
+
+  <span class="cm">// ── Spoke links (fast) ────────────────</span>
+  <span class="ty">PointToPointHelper</span> spoke<span class="punct">;</span>
+  spoke<span class="punct">.</span><span class="fn">SetDeviceAttribute</span><span class="punct">(</span>
+    <span class="str">"DataRate"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"10Mbps"</span><span class="punct">));</span>
+  spoke<span class="punct">.</span><span class="fn">SetChannelAttribute</span><span class="punct">(</span>
+    <span class="str">"Delay"</span><span class="punct">,</span> <span class="ty">StringValue</span><span class="punct">(</span><span class="str">"1ms"</span><span class="punct">));</span>
+
+  <span class="cm">// ── Install Internet stack ────────────</span>
+  <span class="ty">InternetStackHelper</span> stack<span class="punct">;</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>routers<span class="punct">);</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>leftNodes<span class="punct">);</span>
+  stack<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>rightNodes<span class="punct">);</span>
+
+  <span class="cm">// ── IP addresses ─────────────────────</span>
+  <span class="ty">Ipv4AddressHelper</span> addr<span class="punct">;</span>
+  <span class="kw">uint32_t</span> subnet <span class="punct">=</span> <span class="num">1</span><span class="punct">;</span>
+
+  <span class="cm">// Bottleneck: 10.1.0.0/24</span>
+  addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+    <span class="ip">"10.1.0.0"</span><span class="punct">,</span> <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+  addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>rDevs<span class="punct">);</span>
+
+  <span class="cm">// Left spokes: 10.1.1.0, 10.1.2.0 ...</span>
+  std<span class="punct">::</span>vector<span class="punct">&lt;</span><span class="ty">Ipv4InterfaceContainer</span><span class="punct">&gt;</span>
+    leftIf<span class="punct">,</span> rightIf<span class="punct">;</span>
+
+  <span class="kw">for</span> <span class="punct">(</span><span class="kw">uint32_t</span> i <span class="punct">=</span> <span class="num">0</span><span class="punct">;</span> i <span class="punct">&lt;</span> nLeft<span class="punct">;</span> i<span class="punct">++)</span> <span class="punct">{</span>
+    <span class="ty">NodeContainer</span> pair<span class="punct">(</span>
+      leftNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>i<span class="punct">),</span>
+      routers<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">0</span><span class="punct">));</span>  <span class="cm">// → R0</span>
+    <span class="ty">NetDeviceContainer</span> d <span class="punct">=</span>
+      spoke<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>pair<span class="punct">);</span>
+    std<span class="punct">::</span>ostringstream b<span class="punct">;</span>
+    b <span class="punct">&lt;&lt;</span> <span class="str">"10.1."</span> <span class="punct">&lt;&lt;</span> subnet<span class="punct">++</span> <span class="punct">&lt;&lt;</span> <span class="str">".0"</span><span class="punct">;</span>
+    addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+      b<span class="punct">.</span><span class="fn">str</span><span class="punct">().</span><span class="fn">c_str</span><span class="punct">(),</span>
+      <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+    leftIf<span class="punct">.</span><span class="fn">push_back</span><span class="punct">(</span>addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>d<span class="punct">));</span>
+  <span class="punct">}</span>
+
+  <span class="kw">for</span> <span class="punct">(</span><span class="kw">uint32_t</span> i <span class="punct">=</span> <span class="num">0</span><span class="punct">;</span> i <span class="punct">&lt;</span> nRight<span class="punct">;</span> i<span class="punct">++)</span> <span class="punct">{</span>
+    <span class="ty">NodeContainer</span> pair<span class="punct">(</span>
+      routers<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span>  <span class="cm">// R1 →</span>
+      rightNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>i<span class="punct">));</span>
+    <span class="ty">NetDeviceContainer</span> d <span class="punct">=</span>
+      spoke<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>pair<span class="punct">);</span>
+    std<span class="punct">::</span>ostringstream b<span class="punct">;</span>
+    b <span class="punct">&lt;&lt;</span> <span class="str">"10.2."</span> <span class="punct">&lt;&lt;</span> subnet<span class="punct">++</span> <span class="punct">&lt;&lt;</span> <span class="str">".0"</span><span class="punct">;</span>
+    addr<span class="punct">.</span><span class="fn">SetBase</span><span class="punct">(</span>
+      b<span class="punct">.</span><span class="fn">str</span><span class="punct">().</span><span class="fn">c_str</span><span class="punct">(),</span>
+      <span class="ip">"255.255.255.0"</span><span class="punct">);</span>
+    rightIf<span class="punct">.</span><span class="fn">push_back</span><span class="punct">(</span>addr<span class="punct">.</span><span class="fn">Assign</span><span class="punct">(</span>d<span class="punct">));</span>
+  <span class="punct">}</span>
+
+  <span class="cm">// ── Routing ───────────────────────────</span>
+  Ipv4GlobalRoutingHelper<span class="punct">::</span>
+    <span class="fn">PopulateRoutingTables</span><span class="punct">();</span>
+
+  <span class="cm">// ── Apps: left→right (0→0, 1→1, 2→2)</span>
+  <span class="kw">for</span> <span class="punct">(</span><span class="kw">uint32_t</span> i <span class="punct">=</span> <span class="num">0</span><span class="punct">;</span> i <span class="punct">&lt;</span> nRight<span class="punct">;</span> i<span class="punct">++)</span> <span class="punct">{</span>
+    <span class="ty">UdpEchoServerHelper</span> srv<span class="punct">(</span><span class="num">9</span><span class="punct">);</span>
+    <span class="ty">ApplicationContainer</span> s <span class="punct">=</span>
+      srv<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>rightNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>i<span class="punct">));</span>
+    s<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">1.0</span><span class="punct">));</span>
+    s<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+
+    <span class="cm">// rightIf[i].GetAddress(1) = right node IP</span>
+    <span class="ty">UdpEchoClientHelper</span> cli<span class="punct">(</span>
+      rightIf<span class="punct">[</span>i<span class="punct">].</span><span class="fn">GetAddress</span><span class="punct">(</span><span class="num">1</span><span class="punct">),</span> <span class="num">9</span><span class="punct">);</span>
+    cli<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+      <span class="str">"MaxPackets"</span><span class="punct">,</span>
+      <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">5</span><span class="punct">));</span>
+    cli<span class="punct">.</span><span class="fn">SetAttribute</span><span class="punct">(</span>
+      <span class="str">"PacketSize"</span><span class="punct">,</span>
+      <span class="ty">UintegerValue</span><span class="punct">(</span><span class="num">1024</span><span class="punct">));</span>
+    <span class="ty">ApplicationContainer</span> c <span class="punct">=</span>
+      cli<span class="punct">.</span><span class="fn">Install</span><span class="punct">(</span>leftNodes<span class="punct">.</span><span class="fn">Get</span><span class="punct">(</span>i<span class="punct">));</span>
+    c<span class="punct">.</span><span class="fn">Start</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">2.0</span><span class="punct">));</span>
+    c<span class="punct">.</span><span class="fn">Stop</span><span class="punct">(</span><span class="fn">Seconds</span><span class="punct">(</span><span class="num">10.0</span><span class="punct">));</span>
+  <span class="punct">}</span>
+
+  bottleneck<span class="punct">.</span><span class="fn">EnablePcapAll</span><span class="punct">(</span>
+    <span class="str">"dumbbell"</span><span class="punct">);</span>
+  Simulator<span class="punct">::</span><span class="fn">Run</span><span class="punct">();</span>
+  Simulator<span class="punct">::</span><span class="fn">Destroy</span><span class="punct">();</span>
+  <span class="kw">return</span> <span class="num">0</span><span class="punct">;</span>
+<span class="punct">}</span>
+</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- container -->
+<footer>NS-3 Topology Reference · 6 Topologies · Diagrams + Full Code · Good luck on the exam! 🚀</footer>
+</body>
+</html>

@@ -1,0 +1,23 @@
+Connection established to server: localhost:6666
+Local port: 33136
+Enter username: SUCCESS: Authenticated as user2\nLIST_USERS\n
+
+========== FILE SERVER MENU ==========
+1. LIST_USERS                         - List all users (online/offline)
+2. LIST_FILES                         - List your files (private/public)
+3. LIST_PUBLIC_FILES <username>       - List public files of a user
+4. UPLOAD <filepath> <public|private> - Upload a file
+5. UPLOAD_REQUEST <filepath> <requestID> <public|private> - Upload as response to request
+6. DOWNLOAD <username> <filename>     - Download a file from a user
+7. FILE_REQUEST <description> <username|ALL> - Request a file from user(s)
+8. VIEW_MESSAGES                      - View unread file request messages
+9. VIEW_HISTORY                       - View upload/download history
+10. LOGOUT                            - Disconnect from server
+=====================================
+
+
+Enter command: Exception in thread "main" java.util.NoSuchElementException: No line found
+	at java.base/java.util.Scanner.nextLine(Scanner.java:1660)
+	at SocketProgramming.Client.run(Client.java:49)
+	at SocketProgramming.Client.main(Client.java:25)
+Error receiving message: Socket closed

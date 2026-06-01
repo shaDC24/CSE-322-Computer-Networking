@@ -1,0 +1,62 @@
+
+[0;34m[TEST 1] Java Files Compilation[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 2] Server Startup (Port 6666)[0m
+[0;31m✗ FAILED: Server failed to start[0m
+
+[0;34m[TEST 3] Configuration Parameters Validation[0m
+Checking Server.java for:
+  - MAX_BUFFER_SIZE: 10 MB
+  - MIN_CHUNK_SIZE: 1 KB
+  - MAX_CHUNK_SIZE: 100 KB
+  - PORT: 6666
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 4] Class Structure Verification[0m
+Missing method: authenticate
+Missing method: handleClientRequest
+[0;31m✗ FAILED: Found 2 structural issues[0m
+
+[0;34m[TEST 5] Command Handler Verification[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 6] Authentication Flow Verification[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 7] Client Directory Creation Logic[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 8] Upload Session Management[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 9] File Request Queue Implementation[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 10] Random Chunk Size Generation[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 11] Synchronization for Thread Safety[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 12] ObjectStream Initialization[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 13] Exception Handling[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 14] Message Receiver Thread Implementation[0m
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 15] Menu Display Functionality[0m
+[0;32m✓ PASSED[0m
+
+[1;33m================================[0m
+[1;33mTEST SUMMARY[0m
+[1;33m================================[0m
+Total Tests Run: 15
+[0;32mPassed: 13[0m
+[0;31mFailed: 2[0m
+[1;33m================================[0m
+
+[0;31mSOME TESTS FAILED![0m ✗

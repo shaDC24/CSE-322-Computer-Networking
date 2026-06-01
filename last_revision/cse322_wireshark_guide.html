@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSE 322 — Wireshark Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=DM+Sans:wght@300;400;500;700&family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f3ee;
+  --surface: #ffffff;
+  --surface2: #f0ebe3;
+  --border: #ddd5c8;
+  --ink: #1a1410;
+  --ink2: #4a3f35;
+  --ink3: #8c7b6e;
+  --accent: #c0392b;
+  --accent2: #e67e22;
+  --green: #1a7a4a;
+  --blue: #1a4a8a;
+  --purple: #6c3483;
+  --code-bg: #1a1410;
+  --code-text: #f0c080;
+  --highlight: #fef9c3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(192,57,43,0.03) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(26,74,138,0.03) 0%, transparent 60%);
+}
+
+/* HEADER */
+header {
+  background: var(--ink);
+  color: #f7f3ee;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--accent);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.logo-tag {
+  background: var(--accent);
+  color: white;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+.logo-title {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  color: #f0c080;
+  letter-spacing: 1px;
+}
+.header-note {
+  font-size: 0.75rem;
+  color: #8c7b6e;
+  font-family: 'Fira Code', monospace;
+}
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* SIDEBAR */
+nav.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  padding: 1.5rem 0;
+}
+nav.sidebar::-webkit-scrollbar { width: 3px; }
+nav.sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+.nav-label {
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  padding: 0.5rem 1.25rem 0.3rem;
+  font-family: 'Fira Code', monospace;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.82rem;
+  color: var(--ink2);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.nav-item:hover, .nav-item.active {
+  background: #fef0ee;
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+.nav-num {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  color: var(--ink3);
+  min-width: 18px;
+}
+
+/* MAIN */
+main { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
+
+/* SECTION */
+.section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 70px;
+}
+.section-hdr {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--ink);
+}
+.s-num {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem;
+  background: var(--ink);
+  color: #f0c080;
+  padding: 3px 9px;
+  border-radius: 3px;
+}
+.section-hdr h2 { font-size: 1.3rem; font-weight: 700; }
+
+/* BANGLA BOX */
+.bangla {
+  background: #fff8f0;
+  border: 1px solid #f0d8b8;
+  border-left: 4px solid var(--accent2);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-family: 'Hind Siliguri', sans-serif;
+  font-size: 1rem;
+  line-height: 1.85;
+  color: #3d2b1a;
+}
+.bangla .bl { font-family: 'Fira Code', monospace; font-size: 0.62rem; letter-spacing: 2px; color: var(--accent2); display: block; margin-bottom: 0.4rem; text-transform: uppercase; }
+
+/* CODE BLOCK */
+.code-wrap { background: var(--code-bg); border-radius: 8px; overflow: hidden; margin: 0.75rem 0; }
+.code-hdr {
+  background: #2a2018;
+  padding: 0.45rem 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.code-hdr span { font-family: 'Fira Code', monospace; font-size: 0.68rem; color: #8c7b6e; }
+.dots { display: flex; gap: 5px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+.dr { background: #ff5f57; } .dy { background: #febc2e; } .dg { background: #28c840; }
+.code-wrap pre {
+  padding: 1.1rem 1.25rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--code-text);
+  overflow-x: auto;
+}
+pre .cmd { color: #7ec8e3; }
+pre .out { color: #6a7c5e; }
+pre .cmt { color: #5a6858; font-style: italic; }
+pre .kw { color: #f0c080; }
+pre .str { color: #a8d8a8; }
+pre .num { color: #f09060; }
+pre .hl { color: #ffffff; background: rgba(255,255,255,0.1); padding: 0 3px; border-radius: 2px; }
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.card h3 {
+  font-size: 0.92rem; font-weight: 700;
+  margin-bottom: 0.65rem; color: var(--blue);
+  display: flex; align-items: center; gap: 8px;
+}
+.card h3::before { content: '◈'; font-size: 0.7rem; }
+.card p, .card li { font-size: 0.86rem; line-height: 1.7; color: var(--ink2); }
+.card ul { padding-left: 1.2rem; }
+.card ul li { margin-bottom: 3px; }
+
+/* TABLE */
+.tbl { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 0.75rem 0; }
+.tbl th {
+  background: var(--ink); color: #f0c080;
+  font-family: 'Fira Code', monospace; font-size: 0.7rem;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 0.65rem 0.9rem; text-align: left;
+}
+.tbl td { padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); color: var(--ink2); vertical-align: top; }
+.tbl tr:hover td { background: #fdf8f4; }
+code {
+  font-family: 'Fira Code', monospace; font-size: 0.78rem;
+  background: #f0ebe3; padding: 1px 6px; border-radius: 3px;
+  color: var(--accent); border: 1px solid #ddd5c8;
+}
+
+/* ALERT */
+.alert { border-radius: 6px; padding: 0.85rem 1.1rem; margin: 0.75rem 0; font-size: 0.85rem; line-height: 1.65; display: flex; gap: 10px; }
+.alert.red { background: #fef0ee; border: 1px solid #f0b8b8; }
+.alert.blue { background: #eef4ff; border: 1px solid #b8d0f0; }
+.alert.green { background: #eef8f2; border: 1px solid #b8e0c8; }
+.alert.yellow { background: #fef9e7; border: 1px solid #f0e0a0; }
+.alert-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* SCENARIO BLOCK */
+.scenario {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.scenario-hdr {
+  background: var(--ink);
+  color: #f0c080;
+  padding: 0.6rem 1.1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.scenario-body { padding: 1rem 1.25rem; }
+.scenario-output {
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  color: var(--code-text);
+  margin: 0.75rem 0;
+}
+.why-box {
+  background: var(--highlight);
+  border: 1px solid #e8d8a0;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+.why-box strong { color: var(--accent); }
+
+/* Q&A */
+.qa-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 0.75rem; }
+.qa-q {
+  padding: 0.85rem 1.1rem; background: var(--surface);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+  transition: background 0.15s;
+}
+.qa-q:hover { background: #fef0ee; }
+.qa-q-t { font-size: 0.86rem; color: var(--ink); font-weight: 600; line-height: 1.5; }
+.lvl { font-size: 0.62rem; font-family: 'Fira Code', monospace; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+.easy { background: #eef8f2; color: var(--green); border: 1px solid #b8e0c8; }
+.medium { background: #fef9e7; color: #c47a00; border: 1px solid #f0d890; }
+.hard { background: #fef0ee; color: var(--accent); border: 1px solid #f0b8b8; }
+.mcq { background: #eef4ff; color: var(--blue); border: 1px solid #b8d0f0; }
+.qa-a { display: none; padding: 1rem 1.1rem; border-top: 1px solid var(--border); background: #fdfaf7; font-size: 0.85rem; line-height: 1.75; color: var(--ink2); }
+.qa-a.show { display: block; }
+.qa-a strong { color: var(--accent); }
+
+/* SAMPLE Q ANSWERS */
+.sample-card {
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.sample-hdr {
+  background: var(--ink);
+  color: #f0c080;
+  padding: 0.7rem 1.25rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.sample-hdr .badge {
+  background: var(--accent);
+  color: white; font-family: 'Fira Code', monospace;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 3px;
+}
+.sample-hdr span { font-size: 0.88rem; font-weight: 600; }
+.sample-body { padding: 1.25rem; background: var(--surface); }
+.q-row { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
+.q-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.q-text { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; }
+.q-ans { font-size: 0.84rem; color: var(--ink2); line-height: 1.7; }
+
+/* MCQ RADIO */
+.mcq-opt {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 0.5rem 0.75rem; border-radius: 4px;
+  margin: 4px 0; font-size: 0.84rem; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  transition: all 0.15s;
+}
+.mcq-opt:hover { background: #fef0ee; border-color: var(--accent); }
+.mcq-opt.correct { background: #eef8f2; border-color: var(--green); color: var(--green); }
+.mcq-opt.wrong { background: #fef0ee; border-color: var(--accent); color: var(--accent); }
+.opt-key { font-family: 'Fira Code', monospace; font-size: 0.7rem; background: var(--ink); color: #f0c080; padding: 1px 6px; border-radius: 2px; flex-shrink: 0; margin-top: 1px; }
+
+.divider { height: 1px; background: linear-gradient(90deg, var(--accent), transparent); margin: 2rem 0; opacity: 0.4; }
+
+/* FILTER CHEAT */
+.filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.filter-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 6px;
+}
+.filter-label { font-size: 0.75rem; color: var(--ink3); font-family: 'Fira Code', monospace; text-transform: uppercase; letter-spacing: 1px; }
+.filter-code { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); font-weight: 700; }
+.filter-desc { font-size: 0.78rem; color: var(--ink2); line-height: 1.5; }
+
+@media (max-width: 768px) {
+  nav.sidebar { display: none; }
+  main { padding: 1.5rem; }
+  .filter-grid { grid-template-columns: 1fr; }
+}
+
+.tag { display: inline-block; font-family: 'Fira Code', monospace; font-size: 0.72rem; padding: 2px 7px; border-radius: 3px; }
+.tag.blue { background: #eef4ff; color: var(--blue); border: 1px solid #b8d0f0; }
+.tag.red { background: #fef0ee; color: var(--accent); border: 1px solid #f0b8b8; }
+.tag.green { background: #eef8f2; color: var(--green); border: 1px solid #b8e0c8; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <span class="logo-tag">CSE 322</span>
+      <span class="logo-title">Wireshark & Network Monitoring</span>
+    </div>
+    <div class="header-note">// SESSIONAL QUIZ GUIDE — Teacher Suggestions Applied</div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar">
+  <div class="nav-label">Contents</div>
+  <a class="nav-item active" href="#sample-ans"><span class="nav-num">★</span> Sample Q Answers</a>
+  <a class="nav-item" href="#concepts"><span class="nav-num">01</span> Core Concepts</a>
+  <a class="nav-item" href="#tools"><span class="nav-num">02</span> Tools (tcpdump/tshark)</a>
+  <a class="nav-item" href="#interface"><span class="nav-num">03</span> Wireshark Interface</a>
+  <a class="nav-item" href="#filters"><span class="nav-num">04</span> Capture vs Display Filter</a>
+  <a class="nav-item" href="#filterref"><span class="nav-num">05</span> Filter Cheatsheet</a>
+  <a class="nav-item" href="#tcpflags"><span class="nav-num">06</span> TCP Flags & Segments</a>
+  <a class="nav-item" href="#scenarios"><span class="nav-num">07</span> Scenarios (Output+Why)</a>
+  <a class="nav-item" href="#shortqs"><span class="nav-num">08</span> Short Questions</a>
+  <a class="nav-item" href="#mcqs"><span class="nav-num">09</span> MCQ Bank</a>
+</nav>
+
+<main>
+
+<!-- ===================== SAMPLE QUESTION ANSWERS ===================== -->
+<div class="section" id="sample-ans">
+  <div class="section-hdr">
+    <span class="s-num">★</span>
+    <h2>Sample Lab Questions — Answers & Filter Codes</h2>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">💡</div>
+    <div><strong>Pattern:</strong> প্রতিটা online quiz-এ ৪টা question থাকে: (1) protocol filter, (2) port/IP filter, (3) count করা, (4) payload-এ search করে hidden info বের করা। নিচে সব batch-এর answers দেওয়া হলো।</div>
+  </div>
+
+  <!-- A1 -->
+  <div class="sample-card">
+    <div class="sample-hdr">
+      <span class="badge">A1</span>
+      <span>Maganlal Meghraj — Stolen Statue (UDP Focus)</span>
+    </div>
+    <div class="sample-body">
+      <div class="q-row">
+        <div class="q-text">Q1. Filter all the UDP packets</div>
+        <div class="q-ans">
+          <strong>Display Filter:</strong><br>
+          <code>udp</code><br>
+          <span style="font-size:0.8rem; color:var(--ink3);">→ সব UDP protocol-এর packet দেখাবে। Wireshark filter bar-এ লিখলে green হলে correct syntax।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q2. Filter all the UDP packets with port 123 (either source or destination)</div>
+        <div class="q-ans">
+          <strong>Display Filter:</strong><br>
+          <code>udp.port == 123</code><br>
+          <span style="font-size:0.8rem; color:var(--ink3);">→ Port 123 = NTP (Network Time Protocol). <code>udp.port</code> মানে source OR destination যেকোনো একটা port 123 হলেই দেখাবে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q3. Report the number of HTTP request packets</div>
+        <div class="q-ans">
+          <strong>Display Filter:</strong><br>
+          <code>http.request</code><br>
+          <span style="font-size:0.8rem; color:var(--ink3);">→ Filter apply করার পর, Wireshark-এর status bar-এ "Displayed: X" দেখলেই সেটা count। শুধু HTTP GET/POST/HEAD request গুলো দেখাবে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q4. Where is the stolen statue? (Search HTTP payload)</div>
+        <div class="q-ans">
+          <strong>Display Filter:</strong><br>
+          <code>http contains "statue"</code><br>
+          <span style="font-size:0.8rem; color:var(--ink3);">→ HTTP packet-এর payload-এ "statue" keyword আছে এমন packet দেখাবে। Packet-এ click করে নিচের hex panel-এ বা "Follow HTTP Stream" করলে location পাওয়া যাবে।</span>
+          <div class="alert green" style="margin-top:8px;">
+            <div class="alert-icon">✅</div>
+            <div><strong>Alternative:</strong> <code>http and frame contains "statue"</code> বা Ctrl+F দিয়ে string search করো।</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2 -->
+  <div class="sample-card">
+    <div class="sample-hdr">
+      <span class="badge">A2</span>
+      <span>Rajkumar — Sontu's Location (IP Focus)</span>
+    </div>
+    <div class="sample-body">
+      <div class="q-row">
+        <div class="q-text">Q1. Filter all the IP packets</div>
+        <div class="q-ans"><code>ip</code> <span style="font-size:0.8rem;color:var(--ink3);">→ IPv4 packets filter করে। IPv6 বাদ যাবে।</span></div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q2. Filter all the IP packets with destination address 10.0.0.1</div>
+        <div class="q-ans">
+          <code>ip.dst == 10.0.0.1</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ <code>ip.dst</code> = destination IP address। শুধু সেই IP-তে যাওয়া packets।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q3. Report the number of HTTP POST request packets</div>
+        <div class="q-ans">
+          <code>http.request.method == "POST"</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ শুধু HTTP POST method-এর packets count করো।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q4. Where has Sontu been taken? (case-sensitive keyword)</div>
+        <div class="q-ans">
+          <code>http contains "Sontu"</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ Case-sensitive! "sontu" লিখলে কাজ করবে না। Capital S দিতে হবে।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B1/B2 -->
+  <div class="sample-card">
+    <div class="sample-hdr">
+      <span class="badge">B1/B2</span>
+      <span>Al Taïr — Apple of Eden (DNS + TCP src port Focus)</span>
+    </div>
+    <div class="sample-body">
+      <div class="q-row">
+        <div class="q-text">Q1. Filter all the DNS packets</div>
+        <div class="q-ans">
+          <code>dns</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ DNS protocol-এর সব packets। Port 53-এ চলে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q2. Filter all the TCP packets with source port 80</div>
+        <div class="q-ans">
+          <code>tcp.srcport == 80</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ <strong>Source</strong> port 80 — মানে server থেকে আসা HTTP response packets। Destination port 80 হলে হতো <code>tcp.dstport == 80</code>।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q3. Report the number of HTTP response packets</div>
+        <div class="q-ans">
+          <code>http.response</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ Server থেকে আসা HTTP responses (200 OK, 404 Not Found, etc.)। <code>http.request</code>-এর opposite।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q4. Where is the apple of eden? (Search HTTP payload)</div>
+        <div class="q-ans">
+          <code>http contains "apple"</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ HTTP packet-এ "apple" keyword search।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C1/C2 -->
+  <div class="sample-card">
+    <div class="sample-hdr">
+      <span class="badge">C1/C2</span>
+      <span>Sherlock Holmes — Bank Robbery Time (TCP Focus)</span>
+    </div>
+    <div class="sample-body">
+      <div class="q-row">
+        <div class="q-text">Q1. Filter all the TCP packets</div>
+        <div class="q-ans"><code>tcp</code></div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q2. Filter all the TCP packets with port 80 (either source or destination)</div>
+        <div class="q-ans">
+          <code>tcp.port == 80</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ <code>tcp.port</code> মানে src OR dst — যেকোনো দিকে 80 হলেই দেখাবে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q3. Report the number of HTTP packets</div>
+        <div class="q-ans">
+          <code>http</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ সব HTTP packets (request + response উভয়)। Status bar-এ "Displayed" count দেখো।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q4. What is the time of the next robbery?</div>
+        <div class="q-ans">
+          <code>http contains "robbery"</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ Packet-এ click করে → "Follow HTTP Stream" করলে পুরো conversation দেখা যাবে।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAKEUP -->
+  <div class="sample-card">
+    <div class="sample-hdr">
+      <span class="badge">MAKEUP</span>
+      <span>Dr. MLD — Monalisa Location (ARP + UDP dst port Focus)</span>
+    </div>
+    <div class="sample-body">
+      <div class="q-row">
+        <div class="q-text">Q1. Filter all the ARP packets</div>
+        <div class="q-ans">
+          <code>arp</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ ARP (Address Resolution Protocol) — IP থেকে MAC address খোঁজে। Layer 2 protocol।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q2. Filter all the UDP packets with destination port 7078</div>
+        <div class="q-ans">
+          <code>udp.dstport == 7078</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ Destination port 7078-এর UDP packets। <code>udp.dst port 7078</code> বা <code>udp.dstport == 7078</code> — দুটোই কাজ করে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q3. Report the number of HTTP HEAD request packets</div>
+        <div class="q-ans">
+          <code>http.request.method == "HEAD"</code><br>
+          <span style="font-size:0.8rem;color:var(--ink3);">→ HTTP HEAD method — GET-এর মতো কিন্তু body ছাড়া, শুধু headers আসে।</span>
+        </div>
+      </div>
+      <div class="q-row">
+        <div class="q-text">Q4. Where is Monalisa? (case-sensitive!)</div>
+        <div class="q-ans">
+          <code>http contains "Monalisa"</code><br>
+          <div class="alert red" style="margin-top:8px;">
+            <div class="alert-icon">⚠️</div>
+            <div><strong>Case-sensitive!</strong> "monalisa" বা "MONALISA" লিখলে কাজ করবে না। Exactly "Monalisa" লিখতে হবে।</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== CORE CONCEPTS ===================== -->
+<div class="section" id="concepts">
+  <div class="section-hdr">
+    <span class="s-num">01</span>
+    <h2>Core Concepts — Network Monitoring</h2>
+  </div>
+
+  <div class="bangla">
+    <span class="bl">🇧🇩 বাংলায় ব্যাখ্যা</span>
+    Network Monitoring মানে হলো নেটওয়ার্কে কি ধরনের traffic চলছে সেটা observe করা। কেন দরকার? Router/Firewall policy সঠিকভাবে কাজ করছে কিনা check করতে, abnormal/error traffic detect করতে (security), এবং future forensic analysis-এর জন্য traffic log রাখতে।
+  </div>
+
+  <div class="card">
+    <h3>3 Tools — tcpdump, tshark, Wireshark</h3>
+    <table class="tbl">
+      <tr><th>Feature</th><th>tcpdump</th><th>tshark</th><th>Wireshark</th></tr>
+      <tr><td>Interface</td><td>CLI (Command Line)</td><td>CLI (like tcpdump)</td><td>GUI (Graphical)</td></tr>
+      <tr><td>Platform</td><td>Unix/Linux</td><td>Cross-platform</td><td>Cross-platform</td></tr>
+      <tr><td>Filter power</td><td>Simple filters</td><td>Simple + BPF</td><td>Complex filters ✓</td></tr>
+      <tr><td>Protocol decode</td><td>Basic</td><td>Full</td><td>Full + deep ✓</td></tr>
+      <tr><td>Payload analysis</td><td>Limited</td><td>Yes</td><td>Full decode ✓</td></tr>
+      <tr><td>File read</td><td><code>-r file.pcap</code></td><td><code>-r file.pcap</code></td><td>File → Open</td></tr>
+      <tr><td>File write</td><td><code>-w file.pcap</code></td><td><code>-w file.pcap</code></td><td>File → Save</td></tr>
+    </table>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">📌</div>
+    <div><strong>Key:</strong> Wireshark হলো tcpdump/tshark-এর GUI version। Wireshark-এ .pcap file open করা যায় যেটা tcpdump <code>-w</code> দিয়ে save করা। Tshark হলো Wireshark-এর সাথে আসা CLI tool।</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== TOOLS ===================== -->
+<div class="section" id="tools">
+  <div class="section-hdr">
+    <span class="s-num">02</span>
+    <h2>tcpdump — Commands & Output</h2>
+  </div>
+
+  <div class="bangla">
+    <span class="bl">🇧🇩 বাংলায় ব্যাখ্যা</span>
+    tcpdump হলো Unix-এর command-line packet capture tool। এটা network interface থেকে live packet ধরে বা আগে save করা file পড়তে পারে। <strong>sudo</strong> দিয়ে run করতে হয় কারণ network interface access করতে root privilege লাগে।
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-hdr"><div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div><span>tcpdump — Common Commands</span></div>
+    <pre>
+<span class="cmt"># Basic — eth0 interface থেকে capture শুরু করো</span>
+<span class="cmd">$ sudo tcpdump -i eth0</span>
+
+<span class="cmt"># Verbose output</span>
+<span class="cmd">$ sudo tcpdump -v -i eth0</span>
+
+<span class="cmt"># File-এ save করো (live capture → pcap file)</span>
+<span class="cmd">$ sudo tcpdump -i eth0 -w capture.pcap</span>
+
+<span class="cmt"># Saved file পড়ো</span>
+<span class="cmd">$ tcpdump -r capture.pcap</span>
+
+<span class="cmt"># Only UDP packets</span>
+<span class="cmd">$ tcpdump "udp"</span>
+
+<span class="cmt"># Only TCP packets</span>
+<span class="cmd">$ tcpdump "tcp"</span>
+
+<span class="cmt"># UDP with destination port 53 (DNS requests)</span>
+<span class="cmd">$ tcpdump "udp dst port 53"</span>
+
+<span class="cmt"># UDP with source port 53 (DNS replies)</span>
+<span class="cmd">$ tcpdump "udp src port 53"</span>
+
+<span class="cmt"># UDP with port 53 (both DNS requests and replies)</span>
+<span class="cmd">$ tcpdump "udp port 53"</span>
+    </pre>
+  </div>
+
+  <div class="card">
+    <h3>tcpdump Output Line — Breakdown</h3>
+    <div class="code-wrap" style="margin:8px 0;">
+      <pre style="padding:0.85rem 1rem; font-size:0.78rem; line-height:1.8;">
+<span class="kw">01:46:28.808262</span>  <span class="str">IP</span>  <span class="hl">danjo.CS.Berkeley.EDU.ssh</span>  <span class="num">&gt;</span>  <span class="hl">adsl-69-228-230-7.dsl.pltn13.pacbell.net.2481</span>:
+      <span class="kw">↑</span>              <span class="str">↑</span>          <span class="kw">↑</span>               <span class="num">↑</span>              <span class="kw">↑</span>                    <span class="num">↑</span>
+   Timestamp      IP packet   SRC hostname    SRC port(22)    DST hostname          DST port
+
+<span class="num">2513546054:2513547434(1380) ack 1268355216 win 12816</span>
+<span class="num">↑ TCP seq range(size)         ↑ ACK number    ↑ Window size</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== INTERFACE ===================== -->
+<div class="section" id="interface">
+  <div class="section-hdr">
+    <span class="s-num">03</span>
+    <h2>Wireshark Interface — 4 Panels</h2>
+  </div>
+
+  <div class="bangla">
+    <span class="bl">🇧🇩 বাংলায় ব্যাখ্যা</span>
+    Wireshark খুললে ৪টা প্রধান অংশ দেখা যায়: উপরে <strong>filter bar</strong>, তারপর <strong>packet list</strong> (সব captured packets), তার নিচে <strong>packet details</strong> (selected packet-এর layer-by-layer breakdown), এবং সবচেয়ে নিচে <strong>hex dump</strong> (raw bytes in hex এবং ASCII)।
+  </div>
+
+  <div class="card">
+    <h3>Wireshark-এর 4 Parts</h3>
+    <table class="tbl">
+      <tr><th>Part</th><th>কি দেখায়</th><th>Location</th></tr>
+      <tr><td><strong>Command Menus</strong></td><td>File, Edit, Capture, Analyze, Statistics... সব menu</td><td>Top bar</td></tr>
+      <tr><td><strong>Display Filter</strong></td><td>Filter type করার bar — <code>Apply a display filter...</code></td><td>Below menus</td></tr>
+      <tr><td><strong>Packet List</strong></td><td>No., Time, Source, Destination, Protocol, Length, Info</td><td>Upper panel</td></tr>
+      <tr><td><strong>Packet Details</strong></td><td>Selected packet-এর protocol layers (Frame → Ethernet → IP → TCP → App)</td><td>Middle panel</td></tr>
+      <tr><td><strong>Packet Content</strong></td><td>Raw hex dump + ASCII representation</td><td>Bottom panel</td></tr>
+      <tr><td><strong>Status Bar</strong></td><td>Packets: total · Displayed: filtered count · Profile</td><td>Very bottom</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Packet Detail Layers (Clicking ▶ expands)</h3>
+    <div class="code-wrap" style="margin:8px 0;">
+      <pre>
+▶ <span class="kw">Frame</span> 5031: 66 bytes on wire (528 bits)
+▶ <span class="kw">Ethernet II</span>, Src: IntelCor_07:90:b8, Dst: BelkinIn_ea:c6:d5
+▶ <span class="kw">Internet Protocol Version 4</span>, Src: 192.168.2.5, Dst: 103.94.135.200
+▶ <span class="kw">Transmission Control Protocol</span>, Src Port: 49643, Dst Port: 443, Seq: 1318, Ack: 578795
+      </pre>
+    </div>
+    <p style="font-size:0.82rem; color:var(--ink3); margin-top:6px;">এটা OSI model-এর নিচ থেকে উপরে — Frame (L1), Ethernet (L2), IP (L3), TCP (L4)।</p>
+  </div>
+
+  <div class="card">
+    <h3>Capture Options — Promiscuous Mode</h3>
+    <ul>
+      <li><strong>Promiscuous mode:</strong> সব network traffic capture করে (শুধু নিজের নয়)। "Enable promiscuous mode on all interfaces" checkbox।</li>
+      <li><strong>কখন কাজ করে না:</strong> Driver support না থাকলে, বা Switched LAN-এ (switch শুধু addressed packets পাঠায়)।</li>
+      <li><strong>Ring Buffer:</strong> Huge trace problem solve করে। Define করা যায় কতটা file, কত packets/bytes/time-এ নতুন file create হবে।</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== FILTERS ===================== -->
+<div class="section" id="filters">
+  <div class="section-hdr">
+    <span class="s-num">04</span>
+    <h2>Capture Filter vs Display Filter</h2>
+  </div>
+
+  <div class="bangla">
+    <span class="bl">🇧🇩 বাংলায় ব্যাখ্যা</span>
+    Wireshark-এ দুই ধরনের filter আছে। <strong>Capture Filter</strong> দিয়ে capture শুরু করার আগেই বলে দেওয়া হয় কি ধরনের packet capture হবে — বাকি packets ধরাই হবে না। <strong>Display Filter</strong> capture-এর পরে শুধু view পরিবর্তন করে — সব packets trace-এ থাকে, শুধু display-এ filter হয়।
+  </div>
+
+  <div class="card">
+    <h3>Capture Filter vs Display Filter — Key Differences</h3>
+    <table class="tbl">
+      <tr><th></th><th>Capture Filter</th><th>Display Filter</th></tr>
+      <tr><td>কখন apply?</td><td>Capture শুরু হওয়ার আগে</td><td>Capture-এর পরে (analysis-এ)</td></tr>
+      <tr><td>Effect?</td><td>Non-matching packets capture-ই হয় না</td><td>সব packets আছে, শুধু view filtered</td></tr>
+      <tr><td>Syntax</td><td>BPF (Berkeley Packet Filter) syntax</td><td>Wireshark-specific syntax</td></tr>
+      <tr><td>Power</td><td>Simple</td><td>Much more powerful ✓</td></tr>
+      <tr><td>Location</td><td>Capture → Options → Capture filter field</td><td>Filter bar (Ctrl+/ বা top bar)</td></tr>
+      <tr><td>Save packets?</td><td>Non-matched packets lost forever</td><td>All packets still saved</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Capture Filter Examples (BPF Syntax)</h3>
+    <table class="tbl">
+      <tr><th>Goal</th><th>Capture Filter</th></tr>
+      <tr><td>Specific host</td><td><code>host 10.1.11.24</code></td></tr>
+      <tr><td>Two hosts conversation</td><td><code>host 192.168.0.1 and host 10.1.11.1</code></td></tr>
+      <tr><td>HTTP port</td><td><code>tcp port http</code></td></tr>
+      <tr><td>IPv4 only</td><td><code>ip</code></td></tr>
+      <tr><td>No broadcast/multicast</td><td><code>not broadcast not multicast</code></td></tr>
+      <tr><td>Specific MAC</td><td><code>ether host 00:04:13:00:09:a3</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Display Filter — Syntax Structure</h3>
+    <div class="code-wrap" style="margin:8px 0;">
+      <pre>
+Syntax:   <span class="kw">Protocol</span> . <span class="str">Field</span>  <span class="num">Operator</span>  <span class="hl">Value</span>
+Example:  <span class="kw">ip</span>       . <span class="str">addr</span>   <span class="num">==</span>        <span class="hl">192.168.1.10</span>
+Example:  <span class="kw">tcp</span>      . <span class="str">port</span>   <span class="num">==</span>        <span class="hl">80</span>
+Example:  <span class="kw">http</span>     . <span class="str">request.method</span>  <span class="num">==</span>  <span class="hl">"GET"</span>
+
+<span class="cmt">Comparison operators:</span>
+  <span class="num">==</span> (eq)    <span class="num">!=</span> (ne)    <span class="num">&gt;</span> (gt)    <span class="num">&lt;</span> (lt)    <span class="num">&gt;=</span> (ge)    <span class="num">&lt;=</span> (le)
+
+<span class="cmt">Logical operators:</span>
+  <span class="num">&amp;&amp;</span> (and)    <span class="num">||</span> (or)    <span class="num">!</span> (not)    <span class="num">^^</span> (xor)
+
+<span class="cmt">Syntax correct → GREEN highlight</span>
+<span class="cmt">Syntax wrong   → RED highlight</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== FILTER CHEATSHEET ===================== -->
+<div class="section" id="filterref">
+  <div class="section-hdr">
+    <span class="s-num">05</span>
+    <h2>Complete Filter Cheatsheet — Exam Ready</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-hdr"><div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div><span>Display Filters — Full Reference</span></div>
+    <pre>
+<span class="cmt">══════════ PROTOCOL FILTERS ══════════</span>
+<span class="kw">tcp</span>                          <span class="cmt">→ All TCP packets</span>
+<span class="kw">udp</span>                          <span class="cmt">→ All UDP packets</span>
+<span class="kw">ip</span>                           <span class="cmt">→ All IPv4 packets</span>
+<span class="kw">ipv6</span>                         <span class="cmt">→ All IPv6 packets</span>
+<span class="kw">http</span>                         <span class="cmt">→ All HTTP packets (req + resp)</span>
+<span class="kw">dns</span>                          <span class="cmt">→ All DNS packets (port 53)</span>
+<span class="kw">arp</span>                          <span class="cmt">→ All ARP packets</span>
+<span class="kw">icmp</span>                         <span class="cmt">→ All ICMP packets (ping)</span>
+<span class="kw">ftp</span>                          <span class="cmt">→ FTP packets</span>
+<span class="kw">smtp</span>                         <span class="cmt">→ Email (SMTP) packets</span>
+<span class="kw">tls</span> / <span class="kw">ssl</span>                    <span class="cmt">→ TLS/SSL encrypted traffic</span>
+
+<span class="cmt">══════════ PORT FILTERS ══════════</span>
+<span class="kw">tcp.port == 80</span>               <span class="cmt">→ TCP src OR dst port 80</span>
+<span class="kw">tcp.srcport == 80</span>            <span class="cmt">→ TCP source port = 80 (server responses)</span>
+<span class="kw">tcp.dstport == 80</span>            <span class="cmt">→ TCP destination port = 80 (client requests)</span>
+<span class="kw">udp.port == 123</span>              <span class="cmt">→ UDP src OR dst port 123 (NTP)</span>
+<span class="kw">udp.dstport == 7078</span>          <span class="cmt">→ UDP destination port = 7078</span>
+<span class="kw">tcp.port == 80 || tcp.port == 443</span> <span class="cmt">→ HTTP or HTTPS</span>
+<span class="kw">tcp.port == 25</span>               <span class="cmt">→ SMTP (email)</span>
+<span class="kw">tcp.dstport == 80</span>            <span class="cmt">→ Outgoing HTTP requests</span>
+
+<span class="cmt">══════════ IP ADDRESS FILTERS ══════════</span>
+<span class="kw">ip.addr == 192.168.1.10</span>      <span class="cmt">→ IP src OR dst = 192.168.1.10</span>
+<span class="kw">ip.src == 192.168.1.10</span>       <span class="cmt">→ Source IP</span>
+<span class="kw">ip.dst == 10.0.0.1</span>          <span class="cmt">→ Destination IP</span>
+<span class="kw">ip.src == 10.1.11.0/24</span>      <span class="cmt">→ Subnet filter</span>
+
+<span class="cmt">══════════ HTTP SPECIFIC FILTERS ══════════</span>
+<span class="kw">http.request</span>                 <span class="cmt">→ All HTTP requests (GET/POST/HEAD/PUT...)</span>
+<span class="kw">http.response</span>                <span class="cmt">→ All HTTP responses (200 OK, 404, etc.)</span>
+<span class="kw">http.request.method == "GET"</span> <span class="cmt">→ Only GET requests</span>
+<span class="kw">http.request.method == "POST"</span><span class="cmt">→ Only POST requests</span>
+<span class="kw">http.request.method == "HEAD"</span><span class="cmt">→ Only HEAD requests</span>
+<span class="kw">http contains "keyword"</span>      <span class="cmt">→ Payload search (case-sensitive!)</span>
+<span class="kw">http.response.code == 200</span>   <span class="cmt">→ HTTP 200 OK responses only</span>
+<span class="kw">http.response.code == 404</span>   <span class="cmt">→ HTTP 404 Not Found</span>
+
+<span class="cmt">══════════ TCP FLAG FILTERS ══════════</span>
+<span class="kw">tcp.flags == 0x002</span>           <span class="cmt">→ SYN packets (connection initiation)</span>
+<span class="kw">tcp.flags.syn == 1</span>           <span class="cmt">→ SYN flag set (same as above)</span>
+<span class="kw">tcp.flags == 0x012</span>           <span class="cmt">→ SYN-ACK packets</span>
+<span class="kw">tcp.flags == 0x010</span>           <span class="cmt">→ ACK packets</span>
+<span class="kw">tcp.flags == 0x001</span>           <span class="cmt">→ FIN packets</span>
+<span class="kw">tcp.flags == 0x004</span>           <span class="cmt">→ RST (Reset) packets</span>
+<span class="kw">tcp.flags</span>                    <span class="cmt">→ Any TCP packet with a flag set</span>
+
+<span class="cmt">══════════ COMBINATION FILTERS ══════════</span>
+<span class="kw">ip.addr==192.168.1.10 &amp;&amp; ip.addr==192.168.1.20</span>  <span class="cmt">→ Between two hosts</span>
+<span class="kw">!(ip.addr==192.168.1.10)</span>     <span class="cmt">→ Exclude specific IP</span>
+<span class="kw">tcp.port==80 || tcp.port==443</span><span class="cmt">→ HTTP or HTTPS</span>
+<span class="kw">http &amp;&amp; ip.src==192.168.1.5</span> <span class="cmt">→ HTTP from specific IP</span>
+<span class="kw">snmp || dns || icmp</span>          <span class="cmt">→ Multiple protocols</span>
+<span class="kw">not arp and not dns</span>          <span class="cmt">→ Exclude ARP and DNS noise</span>
+<span class="kw">tcp.stream eq 5</span>              <span class="cmt">→ Follow specific TCP stream</span>
+
+<span class="cmt">══════════ PAYLOAD SEARCH ══════════</span>
+<span class="kw">http contains "keyword"</span>      <span class="cmt">→ HTTP payload search (case-sensitive)</span>
+<span class="kw">frame contains "keyword"</span>     <span class="cmt">→ Search entire frame</span>
+<span class="kw">tcp contains "keyword"</span>       <span class="cmt">→ TCP payload search</span>
+    </pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== TCP FLAGS ===================== -->
+<div class="section" id="tcpflags">
+  <div class="section-hdr">
+    <span class="s-num">06</span>
+    <h2>TCP Segment & Flags</h2>
+  </div>
+
+  <div class="bangla">
+    <span class="bl">🇧🇩 বাংলায় ব্যাখ্যা</span>
+    TCP-তে ৬টা গুরুত্বপূর্ণ flag আছে। প্রতিটা flag ১ bit। এই flags দিয়ে TCP connection-এর state বোঝা যায়। Wireshark-এ এই flags filter করা যায়।
+  </div>
+
+  <div class="card">
+    <h3>TCP Flags — Wireshark Filter Values</h3>
+    <table class="tbl">
+      <tr><th>Flag</th><th>Full Name</th><th>Hex Value</th><th>Wireshark Filter</th><th>কি করে</th></tr>
+      <tr><td><span class="tag red">SYN</span></td><td>Synchronize</td><td>0x002</td><td><code>tcp.flags == 0x002</code> বা <code>tcp.flags.syn==1</code></td><td>Connection শুরু করা</td></tr>
+      <tr><td><span class="tag green">SYN-ACK</span></td><td>Syn + Acknowledge</td><td>0x012</td><td><code>tcp.flags == 0x012</code></td><td>Connection accept</td></tr>
+      <tr><td><span class="tag blue">ACK</span></td><td>Acknowledge</td><td>0x010</td><td><code>tcp.flags == 0x010</code></td><td>Data received confirm</td></tr>
+      <tr><td><span class="tag red">FIN</span></td><td>Finish</td><td>0x001</td><td><code>tcp.flags == 0x001</code></td><td>Connection বন্ধ করা</td></tr>
+      <tr><td><span class="tag red">RST</span></td><td>Reset</td><td>0x004</td><td><code>tcp.flags == 0x004</code></td><td>Connection forcefully বন্ধ</td></tr>
+      <tr><td><span class="tag blue">PSH</span></td><td>Push</td><td>0x008</td><td><code>tcp.flags.push==1</code></td><td>Data এখনই deliver করো</td></tr>
+    </table>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">🎯</div>
+    <div><strong>Exam Tip:</strong> <code>tcp.flags == 2</code> = SYN। <code>tcp.flags == 18</code> (decimal) = SYN-ACK (0x12 hex = 18 decimal)। TCP 3-way handshake: SYN → SYN-ACK → ACK।</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== SCENARIOS ===================== -->
+<div class="section" id="scenarios">
+  <div class="section-hdr">
+    <span class="s-num">07</span>
+    <h2>Scenario-Based Questions — Output কি এবং কেন?</h2>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">🎓</div>
+    <div><strong>Teacher-এর suggestion:</strong> "Scenario based questions thakte pare: like output ki nd why" — নিচে real output দেখে explain করার practice করো।</div>
+  </div>
+
+  <!-- SCENARIO 1 -->
+  <div class="scenario">
+    <div class="scenario-hdr">📡 Scenario 1 — tcpdump output analyze করো</div>
+    <div class="scenario-body">
+      <div class="scenario-output">
+01:46:28.808262 IP danjo.CS.Berkeley.EDU.ssh > adsl-69-228-230-7.dsl.pltn13.pacbell.net.2481:
+. 2513546054:2513547434(1380) ack 1268355216 win 12816
+      </div>
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">Q: এই output-এর প্রতিটা অংশ কি বোঝায়?</p>
+      <div class="why-box">
+        <strong>Answer:</strong><br>
+        <code>01:46:28.808262</code> → Timestamp (সময়)<br>
+        <code>IP</code> → এটা একটা IP packet<br>
+        <code>danjo.CS.Berkeley.EDU.ssh</code> → Source = danjo.CS.Berkeley.EDU, Source Port = ssh (port 22)<br>
+        <code>&gt;</code> → Packet direction (পাঠানো হচ্ছে)<br>
+        <code>adsl-69-228-230-7...net.2481</code> → Destination host, Destination Port = 2481<br>
+        <code>.</code> → No flags set (just data)<br>
+        <code>2513546054:2513547434(1380)</code> → Seq range, 1380 bytes of data<br>
+        <code>ack 1268355216</code> → ACK number<br>
+        <code>win 12816</code> → Window size (কত byte receive করতে পারবে)
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 2 -->
+  <div class="scenario">
+    <div class="scenario-hdr">🔍 Scenario 2 — Display filter result count</div>
+    <div class="scenario-body">
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">Q: Wireshark-এ filter <code>http.request</code> apply করার পর status bar-এ দেখাচ্ছে: <em>"Packets: 30180 · Displayed: 45"</em> — এর মানে কি?</p>
+      <div class="why-box">
+        <strong>Answer:</strong><br>
+        <strong>Packets: 30180</strong> → Total 30,180 টা packet capture হয়েছে (pcap file-এ আছে)<br>
+        <strong>Displayed: 45</strong> → Filter apply করার পরে মাত্র 45 টা HTTP request packet দেখা যাচ্ছে<br><br>
+        <strong>কেন বাকিগুলো দেখা যাচ্ছে না?</strong> Display filter শুধু view change করে — সব 30,180 packets এখনো file-এ আছে। Filter remove করলে আবার সব দেখা যাবে।<br><br>
+        তাই <strong>HTTP request count = 45</strong>।
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 3 -->
+  <div class="scenario">
+    <div class="scenario-hdr">🛡️ Scenario 3 — Capture filter vs Display filter</div>
+    <div class="scenario-body">
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">Q: একটা analyst Capture filter দিয়ে <code>tcp</code> দিয়ে capture করেছে। পরে সে UDP packets দেখতে চাইছে Display filter দিয়ে। সে কি পারবে? কেন?</p>
+      <div class="why-box">
+        <strong>Answer: না, পারবে না।</strong><br><br>
+        কারণ: Capture filter <code>tcp</code> দিলে capture শুরু হওয়ার সময়ই শুধু TCP packets capture হয়েছে। UDP packets capture-ই হয়নি — pcap file-এ নেই।<br><br>
+        Display filter শুধু already captured packets-এর view change করে। যা capture হয়নি, তা display করা সম্ভব না।<br><br>
+        <strong>সমাধান:</strong> আবার capture করতে হবে — এবার Capture filter ছাড়া, বা <code>udp</code> দিয়ে।
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 4 -->
+  <div class="scenario">
+    <div class="scenario-hdr">📊 Scenario 4 — Protocol Hierarchy কি দেখায়</div>
+    <div class="scenario-body">
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">Q: Statistics → Protocol Hierarchy-তে TCP 91% দেখাচ্ছে। এর মানে কি?</p>
+      <div class="why-box">
+        <strong>Answer:</strong> Total captured packets-এর 91% হলো TCP packets। এর মানে:<br>
+        → ওই network-এ বেশিরভাগ traffic TCP-based (HTTP, HTTPS, SSH, etc.)<br>
+        → UDP traffic (DNS, video streaming, etc.) মাত্র ~9%<br><br>
+        Protocol Hierarchy Statistics → Statistics menu থেকে পাওয়া যায়। এটা নেটওয়ার্কের traffic composition বুঝতে ব্যবহার হয়।
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 5 -->
+  <div class="scenario">
+    <div class="scenario-hdr">🔴 Scenario 5 — Filter syntax error</div>
+    <div class="scenario-body">
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">Q: Filter bar-এ <code>tcp.port = 80</code> লিখলে Red হয়। কিন্তু <code>tcp.port == 80</code> লিখলে Green হয়। কেন?</p>
+      <div class="why-box">
+        <strong>Answer:</strong><br>
+        Wireshark Display filter-এ comparison operator হলো <strong>double equals <code>==</code></strong> (C-like syntax)।<br>
+        Single <code>=</code> হলো assignment operator (programming-এ) — Wireshark এটা filter syntax হিসেবে accept করে না।<br><br>
+        <strong>Rule:</strong> Correct syntax → Green background। Wrong syntax → Red background।
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== SHORT QUESTIONS ===================== -->
+<div class="section" id="shortqs">
+  <div class="section-hdr">
+    <span class="s-num">08</span>
+    <h2>Short Questions (1-3 marks) — Teacher Suggested</h2>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">📝</div>
+    <div>Teacher-এর suggestion: <em>"Mostly short questions ashbe"</em> — নিচে click করলে answer দেখা যাবে।</div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q1. Wireshark কি? এটা tcpdump থেকে কিভাবে আলাদা? (2 marks)</div>
+      <span class="lvl easy">Easy</span>
+    </div>
+    <div class="qa-a">
+      <strong>Wireshark:</strong> একটা open-source GUI-based packet sniffer/protocol analyzer। এটা Ethereal tool-এর latest version।<br><br>
+      <strong>Tcpdump থেকে পার্থক্য:</strong><br>
+      → Wireshark GUI; tcpdump CLI<br>
+      → Wireshark complex filters support করে; tcpdump simple filters<br>
+      → Wireshark protocol decode করে (payload analysis); tcpdump basic analysis<br>
+      → Wireshark advanced network interfaces; tcpdump conventional
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q2. Capture Filter এবং Display Filter-এর মধ্যে পার্থক্য লেখো। (2 marks)</div>
+      <span class="lvl easy">Easy</span>
+    </div>
+    <div class="qa-a">
+      <strong>Capture Filter:</strong> Capture শুরু হওয়ার আগে set করা হয়। Non-matching packets capture-ই হয় না — trace file-এ থাকে না। BPF syntax use করে। Simple but efficient।<br><br>
+      <strong>Display Filter:</strong> Capture-এর পরে analysis-এ use করা হয়। সব packets trace-এ থাকে, শুধু display filtered হয়। Wireshark-specific syntax। অনেক বেশি powerful।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q3. Wireshark Interface-এর 4টি প্রধান অংশের নাম ও কাজ লেখো। (2 marks)</div>
+      <span class="lvl easy">Easy</span>
+    </div>
+    <div class="qa-a">
+      1. <strong>Display Filter Bar:</strong> Packet display filter লেখার জায়গা।<br>
+      2. <strong>Packet List Panel:</strong> সব captured packets-এর list — No., Time, Src, Dst, Protocol, Info।<br>
+      3. <strong>Packet Details Panel:</strong> Selected packet-এর layer-by-layer protocol breakdown।<br>
+      4. <strong>Packet Content Panel:</strong> Raw hex dump + ASCII representation of selected packet।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q4. Wireshark-এ HTTP request packet count কিভাবে করবে? (1 mark)</div>
+      <span class="lvl easy">Easy</span>
+    </div>
+    <div class="qa-a">
+      Display filter bar-এ <code>http.request</code> লিখে Enter press করো। Filter apply হলে status bar-এ <strong>"Displayed: X"</strong> দেখাবে — সেটাই HTTP request packet count।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q5. <code>tcp.flags == 0x002</code> এবং <code>tcp.flags == 0x012</code> — প্রতিটা কি? (2 marks)</div>
+      <span class="lvl medium">Medium</span>
+    </div>
+    <div class="qa-a">
+      <code>tcp.flags == 0x002</code> → <strong>SYN packet</strong> — TCP connection শুরু করার সময় client পাঠায়।<br><br>
+      <code>tcp.flags == 0x012</code> → <strong>SYN-ACK packet</strong> — Server-এর response to SYN। 0x012 = SYN (0x002) + ACK (0x010) = 0x012।<br><br>
+      3-way handshake: Client → SYN → Server → SYN-ACK → Client → ACK।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q6. Promiscuous mode কি? কখন কাজ করে না? (2 marks)</div>
+      <span class="lvl medium">Medium</span>
+    </div>
+    <div class="qa-a">
+      <strong>Promiscuous mode:</strong> Network adapter-এর এমন একটা mode যেখানে শুধু নিজের IP-addressকৃত packets নয়, নেটওয়ার্কের সব packets capture করা হয়।<br><br>
+      <strong>কখন কাজ করে না:</strong><br>
+      → Driver promiscuous mode support না করলে<br>
+      → Switched LAN-এ (switch শুধু addressed packets forward করে, broadcast/multicast ছাড়া অন্যের traffic পাওয়া যায় না)
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q7. Ring Buffer কি? কখন ব্যবহার করা হয়? (1 mark)</div>
+      <span class="lvl medium">Medium</span>
+    </div>
+    <div class="qa-a">
+      Ring Buffer হলো Wireshark-এর একটা capture feature যা huge trace file-এর সমস্যা সমাধান করে। নির্দিষ্ট সংখ্যক file বা size/time limit define করে automatic নতুন file create করে। পুরানো file overwrite হয় — memory/disk সমস্যা avoid করা হয়।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q8. Wireshark-এ HTTP payload-এ "keyword" search করার filter কি? Case-sensitivity কি important? (2 marks)</div>
+      <span class="lvl medium">Medium</span>
+    </div>
+    <div class="qa-a">
+      Filter: <code>http contains "keyword"</code><br><br>
+      <strong>হ্যাঁ, case-sensitivity important!</strong> <code>contains</code> operator case-sensitive। "Monalisa" আর "monalisa" আলাদা। Exact spelling এবং capitalization match করতে হবে।<br><br>
+      Alternative: <code>frame contains "keyword"</code> — পুরো packet (সব layers) search করে।
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q9. Expert Information (Analyze → Expert Information) কি দেখায়? (1 mark)</div>
+      <span class="lvl hard">Hard</span>
+    </div>
+    <div class="qa-a">
+      Expert Information Wireshark-এর automatic analysis tool যা network issues highlight করে severity অনুযায়ী:<br>
+      → <strong>Error:</strong> Critical issues (malformed packets, TLS errors)<br>
+      → <strong>Warning:</strong> Potential issues (retransmissions, RST, zero window)<br>
+      → <strong>Note:</strong> Notable events (fast retransmission, duplicate ACK)<br>
+      → <strong>Chat:</strong> Normal events (connection established)<br>
+      Path: Analyze → Expert Information
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <div class="qa-q-t">Q10. <code>tcp.srcport == 80</code> এবং <code>tcp.dstport == 80</code> — কোনটা HTTP request এবং কোনটা HTTP response? (2 marks)</div>
+      <span class="lvl hard">Hard</span>
+    </div>
+    <div class="qa-a">
+      <code>tcp.dstport == 80</code> → <strong>HTTP Request</strong> — Client server-এর port 80-এ পাঠাচ্ছে (destination = server)।<br><br>
+      <code>tcp.srcport == 80</code> → <strong>HTTP Response</strong> — Server port 80 থেকে client-এ পাঠাচ্ছে (source = server)।<br><br>
+      সহজ মনে রাখা: Traffic direction = destination হলো "গেলো", source হলো "এলো"।
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== MCQ ===================== -->
+<div class="section" id="mcqs">
+  <div class="section-hdr">
+    <span class="s-num">09</span>
+    <h2>MCQ Bank — (Click option to see answer)</h2>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">📋</div>
+    <div>Teacher-এর suggestion: <em>"few MCQs thakbe"</em> — নিচের options-এ click করলে correct/wrong দেখাবে।</div>
+  </div>
+
+  <!-- MCQ 1 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 1. Wireshark কোন ধরনের tool?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> Command-line packet capture tool</div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> GUI-based packet sniffer/protocol analyzer</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> Network firewall tool</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> Routing protocol</div>
+  </div>
+
+  <!-- MCQ 2 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 2. DNS packets filter করার Wireshark display filter কোনটা?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> <code>port 53</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">B</span> <code>udp port 53</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">C</span> <code>dns</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> <code>tcp.port == 53</code></div>
+  </div>
+
+  <!-- MCQ 3 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 3. HTTP POST request packets count করার filter কোনটা?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> <code>http.response</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">B</span> <code>http.request</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">C</span> <code>http.request.method == "POST"</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> <code>tcp.port == 80 and http</code></div>
+  </div>
+
+  <!-- MCQ 4 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 4. Wireshark-এ TCP SYN packet filter করার সঠিক filter কোনটা?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> <code>tcp.flags == 0x012</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> <code>tcp.flags == 0x002</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> <code>tcp.flags == 0x010</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> <code>tcp.flags == 0x001</code></div>
+  </div>
+
+  <!-- MCQ 5 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 5. Capture filter-এ <code>tcp</code> দিয়ে capture করলে পরে Display filter-এ <code>udp</code> দিলে কি হবে?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> UDP packets দেখাবে</div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> কোনো packet দেখাবে না — UDP capture-ই হয়নি</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> Error দেখাবে</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> Wireshark crash করবে</div>
+  </div>
+
+  <!-- MCQ 6 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 6. Filter <code>ip.dst == 10.0.0.1</code> কি করে?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> 10.0.0.1 থেকে আসা সব packets দেখায়</div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> 10.0.0.1-এ যাওয়া সব packets দেখায়</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> 10.0.0.1 সম্পর্কিত সব packets দেখায়</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> 10.0.0.1 কে ping করে</div>
+  </div>
+
+  <!-- MCQ 7 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 7. Wireshark display filter-এ কোনটা AND operator হিসেবে কাজ করে?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> <code>&</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> <code>&&</code> (বা <code>and</code>)</div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> <code>+</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> <code>AND</code> (capital)</div>
+  </div>
+
+  <!-- MCQ 8 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p style="font-size:0.88rem; font-weight:600; margin-bottom:10px;">MCQ 8. tcpdump-এ live capture file-এ save করার option কোনটা?</p>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">A</span> <code>-r</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'correct')"><span class="opt-key">B</span> <code>-w</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">C</span> <code>-i</code></div>
+    <div class="mcq-opt" onclick="mcq(this,'wrong')"><span class="opt-key">D</span> <code>-s</code></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+function toggle(el) {
+  el.nextElementSibling.classList.toggle('show');
+}
+function mcq(el, result) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.mcq-opt').forEach(o => { o.classList.remove('correct','wrong'); });
+  el.classList.add(result);
+  setTimeout(() => {
+    parent.querySelectorAll('.mcq-opt').forEach(o => o.classList.remove('correct','wrong'));
+    el.classList.add(result);
+  }, 50);
+}
+// Nav active on scroll
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (s.getBoundingClientRect().top < 100) cur = s.id; });
+  navItems.forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + cur) n.classList.add('active');
+  });
+});
+navItems.forEach(n => {
+  n.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(n.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
