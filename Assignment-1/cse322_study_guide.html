@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSE322 — Socket Programming & HTTP Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1422;
+  --bg3: #141828;
+  --card: #161c2e;
+  --border: #1e2840;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #f59e0b;
+  --accent4: #10b981;
+  --accent5: #ef4444;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --code-bg: #0d1117;
+  --easy: #10b981;
+  --medium: #f59e0b;
+  --hard: #ef4444;
+  --advanced: #a855f7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,14,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.logo span { color: var(--text2); font-weight: 400; }
+
+nav {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+
+nav a:hover { background: var(--border); color: var(--accent); }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 5rem 2rem 3rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(0,212,255,0); }
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  color: var(--text2);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  font-family: 'Noto Sans Bengali', sans-serif;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+/* ===== SECTION HEADERS ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.section-header p {
+  font-size: 0.85rem;
+  color: var(--text2);
+  font-family: 'Noto Sans Bengali', sans-serif;
+}
+
+/* ===== CONCEPT CARDS ===== */
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.concept-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.concept-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent-color, var(--accent));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.concept-card:hover {
+  border-color: var(--accent-color, var(--accent));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.concept-card:hover::before { opacity: 1; }
+
+.concept-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.concept-card .bangla {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-color, var(--accent));
+}
+
+.concept-card .english {
+  font-size: 0.85rem;
+  color: var(--text3);
+  line-height: 1.7;
+}
+
+/* ===== CODE BLOCKS ===== */
+.code-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.code-dots {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.dot:nth-child(1) { background: #ef4444; }
+.dot:nth-child(2) { background: #f59e0b; }
+.dot:nth-child(3) { background: #10b981; }
+
+pre {
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  background: var(--code-bg);
+  color: #e2e8f0;
+}
+
+.code-explanation {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.code-line-note {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.83rem;
+}
+
+.line-num {
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  min-width: 60px;
+  font-size: 0.75rem;
+}
+
+.line-explanation {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ===== Q&A SECTION ===== */
+.qa-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.qa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.qa-card:hover { border-color: rgba(255,255,255,0.1); }
+
+.qa-question {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  user-select: none;
+}
+
+.qa-question:hover { background: rgba(255,255,255,0.02); }
+
+.difficulty-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.diff-easy { background: rgba(16,185,129,0.15); color: var(--easy); border: 1px solid rgba(16,185,129,0.3); }
+.diff-medium { background: rgba(245,158,11,0.15); color: var(--medium); border: 1px solid rgba(245,158,11,0.3); }
+.diff-hard { background: rgba(239,68,68,0.15); color: var(--hard); border: 1px solid rgba(239,68,68,0.3); }
+.diff-advanced { background: rgba(168,85,247,0.15); color: var(--advanced); border: 1px solid rgba(168,85,247,0.3); }
+
+.qa-q-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.qa-toggle {
+  font-size: 1rem;
+  color: var(--text3);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.qa-answer {
+  display: none;
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0;
+  padding-top: 1rem;
+}
+
+.qa-answer.open { display: block; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+.qa-answer p {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+
+.qa-answer .bangla-ans {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text2);
+  background: rgba(0,212,255,0.05);
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 0.75rem;
+  line-height: 1.9;
+}
+
+.qa-answer pre {
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+/* syntax highlight tokens */
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm { color: #546e7a; font-style: italic; }
+.cls { color: #ffcb6b; }
+.op { color: #89ddff; }
+
+/* ===== FLOW DIAGRAM ===== */
+.flow-diagram {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+.flow-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.flow-steps {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  min-width: 600px;
+}
+
+.flow-col {
+  flex: 1;
+}
+
+.flow-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  padding: 0.4rem;
+  background: rgba(0,212,255,0.1);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.flow-label.srv { color: var(--accent2); background: rgba(124,58,237,0.1); }
+
+.flow-step {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin: 0.3rem 0;
+  font-size: 0.78rem;
+  text-align: center;
+  color: var(--text2);
+  position: relative;
+}
+
+.flow-step.highlight { border-color: var(--accent); color: var(--accent); }
+.flow-step.highlight-purple { border-color: var(--accent2); color: #a78bfa; }
+
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.arrow-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.arrow-label {
+  font-size: 0.65rem;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ===== INFO BOXES ===== */
+.info-box {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+}
+
+.info-box.tip { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); }
+.info-box.warn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+.info-box.danger { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+.info-box.info { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); }
+
+.info-box .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.info-box .content { flex: 1; }
+.info-box .content strong { display: block; margin-bottom: 0.25rem; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.info-box .content p, .info-box .content span { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.8; color: var(--text2); }
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+th {
+  background: var(--bg3);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 0.85rem;
+}
+
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+td code {
+  background: var(--code-bg);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+/* ===== TABS ===== */
+.tab-container { margin-bottom: 2rem; }
+
+.tab-buttons {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-family: 'Syne', sans-serif;
+}
+
+.tab-btn.active, .tab-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+
+/* ===== QUICK REF ===== */
+.quick-ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.quick-ref-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.quick-ref-card h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quick-ref-card ul {
+  list-style: none;
+}
+
+.quick-ref-card ul li {
+  font-size: 0.82rem;
+  color: var(--text2);
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.quick-ref-card ul li:last-child { border: none; }
+
+.quick-ref-card ul li::before {
+  content: '▸';
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .concept-grid { grid-template-columns: 1fr; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .container { padding: 0 1rem 3rem; }
+}
+
+.highlight-box {
+  background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08));
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">CSE322 <span>Socket & HTTP</span></div>
+    <nav>
+      <a href="#socket-basics">Socket Basics</a>
+      <a href="#tcp-connection">TCP/Connection</a>
+      <a href="#http">HTTP</a>
+      <a href="#threading">Threading</a>
+      <a href="#file-transfer">File Transfer</a>
+      <a href="#assignment">Assignment</a>
+      <a href="#code-walkthrough">Code</a>
+      <a href="#qa">Q&A</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">⚡ Quiz Prep — July 2025</div>
+  <h1>Socket Programming<br>& HTTP Study Guide</h1>
+  <p>তোমার CSE322 sessional quiz-এর জন্য সম্পূর্ণ গাইড। সব concept বাংলায় বোঝানো হয়েছে।</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">6</span><span class="stat-label">Topics</span></div>
+    <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Q&A</span></div>
+    <div class="stat"><span class="stat-num">8</span><span class="stat-label">Code Files</span></div>
+    <div class="stat"><span class="stat-num">4</span><span class="stat-label">Difficulty Levels</span></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ==================== SECTION 1: SOCKET BASICS ==================== -->
+<div id="socket-basics" class="section-header">
+  <div class="section-icon" style="background:rgba(0,212,255,0.15);">🔌</div>
+  <div>
+    <h2>Socket Programming — মূল ধারণা</h2>
+    <p>Network, IP, Port, Socket — সব কিছু এক জায়গায়</p>
+  </div>
+</div>
+
+<div class="concept-grid">
+  <div class="concept-card" style="--accent-color: #00d4ff;">
+    <h3>🌐 Network কী?</h3>
+    <div class="bangla">
+      Network হলো একাধিক computer-এর সংযোগ। যখন দুটো বা তার বেশি computer একে অপরের সাথে communicate করতে পারে, তখন তাদের একটি network বলে। Internet হলো বিশ্বের সবচেয়ে বড় network।
+    </div>
+    <div class="english">Multiple computers connected together. Internet = global network via ISP routers and WLAN routers.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #10b981;">
+    <h3>📍 IP Address কী?</h3>
+    <div class="bangla">
+      IP Address হলো network-এ প্রতিটি machine-এর unique পরিচয়। ঠিক যেমন বাড়ির address দিয়ে বাড়ি খুঁজে পাওয়া যায়, IP address দিয়ে network-এ machine খুঁজে পাওয়া যায়। Format: <code>172.20.30.30</code>
+      <br><br>একটি machine যদি একাধিক network-এ connected থাকে, তাহলে প্রতিটি network-এর জন্য আলাদা IP হবে।
+    </div>
+    <div class="english">Unique identifier per network interface. Use <code>ipconfig</code> (Windows) or <code>ifconfig</code> (Linux) to check. One device can have multiple IPs (one per active interface).</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #f59e0b;">
+    <h3>🚪 Port কী?</h3>
+    <div class="bangla">
+      Port হলো একটি logical channel। একটি computer-এ ২¹⁶ = 65536 টি port আছে। প্রতিটি program আলাদা port ব্যবহার করে communicate করে। কিছু port reserved (যেমন HTTP = 80, HTTPS = 443)।
+      <br><br>Port দেখতে: <code>netstat</code> command ব্যবহার করো।
+    </div>
+    <div class="english">Logical endpoint (0–65535). Each program must acquire a port. Reserved ports: 80 (HTTP), 443 (HTTPS), 22 (SSH), 21 (FTP). Use <code>netstat</code> to see active ports.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #a855f7;">
+    <h3>🔗 Socket কী?</h3>
+    <div class="bangla">
+      Socket হলো দুটো network application-এর মধ্যে একটি connection। প্রতিটি connection-এর জন্য একটি socket তৈরি হয়।
+      <br><br>একটি socket জানে:
+      <br>• Remote IP (কে connect করেছে)
+      <br>• Remote Port (কোন port থেকে)
+      <br>• Local Port (নিজের port)
+      <br><br>Socket-এর দুটো buffer আছে: Input Buffer এবং Output Buffer।
+    </div>
+    <div class="english">Represents a single connection. Has input/output buffers. Multiple sockets can share the same port, but only one program can own a port.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #ef4444;">
+    <h3>⚖️ Socket vs Port</h3>
+    <div class="bangla">
+      Port একটি program-এর হয়, কিন্তু socket একটি connection-এর হয়।
+      <br><br>উদাহরণ: Server port 6666 ব্যবহার করছে। Client A এবং Client B দুজনেই connect করলে — server-এর দুটো আলাদা socket তৈরি হবে, কিন্তু দুটোই port 6666 ব্যবহার করছে।
+    </div>
+    <div class="english">Port is owned by a program. Socket is per connection. Server on port 6666 can have many sockets (one per client) all sharing the same port number.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #00d4ff;">
+    <h3>📡 TCP কী?</h3>
+    <div class="bangla">
+      TCP (Transmission Control Protocol) হলো সেই protocol যেটি socket connection establish করে। TCP reliable — মানে data যাবেই, হারাবে না। Socket programming মূলত TCP-র উপর কাজ করে।
+    </div>
+    <div class="english">Transmission Control Protocol — reliable, ordered, connection-oriented. Socket programming in Java (ServerSocket, Socket) uses TCP by default.</div>
+  </div>
+</div>
+
+<!-- Connection steps flow -->
+<div class="flow-diagram">
+  <div class="flow-title">🔄 TCP Connection Establishment — ধাপে ধাপে</div>
+  <div class="flow-steps">
+    <div class="flow-col">
+      <div class="flow-label">SERVER (A: 192.168.0.101)</div>
+      <div class="flow-step highlight">1. ServerSocket(6666) — listen করো</div>
+      <div class="flow-step" style="height:42px"></div>
+      <div class="flow-step highlight">3. accept() — connection গ্রহণ করো</div>
+      <div class="flow-step highlight">4. Socket of A তৈরি হলো (port: 6666)</div>
+      <div class="flow-step highlight">6. আবার listen — নতুন client-এর জন্য</div>
+      <div class="flow-step highlight">7. Client C-র জন্যও নতুন socket (port: 6666)</div>
+    </div>
+    <div class="flow-arrow">
+      <div class="arrow-line">
+        <div style="font-size:1.5rem; color: var(--accent3);">⟷</div>
+        <div class="arrow-label">TCP</div>
+      </div>
+    </div>
+    <div class="flow-col">
+      <div class="flow-label srv">CLIENT (B: 192.168.0.110)</div>
+      <div class="flow-step" style="height:42px"></div>
+      <div class="flow-step highlight-purple">2. new Socket("192.168.0.101", 6666) — connect করো</div>
+      <div class="flow-step" style="height:42px"></div>
+      <div class="flow-step highlight-purple">4. Socket of B তৈরি হলো (random port: 50320)</div>
+      <div class="flow-step highlight-purple">5. দুজনেই একে অপরের IP ও Port জানে</div>
+      <div class="flow-step highlight-purple">Client C-ও connect করতে পারে (port: 40520)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 2: TCP CONNECTION ==================== -->
+<div id="tcp-connection" class="section-header">
+  <div class="section-icon" style="background:rgba(16,185,129,0.15);">⚙️</div>
+  <div>
+    <h2>Java Socket API — কোড বোঝা</h2>
+    <p>ServerSocket, Socket, ObjectInputStream, ObjectOutputStream — সব কিছু</p>
+  </div>
+</div>
+
+<div class="tab-container">
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="showTab('basic-server')">Basic Server</button>
+    <button class="tab-btn" onclick="showTab('basic-client')">Basic Client</button>
+    <button class="tab-btn" onclick="showTab('thread-server')">Threaded Server</button>
+    <button class="tab-btn" onclick="showTab('worker')">Worker Thread</button>
+  </div>
+
+  <div id="basic-server" class="tab-content active">
+    <div class="code-section">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="code-title">📄 Basic/Server.java — Simple Server</div>
+      </div>
+      <pre><span class="kw">package</span> Basic;
+
+<span class="kw">import</span> java.io.ObjectInputStream;
+<span class="kw">import</span> java.io.ObjectOutputStream;
+<span class="kw">import</span> java.net.ServerSocket;
+<span class="kw">import</span> java.net.Socket;
+
+<span class="kw">public class</span> <span class="cls">Server</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> welcomeSocket = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">6666</span>);  <span class="cm">// Line A</span>
+
+        <span class="kw">while</span>(<span class="kw">true</span>) {                                              <span class="cm">// Line B</span>
+            <span class="cls">Socket</span> socket = welcomeSocket.<span class="fn">accept</span>();               <span class="cm">// Line C</span>
+
+            <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(      <span class="cm">// Line D</span>
+                socket.<span class="fn">getOutputStream</span>());
+            <span class="cls">ObjectInputStream</span> in = <span class="kw">new</span> <span class="cls">ObjectInputStream</span>(        <span class="cm">// Line E</span>
+                socket.<span class="fn">getInputStream</span>());
+
+            out.<span class="fn">writeObject</span>(<span class="str">"Hello from server"</span>);               <span class="cm">// Line F</span>
+            <span class="cls">String</span> msg = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();               <span class="cm">// Line G</span>
+            System.out.<span class="fn">println</span>(msg);
+        }
+    }
+}</pre>
+      <div class="code-explanation">
+        <div class="code-line-note">
+          <span class="line-num">Line A</span>
+          <span class="line-explanation">ServerSocket তৈরি করা হলো port 6666-এ। এটি server-এর "welcome door" — এখানে client-রা knock করবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line B</span>
+          <span class="line-explanation">while(true) loop — server সবসময় চালু থাকবে। একজন client serve করার পরেও আরেকজনের জন্য wait করবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line C</span>
+          <span class="line-explanation">accept() — blocking call। কোনো client connect না করা পর্যন্ত এখানেই থামবে। Client connect হলে একটি Socket object return করে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line D</span>
+          <span class="line-explanation">ObjectOutputStream — server থেকে client-এ data পাঠানোর channel (output buffer)। getOutputStream() socket-এর outgoing stream দেয়।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line E</span>
+          <span class="line-explanation">ObjectInputStream — client থেকে server-এ data পড়ার channel (input buffer)। getInputStream() socket-এর incoming stream দেয়।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line F</span>
+          <span class="line-explanation">writeObject() — client-এ String পাঠানো হলো। Object serialization ব্যবহার করে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line G</span>
+          <span class="line-explanation">readObject() — blocking call। Client কিছু না পাঠানো পর্যন্ত এখানে থামবে। Return type Object, তাই String-এ cast করতে হয়।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="basic-client" class="tab-content">
+    <div class="code-section">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="code-title">📄 Basic/Client.java — Simple Client</div>
+      </div>
+      <pre><span class="kw">package</span> Basic;
+
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">Socket</span> socket = <span class="kw">new</span> <span class="cls">Socket</span>(<span class="str">"localhost"</span>, <span class="num">6666</span>);         <span class="cm">// Line A</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Remote port: "</span> + socket.<span class="fn">getPort</span>()); <span class="cm">// Line B</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Local port: "</span> + socket.<span class="fn">getLocalPort</span>());
+
+        <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(socket.<span class="fn">getOutputStream</span>());
+        <span class="cls">ObjectInputStream</span> in = <span class="kw">new</span> <span class="cls">ObjectInputStream</span>(socket.<span class="fn">getInputStream</span>());
+
+        <span class="cls">String</span> msg = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();                  <span class="cm">// Line C</span>
+        System.out.<span class="fn">println</span>(msg);
+
+        out.<span class="fn">writeObject</span>(<span class="str">"Hello from client"</span>);                  <span class="cm">// Line D</span>
+    }
+}</pre>
+      <div class="code-explanation">
+        <div class="code-line-note">
+          <span class="line-num">Line A</span>
+          <span class="line-explanation">new Socket("localhost", 6666) — server-এ connection করো। "localhost" মানে নিজের machine (127.0.0.1)। অন্য PC-র IP দিলে সেখানে connect হবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line B</span>
+          <span class="line-explanation">getPort() — server-এর port (6666) return করে। getLocalPort() — client-এর নিজের random port return করে (যেমন 50320)।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line C</span>
+          <span class="line-explanation">Server আগে message পাঠাচ্ছে, তাই client আগে readObject() করছে। Order গুরুত্বপূর্ণ — একদিক লিখলে অন্যদিক পড়তে হবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line D</span>
+          <span class="line-explanation">এখন client server-এ message পাঠাচ্ছে। Server-এর readObject() এটিই পাবে।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="thread-server" class="tab-content">
+    <div class="code-section">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="code-title">📄 Threading/Server.java — Multi-Client Server</div>
+      </div>
+      <pre><span class="kw">package</span> Threading;
+
+<span class="kw">public class</span> <span class="cls">Server</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> welcomeSocket = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">6666</span>);
+
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">Socket</span> socket = welcomeSocket.<span class="fn">accept</span>();             <span class="cm">// Line A</span>
+
+            <span class="cls">Thread</span> worker = <span class="kw">new</span> <span class="cls">Worker</span>(socket);               <span class="cm">// Line B</span>
+            worker.<span class="fn">start</span>();                                     <span class="cm">// Line C</span>
+        }
+    }
+}</pre>
+      <div class="code-explanation">
+        <div class="code-line-note">
+          <span class="line-num">Line A</span>
+          <span class="line-explanation">Main thread শুধু connection accept করে। কোনো client কাজ করে না — শুধু নতুন connection-এর জন্য wait করে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line B</span>
+          <span class="line-explanation">প্রতিটি client-এর জন্য নতুন Worker thread তৈরি। Worker হলো Thread-এর subclass যেখানে actual client handling হয়।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line C</span>
+          <span class="line-explanation">worker.start() — নতুন thread শুরু। এই thread background-এ client handle করবে। Main thread আবার loop-এ ফিরে নতুন client-এর জন্য accept() করবে।</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <div class="content"><strong>Key Point</strong><span>Threading ছাড়া server একবারে শুধু একজন client serve করতে পারে। Thread ব্যবহার করলে multiple clients simultaneously serve করা যায়।</span></div>
+    </div>
+  </div>
+
+  <div id="worker" class="tab-content">
+    <div class="code-section">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="code-title">📄 Threading/Worker.java — Thread Handler</div>
+      </div>
+      <pre><span class="kw">package</span> Threading;
+
+<span class="kw">public class</span> <span class="cls">Worker</span> <span class="kw">extends</span> <span class="cls">Thread</span> {       <span class="cm">// Line A</span>
+    <span class="cls">Socket</span> socket;
+
+    <span class="kw">public</span> <span class="fn">Worker</span>(<span class="cls">Socket</span> socket) {           <span class="cm">// Line B</span>
+        <span class="kw">this</span>.socket = socket;
+    }
+
+    <span class="kw">public void</span> <span class="fn">run</span>() {                        <span class="cm">// Line C</span>
+        <span class="kw">try</span> {
+            <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(
+                <span class="kw">this</span>.socket.<span class="fn">getOutputStream</span>());
+            <span class="cls">ObjectInputStream</span> in = <span class="kw">new</span> <span class="cls">ObjectInputStream</span>(
+                <span class="kw">this</span>.socket.<span class="fn">getInputStream</span>());
+
+            <span class="kw">while</span> (<span class="kw">true</span>) {                      <span class="cm">// Line D</span>
+                Thread.<span class="fn">sleep</span>(<span class="num">1000</span>);             <span class="cm">// Line E</span>
+                <span class="cls">Date</span> date = <span class="kw">new</span> <span class="cls">Date</span>();
+                out.<span class="fn">writeObject</span>(date.<span class="fn">toString</span>()); <span class="cm">// Line F</span>
+            }
+        } <span class="kw">catch</span> (<span class="cls">IOException</span> | <span class="cls">InterruptedException</span> e) {
+            e.<span class="fn">printStackTrace</span>();
+        }
+    }
+}</pre>
+      <div class="code-explanation">
+        <div class="code-line-note">
+          <span class="line-num">Line A</span>
+          <span class="line-explanation">Worker extends Thread — এটিকে Thread subclass করা হলো। run() method override করতে হবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line B</span>
+          <span class="line-explanation">Constructor-এ socket receive করা হলো। এই socket দিয়েই specific client-এর সাথে communicate করবে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line C</span>
+          <span class="line-explanation">run() method — thread.start() call করলে এই method execute হয়। এখানে actual client logic থাকে।</span>
+        </div>
+        <div class="code-line-note">
+          <span class="line-num">Line D-F</span>
+          <span class="line-explanation">প্রতি 1 second পর current time পাঠাচ্ছে। Thread.sleep(1000) = 1000 millisecond = 1 second wait।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: HTTP ==================== -->
+<div id="http" class="section-header">
+  <div class="section-icon" style="background:rgba(245,158,11,0.15);">🌍</div>
+  <div>
+    <h2>HTTP Protocol</h2>
+    <p>Web server, URL, Request, Response — বিস্তারিত</p>
+  </div>
+</div>
+
+<div class="concept-grid">
+  <div class="concept-card" style="--accent-color: #f59e0b;">
+    <h3>🌐 HTTP কী?</h3>
+    <div class="bangla">
+      HTTP (HyperText Transfer Protocol) হলো web-এ data transfer-এর নিয়ম। Client (browser) এবং Server TCP connection করে, তারপর HTTP দিয়ে কথা বলে।
+      <br><br>কাজের ধাপ:
+      <br>① Client-Server TCP connection করে
+      <br>② Client request পাঠায়
+      <br>③ Server content দিয়ে respond করে
+      <br>④ Connection close হয়
+    </div>
+    <div class="english">Application-layer protocol over TCP. Current version HTTP/1.1 (RFC 2616). Default port: 80.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #00d4ff;">
+    <h3>📦 MIME Type কী?</h3>
+    <div class="bangla">
+      Server যখন content পাঠায়, সে জানিয়ে দেয় content কী ধরনের — এটাই MIME type। Browser MIME type দেখে বুঝতে পারে কীভাবে content দেখাবে।
+    </div>
+    <div class="english">
+      Common MIME types:<br>
+      • <code>text/html</code> — HTML file<br>
+      • <code>text/plain</code> — Plain text<br>
+      • <code>image/jpeg</code> — JPEG image<br>
+      • <code>image/gif</code> — GIF image<br>
+      • <code>application/postscript</code> — PS doc
+    </div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #10b981;">
+    <h3>🔗 URL Structure</h3>
+    <div class="bangla">
+      URL = Uniform Resource Locator। প্রতিটি file-এর unique address।
+      <br><br>উদাহরণ: <code>http://www.aol.com:80/index.html</code>
+      <br><br>Client prefix (<code>http://www.aol.com:80</code>) দেখে বোঝে:
+      <br>• কোন server-এ যাবে
+      <br>• কোন port-এ যাবে
+      <br><br>Server suffix (<code>/index.html</code>) দেখে:
+      <br>• static নাকি dynamic content
+      <br>• file কোথায় আছে
+    </div>
+    <div class="english">Dynamic content URL example: <code>http://host:8000/cgi-bin/adder?15000&213</code> — calls executable 'adder' with args 15000 and 213.</div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #a855f7;">
+    <h3>📄 Static vs Dynamic Content</h3>
+    <div class="bangla">
+      <strong>Static:</strong> Server-এ already stored file। যেমন: HTML, image, audio। Request করলে সরাসরি পাঠিয়ে দেয়।
+      <br><br>
+      <strong>Dynamic:</strong> Request-এর সময় program execute করে content তৈরি। যেমন: CGI script, calculation result।
+      <br><br>
+      Bottom line: সব web content একটি file-এর সাথে associated।
+    </div>
+    <div class="english">Convention: executables in <code>cgi-bin/</code> directory = dynamic. Everything else = static. All web content is a file managed by server.</div>
+  </div>
+</div>
+
+<!-- HTTP Request/Response -->
+<div class="concept-grid">
+  <div class="concept-card" style="--accent-color: #00d4ff;">
+    <h3>📤 HTTP Request Format</h3>
+    <div class="bangla">
+      HTTP Request = Request Line + Headers + (Body)
+      <br>Request Line format: <code>&lt;method&gt; &lt;uri&gt; &lt;version&gt;</code>
+    </div>
+    <div class="english">
+      <strong>Methods:</strong><br>
+      • <code>GET</code> — Static/dynamic content (URI তে arguments)<br>
+      • <code>POST</code> — Dynamic content (body তে arguments)<br>
+      • <code>HEAD</code> — GET কিন্তু body নেই<br>
+      • <code>PUT</code> — Server-এ file লেখা<br>
+      • <code>DELETE</code> — Server থেকে file মুছা<br>
+      • <code>OPTIONS</code> — Server/file attributes<br>
+      • <code>TRACE</code> — Debug (echo request)
+    </div>
+  </div>
+
+  <div class="concept-card" style="--accent-color: #f59e0b;">
+    <h3>📥 HTTP Response Format</h3>
+    <div class="bangla">
+      HTTP Response = Response Line + Headers + Body
+      <br>Response Line: <code>&lt;version&gt; &lt;status code&gt; &lt;msg&gt;</code>
+    </div>
+    <div class="english">
+      <strong>Status Codes:</strong><br>
+      • <code>200 OK</code> — সফল<br>
+      • <code>301 Moved</code> — নতুন URL-এ গেছে<br>
+      • <code>403 Forbidden</code> — Permission নেই<br>
+      • <code>404 Not Found</code> — File নেই<br>
+      • <code>500 Server Error</code> — Server-এ সমস্যা<br><br>
+      <strong>Important Headers:</strong><br>
+      • <code>Content-Type</code> — MIME type<br>
+      • <code>Content-Length</code> — Body size
+    </div>
+  </div>
+</div>
+
+<!-- HTTP 1.0 vs 1.1 -->
+<div style="overflow-x:auto; margin-bottom:2rem;">
+  <table>
+    <thead><tr><th>Feature</th><th>HTTP/1.0</th><th>HTTP/1.1</th></tr></thead>
+    <tbody>
+      <tr><td>Connection</td><td>প্রতিটি request-এ নতুন TCP connection</td><td>Persistent connection (Keep-Alive)</td></tr>
+      <tr><td>HOST header</td><td>Optional</td><td>Required (mandatory)</td></tr>
+      <tr><td>Caching</td><td>Basic</td><td>Advanced caching support</td></tr>
+      <tr><td>Multiple requests</td><td>একটি connection = একটি request</td><td>একটি connection-এ multiple requests</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- HTTP Transaction Example -->
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">🔄 Real HTTP Transaction (telnet দিয়ে)</div>
+  </div>
+  <pre><span class="cm"># Client side (telnet)</span>
+unix&gt; <span class="kw">telnet</span> www.aol.com 80         <span class="cm">← Server-এ connect</span>
+<span class="str">GET / HTTP/1.1</span>                        <span class="cm">← Request line (method + URI + version)</span>
+<span class="str">host: www.aol.com</span>                     <span class="cm">← HTTP/1.1-এ HOST header mandatory</span>
+                                       <span class="cm">← Empty line = header শেষ</span>
+
+<span class="cm"># Server response</span>
+<span class="str">HTTP/1.0 200 OK</span>                       <span class="cm">← Response line</span>
+<span class="str">MIME-Version: 1.0</span>                     <span class="cm">← Response headers শুরু</span>
+<span class="str">Date: Mon, 08 Jan 2001 04:59:42 GMT</span>
+<span class="str">Content-Type: text/html</span>               <span class="cm">← MIME type জানাচ্ছে</span>
+<span class="str">Content-Length: 42092</span>                 <span class="cm">← Body কত bytes</span>
+                                       <span class="cm">← Empty line (\r\n) = headers শেষ</span>
+<span class="str">&lt;html&gt;</span>                                 <span class="cm">← Body শুরু</span>
+<span class="str">...766 lines...</span>
+<span class="str">&lt;/html&gt;</span>                               <span class="cm">← Body শেষ</span></pre>
+</div>
+
+<!-- HTTP Server Skeleton -->
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">📄 HTTPServerSkeleton.java — Teacher's HTTP Server Code</div>
+  </div>
+  <pre><span class="kw">public class</span> <span class="cls">HTTPServerSkeleton</span> {
+    <span class="kw">static final int</span> PORT = <span class="num">56666</span>;                          <span class="cm">// Line A</span>
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> <span class="cls">IOException</span> {
+        <span class="cls">ServerSocket</span> serverConnect = <span class="kw">new</span> <span class="cls">ServerSocket</span>(PORT);
+
+        <span class="cm">// HTML file read করা</span>
+        <span class="cls">File</span> file = <span class="kw">new</span> <span class="cls">File</span>(<span class="str">"../index.html"</span>);               <span class="cm">// Line B</span>
+        <span class="cls">FileInputStream</span> fis = <span class="kw">new</span> <span class="cls">FileInputStream</span>(file);
+        <span class="cls">BufferedReader</span> br = <span class="kw">new</span> <span class="cls">BufferedReader</span>(
+            <span class="kw">new</span> <span class="cls">InputStreamReader</span>(fis, <span class="str">"UTF-8"</span>));              <span class="cm">// Line C</span>
+        <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
+        <span class="cls">String</span> line;
+        <span class="kw">while</span>((line = br.<span class="fn">readLine</span>()) != <span class="kw">null</span>) sb.<span class="fn">append</span>(line).<span class="fn">append</span>(<span class="str">'\n'</span>);
+        <span class="cls">String</span> content = sb.<span class="fn">toString</span>();                        <span class="cm">// Line D</span>
+
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">Socket</span> s = serverConnect.<span class="fn">accept</span>();
+            <span class="cls">BufferedReader</span> in = <span class="kw">new</span> <span class="cls">BufferedReader</span>(
+                <span class="kw">new</span> <span class="cls">InputStreamReader</span>(s.<span class="fn">getInputStream</span>()));   <span class="cm">// Line E</span>
+            <span class="cls">PrintWriter</span> pr = <span class="kw">new</span> <span class="cls">PrintWriter</span>(s.<span class="fn">getOutputStream</span>()); <span class="cm">// Line F</span>
+
+            <span class="cls">String</span> input = in.<span class="fn">readLine</span>();                      <span class="cm">// Line G</span>
+
+            <span class="kw">if</span>(input != <span class="kw">null</span> && input.<span class="fn">startsWith</span>(<span class="str">"GET"</span>)) {    <span class="cm">// Line H</span>
+                pr.<span class="fn">write</span>(<span class="str">"HTTP/1.1 200 OK\r\n"</span>);               <span class="cm">// Line I</span>
+                pr.<span class="fn">write</span>(<span class="str">"Content-Type: text/html\r\n"</span>);
+                pr.<span class="fn">write</span>(<span class="str">"Content-Length: "</span> + content.<span class="fn">length</span>() + <span class="str">"\r\n"</span>);
+                pr.<span class="fn">write</span>(<span class="str">"\r\n"</span>);                              <span class="cm">// Line J — empty line!</span>
+                pr.<span class="fn">write</span>(content);                             <span class="cm">// Line K</span>
+                pr.<span class="fn">flush</span>();                                     <span class="cm">// Line L</span>
+            }
+            s.<span class="fn">close</span>();                                         <span class="cm">// Line M</span>
+        }
+    }
+}</pre>
+  <div class="code-explanation">
+    <div class="code-line-note">
+      <span class="line-num">Line A</span>
+      <span class="line-explanation">Custom port 56666 ব্যবহার। Browser-এ http://localhost:56666 দিয়ে access করা যাবে।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line B-D</span>
+      <span class="line-explanation">Server start হওয়ার সময় একবারই HTML file পড়া হয়। BufferedReader দিয়ে UTF-8 encoding-এ পড়া হচ্ছে। String content-এ সব HTML রাখা হলো।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line E-F</span>
+      <span class="line-explanation">HTTP তে text-based communication। তাই ObjectStream নয়, BufferedReader (text in) এবং PrintWriter (text out) ব্যবহার।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line G</span>
+      <span class="line-explanation">Browser-এর প্রথম line পড়া (request line)। যেমন: "GET /index.html HTTP/1.1"</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line H</span>
+      <span class="line-explanation">startsWith("GET") — GET request check। অন্য method হলে এখানে handle করা হয়নি।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line I-J</span>
+      <span class="line-explanation">HTTP response headers লেখা। প্রতিটি header শেষে \r\n। Line J-তে শুধু \r\n — এটি headers ও body-র মধ্যে mandatory empty line।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line K-L</span>
+      <span class="line-explanation">HTML content body হিসেবে পাঠানো। flush() না করলে data buffer-এ আটকে থাকতে পারে।</span>
+    </div>
+    <div class="code-line-note">
+      <span class="line-num">Line M</span>
+      <span class="line-explanation">HTTP/1.0 style — একটি request serve করেই connection বন্ধ। HTTP/1.1 Keep-Alive হলে বন্ধ করা হতো না।</span>
+    </div>
+  </div>
+</div>
+
+<!-- Proxy -->
+<div class="concept-grid">
+  <div class="concept-card" style="--accent-color: #a855f7;">
+    <h3>🔀 Proxy কী?</h3>
+    <div class="bangla">
+      Proxy হলো client এবং origin server-এর মাঝখানের একটি intermediary (মধ্যস্থতাকারী)।
+      <br><br>• Client-এর কাছে: Proxy একটি server মনে হয়
+      <br>• Server-এর কাছে: Proxy একটি client মনে হয়
+      <br><br><strong>কাজ:</strong>
+      <br>• <strong>Caching:</strong> বারবার একই content server থেকে না নিয়ে proxy তে রেখে দেয়
+      <br>• <strong>Logging:</strong> কে কী দেখছে রেকর্ড করে
+      <br>• <strong>Anonymization:</strong> client-এর পরিচয় লুকায়
+    </div>
+    <div class="english">Client ↔ Proxy ↔ Origin Server. Proxy caches responses — when Client B requests foo.html that A already got, proxy serves from cache without hitting origin server again.</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: THREADING ==================== -->
+<div id="threading" class="section-header">
+  <div class="section-icon" style="background:rgba(168,85,247,0.15);">🧵</div>
+  <div>
+    <h2>Threading in Java</h2>
+    <p>Multi-client server বানানোর পদ্ধতি</p>
+  </div>
+</div>
+
+<div class="concept-grid">
+  <div class="concept-card" style="--accent-color: #a855f7;">
+    <h3>🧵 Thread কেন দরকার?</h3>
+    <div class="bangla">
+      Thread ছাড়া server একটি client serve করার সময় অন্য কোনো client-কে ignore করে। Thread দিয়ে প্রতিটি client-কে আলাদাভাবে একই সময়ে serve করা যায়।
+      <br><br>উদাহরণ: Time server — Client A এবং Client B দুজনেই একই সময়ে current time পাচ্ছে।
+    </div>
+    <div class="english">Without threading: sequential (one at a time). With threading: concurrent (multiple simultaneously). Main thread only accepts connections; Worker threads handle clients.</div>
+  </div>
+  <div class="concept-card" style="--accent-color: #10b981;">
+    <h3>🔒 Thread Safety</h3>
+    <div class="bangla">
+      যখন multiple thread একই data access করে, race condition হতে পারে। এটি এড়াতে:
+      <br><br>• <code>ConcurrentHashMap</code> — HashMap-এর thread-safe version
+      <br>• <code>CopyOnWriteArraySet</code> — Set-এর thread-safe version
+      <br>• <code>synchronized</code> block — একসময় একটিই thread চলবে
+      <br>• <code>Collections.synchronizedList()</code> — List thread-safe করে
+    </div>
+    <div class="english">Used in Server.java: ConcurrentHashMap for currentClients, fileMap, fileRequestMap. CopyOnWriteArraySet for offlineClients. synchronized block in FileUploadInfo for writing chunks.</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: FILE TRANSFER ==================== -->
+<div id="file-transfer" class="section-header">
+  <div class="section-icon" style="background:rgba(239,68,68,0.15);">📁</div>
+  <div>
+    <h2>Chunked File Transfer</h2>
+    <p>Assignment-এর upload/download mechanism বিস্তারিত</p>
+  </div>
+</div>
+
+<div class="info-box info">
+  <span class="icon">📌</span>
+  <div class="content"><strong>Assignment Core Concept</strong><span>File ছোট ছোট chunk-এ ভেঙে পাঠানো হয়। Server randomly chunk size ঠিক করে, client সেটি follow করে।</span></div>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-title">📤 File Upload Flow — ধাপে ধাপে</div>
+  <div style="display:grid; grid-template-columns:1fr 80px 1fr; gap:0.5rem; align-items:start; min-width:500px;">
+    <div>
+      <div class="flow-label">CLIENT</div>
+      <div class="flow-step highlight">① File name + File size পাঠাও</div>
+      <div class="flow-step" style="height:50px;"></div>
+      <div class="flow-step highlight">③ Chunk size ও fileID receive করো</div>
+      <div class="flow-step highlight">④ File → chunks-এ ভাগ করো</div>
+      <div class="flow-step highlight">⑤ Chunk পাঠাও (একটি একটি করে)</div>
+      <div class="flow-step" style="height:30px;"></div>
+      <div class="flow-step highlight">⑦ ACK পেলে পরের chunk পাঠাও</div>
+      <div class="flow-step highlight">⑧ শেষে "completed" message পাঠাও</div>
+      <div class="flow-step" style="height:30px;"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;padding-top:3rem;">
+      <div style="font-size:2rem;color:var(--accent3);">⟷</div>
+    </div>
+    <div>
+      <div class="flow-label srv">SERVER</div>
+      <div class="flow-step" style="height:50px;"></div>
+      <div class="flow-step highlight-purple">② Buffer check: usedBuffer + newFile ≤ MAX_BUFFER_SIZE?</div>
+      <div class="flow-step highlight-purple">③ Random chunk size generate করো, fileID তৈরি করো</div>
+      <div class="flow-step" style="height:50px;"></div>
+      <div class="flow-step highlight-purple">⑥ Chunk receive করো → ACK পাঠাও</div>
+      <div class="flow-step" style="height:30px;"></div>
+      <div class="flow-step highlight-purple">⑨ Total bytes == file size? → Save করো</div>
+      <div class="flow-step highlight-purple">⑩ Success/Failure message পাঠাও</div>
+    </div>
+  </div>
+</div>
+
+<div class="info-box warn">
+  <span class="icon">⚠️</span>
+  <div class="content"><strong>Important Rule</strong><span>Upload: Server ACK wait করে (reliable)। Download: Server ACK wait করে না, সরাসরি MAX_CHUNK_SIZE দিয়ে পাঠায় (fast)।</span></div>
+</div>
+
+<!-- Chunk calculation example -->
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">💡 Chunk Calculation Example</div>
+  </div>
+  <pre><span class="cm">// Example: File size = 1040 KB, Chunk size = 100 KB</span>
+<span class="cm">// Number of chunks = ceil(1040 / 100) = 11</span>
+<span class="cm">// First 10 chunks: 100 KB each</span>
+<span class="cm">// Last chunk: 40 KB</span>
+
+<span class="cm">// ClientUtil.java — actual upload code:</span>
+<span class="kw">byte</span>[] buffer = <span class="kw">new byte</span>[fileChunkSize];         <span class="cm">// chunk size buffer তৈরি</span>
+<span class="kw">int</span> bytesRead = fileInputStream.<span class="fn">read</span>(buffer);    <span class="cm">// প্রথম chunk পড়া</span>
+
+<span class="kw">while</span>(bytesRead != -<span class="num">1</span>) {                         <span class="cm">// যতক্ষণ file আছে</span>
+    <span class="kw">byte</span>[] chunk = <span class="kw">new byte</span>[bytesRead];           <span class="cm">// exact size chunk</span>
+    System.<span class="fn">arraycopy</span>(buffer, <span class="num">0</span>, chunk, <span class="num">0</span>, bytesRead); <span class="cm">// copy bytes</span>
+    out.<span class="fn">writeObject</span>(chunk);                       <span class="cm">// server-এ পাঠাও</span>
+    
+    <span class="cls">String</span> ack = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();         <span class="cm">// ACK wait করো</span>
+    <span class="kw">if</span>(!ack.<span class="fn">contains</span>(<span class="str">"received"</span>)) <span class="kw">break</span>;          <span class="cm">// error হলে বন্ধ</span>
+    
+    bytesRead = fileInputStream.<span class="fn">read</span>(buffer);     <span class="cm">// পরের chunk পড়া</span>
+}
+out.<span class="fn">writeObject</span>(<span class="str">"File upload completed for file ID: "</span> + fileId);</pre>
+</div>
+
+<!-- ==================== SECTION 6: ASSIGNMENT ==================== -->
+<div id="assignment" class="section-header">
+  <div class="section-icon" style="background:rgba(245,158,11,0.15);">📋</div>
+  <div>
+    <h2>Assignment Architecture</h2>
+    <p>Server.java, Worker.java, FileUploadInfo, FileRequest — সব class-এর role</p>
+  </div>
+</div>
+
+<div class="quick-ref-grid">
+  <div class="quick-ref-card">
+    <h4>🖥️ Server.java</h4>
+    <ul>
+      <li>MAX_BUFFER_SIZE = 500MB, MAX_CHUNK_SIZE = 100KB, MIN_CHUNK_SIZE = 10 bytes</li>
+      <li>ConcurrentHashMap: currentClients, fileMap, fileRequestMap</li>
+      <li>CopyOnWriteArraySet: offlineClients</li>
+      <li>initiationOfflineClients() — startup-এ Server/ServerFiles/ folder scan</li>
+      <li>initiationFileMapStorage() — FileMapStorage.txt থেকে fileMap load</li>
+      <li>প্রতিটি connection-এ নতুন Worker thread spawn</li>
+    </ul>
+  </div>
+  <div class="quick-ref-card">
+    <h4>👷 Worker.java</h4>
+    <ul>
+      <li>Thread extends করে — প্রতিটি client-এর জন্য একটি instance</li>
+      <li>Login: username নেওয়া, duplicate check, directory তৈরি</li>
+      <li>Menu: 9টি option handle (1-9, 0 = logout)</li>
+      <li>File upload: buffer check, chunk receive, ACK পাঠানো</li>
+      <li>File download: MAX_CHUNK_SIZE দিয়ে পাঠানো, ACK wait নেই</li>
+      <li>Offline হলে incomplete upload discard</li>
+    </ul>
+  </div>
+  <div class="quick-ref-card">
+    <h4>📄 FileUploadInfo.java</h4>
+    <ul>
+      <li>Serializable implement করে</li>
+      <li>Fields: fileId, fileName, fileSize, accessType, requestId, clientName</li>
+      <li>chunksList: synchronized List (thread-safe)</li>
+      <li>saveFileToTheServerStorage() — chunks জুড়ে file তৈরি</li>
+      <li>FileMapStorage.txt-এ metadata লেখে (pipe-delimited)</li>
+      <li>isComplete flag track করে</li>
+    </ul>
+  </div>
+  <div class="quick-ref-card">
+    <h4>📬 FileRequest.java</h4>
+    <ul>
+      <li>Serializable implement করে</li>
+      <li>Fields: requestID, shortDescription, recipientClientName, clientName</li>
+      <li>requestFulfilled: false initially</li>
+      <li>Unicast: specific username-এ পাঠায়</li>
+      <li>Broadcast: recipient = "ALL" হলে সবাইকে</li>
+      <li>Multiple clients একই request fulfill করতে পারে</li>
+    </ul>
+  </div>
+  <div class="quick-ref-card">
+    <h4>🔧 CommonFunctionUtility.java</h4>
+    <ul>
+      <li>fileToHashMap() — text file পার্স করে</li>
+      <li>Pipe (|) delimiter দিয়ে split করে</li>
+      <li>প্রতিটি line একটি ArrayList&lt;String&gt;</li>
+      <li>FileMapStorage.txt পড়তে ব্যবহার হয়</li>
+    </ul>
+  </div>
+  <div class="quick-ref-card">
+    <h4>💻 ClientUtil.java</h4>
+    <ul>
+      <li>showMenu() — 9 option menu</li>
+      <li>uploadFile() — chunked upload implementation</li>
+      <li>showSelfAllFiles() — নিজের public+private files</li>
+      <li>showOthersPublicFiles() — অন্যদের public files</li>
+      <li>Download: byte[] chunks receive করে FileOutputStream-এ লেখে</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FileMapStorage format -->
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">📄 FileMapStorage.txt — File Format (Pipe-delimited)</div>
+  </div>
+  <pre><span class="cm">// Format: fileId|fileName|fileSize|accessType|requestId|clientName|totalBytes</span>
+<span class="str">f001|report.pdf|204800|Public|null|alice|204800</span>
+<span class="str">f002|notes.txt|1024|Private|null|bob|1024</span>
+<span class="str">f003|image.png|51200|Public|REQ-001|charlie|51200</span>
+
+<span class="cm">// CommonFunctionUtility.fileToHashMap() এটিকে parse করে:</span>
+<span class="cm">// ["f001", "report.pdf", "204800", "Public", "null", "alice", "204800"]</span></pre>
+</div>
+
+<!-- ==================== SECTION 7: CODE WALKTHROUGH ==================== -->
+<div id="code-walkthrough" class="section-header">
+  <div class="section-icon" style="background:rgba(16,185,129,0.15);">🔍</div>
+  <div>
+    <h2>Sample Code — Written Exam-এ যা লিখতে হতে পারে</h2>
+    <p>এই patterns গুলো ভালো করে practice করো</p>
+  </div>
+</div>
+
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">✍️ Sample 1: Simple Echo Server (লিখতে পারতে হবে)</div>
+  </div>
+  <pre><span class="cm">// ECHO SERVER: Client যা পাঠায়, তা ফিরিয়ে দেয়</span>
+<span class="kw">import</span> java.net.*;
+<span class="kw">import</span> java.io.*;
+
+<span class="kw">public class</span> <span class="cls">EchoServer</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> ss = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">8080</span>);        <span class="cm">// Port 8080-এ listen</span>
+        <span class="cls">Socket</span> s = ss.<span class="fn">accept</span>();                           <span class="cm">// Client wait</span>
+        
+        <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(s.<span class="fn">getOutputStream</span>());
+        <span class="cls">ObjectInputStream</span> in = <span class="kw">new</span> <span class="cls">ObjectInputStream</span>(s.<span class="fn">getInputStream</span>());
+        
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">String</span> msg = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();           <span class="cm">// Client থেকে পড়া</span>
+            <span class="kw">if</span>(msg.<span class="fn">equals</span>(<span class="str">"exit"</span>)) <span class="kw">break</span>;
+            out.<span class="fn">writeObject</span>(<span class="str">"Echo: "</span> + msg);              <span class="cm">// ফিরিয়ে দেওয়া</span>
+        }
+        s.<span class="fn">close</span>(); ss.<span class="fn">close</span>();
+    }
+}</pre>
+</div>
+
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">✍️ Sample 2: Multi-Client Server with Thread (লিখতে পারতে হবে)</div>
+  </div>
+  <pre><span class="cm">// Pattern: Server creates new thread per client</span>
+<span class="kw">public class</span> <span class="cls">MultiServer</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> ss = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">6666</span>);
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">Socket</span> s = ss.<span class="fn">accept</span>();
+            <span class="kw">new</span> <span class="cls">Thread</span>(() -&gt; {                               <span class="cm">// Lambda thread</span>
+                <span class="kw">try</span> {
+                    <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(s.<span class="fn">getOutputStream</span>());
+                    out.<span class="fn">writeObject</span>(<span class="str">"Welcome!"</span>);
+                } <span class="kw">catch</span>(<span class="cls">Exception</span> e) { e.<span class="fn">printStackTrace</span>(); }
+            }).<span class="fn">start</span>();
+        }
+    }
+}
+
+<span class="cm">// OR using Worker class (assignment style):</span>
+<span class="kw">class</span> <span class="cls">MyWorker</span> <span class="kw">extends</span> <span class="cls">Thread</span> {
+    <span class="cls">Socket</span> socket;
+    <span class="fn">MyWorker</span>(<span class="cls">Socket</span> s) { <span class="kw">this</span>.socket = s; }
+    
+    <span class="kw">public void</span> <span class="fn">run</span>() {
+        <span class="kw">try</span> {
+            <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(socket.<span class="fn">getOutputStream</span>());
+            out.<span class="fn">writeObject</span>(<span class="str">"Hello from thread!"</span>);
+        } <span class="kw">catch</span>(<span class="cls">Exception</span> e) { e.<span class="fn">printStackTrace</span>(); }
+    }
+}</pre>
+</div>
+
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">✍️ Sample 3: Simple HTTP Response লেখা</div>
+  </div>
+  <pre><span class="cm">// HTTP Response manually লেখার pattern</span>
+<span class="cls">Socket</span> s = serverSocket.<span class="fn">accept</span>();
+<span class="cls">BufferedReader</span> in = <span class="kw">new</span> <span class="cls">BufferedReader</span>(<span class="kw">new</span> <span class="cls">InputStreamReader</span>(s.<span class="fn">getInputStream</span>()));
+<span class="cls">PrintWriter</span> out = <span class="kw">new</span> <span class="cls">PrintWriter</span>(s.<span class="fn">getOutputStream</span>());
+
+<span class="cls">String</span> request = in.<span class="fn">readLine</span>();                   <span class="cm">// "GET /index.html HTTP/1.1"</span>
+
+<span class="cls">String</span> body = <span class="str">"&lt;html&gt;&lt;h1&gt;Hello World!&lt;/h1&gt;&lt;/html&gt;"</span>;
+
+<span class="cm">// Response headers</span>
+out.<span class="fn">print</span>(<span class="str">"HTTP/1.1 200 OK\r\n"</span>);
+out.<span class="fn">print</span>(<span class="str">"Content-Type: text/html\r\n"</span>);
+out.<span class="fn">print</span>(<span class="str">"Content-Length: "</span> + body.<span class="fn">length</span>() + <span class="str">"\r\n"</span>);
+out.<span class="fn">print</span>(<span class="str">"\r\n"</span>);                                  <span class="cm">// ← এই empty line MANDATORY!</span>
+<span class="cm">// Response body</span>
+out.<span class="fn">print</span>(body);
+out.<span class="fn">flush</span>();
+s.<span class="fn">close</span>();</pre>
+</div>
+
+<div class="code-section">
+  <div class="code-header">
+    <div class="code-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="code-title">✍️ Sample 4: File Send over Socket (byte[] chunks)</div>
+  </div>
+  <pre><span class="cm">// Sender side (client):</span>
+<span class="cls">File</span> file = <span class="kw">new</span> <span class="cls">File</span>(<span class="str">"test.pdf"</span>);
+<span class="cls">FileInputStream</span> fis = <span class="kw">new</span> <span class="cls">FileInputStream</span>(file);
+<span class="kw">byte</span>[] buffer = <span class="kw">new byte</span>[<span class="num">1024</span>];  <span class="cm">// 1KB chunk</span>
+<span class="kw">int</span> bytesRead;
+
+<span class="kw">while</span>((bytesRead = fis.<span class="fn">read</span>(buffer)) != -<span class="num">1</span>) {
+    <span class="kw">byte</span>[] chunk = <span class="kw">new byte</span>[bytesRead];
+    System.<span class="fn">arraycopy</span>(buffer, <span class="num">0</span>, chunk, <span class="num">0</span>, bytesRead);
+    out.<span class="fn">writeObject</span>(chunk);
+}
+out.<span class="fn">writeObject</span>(<span class="str">"DONE"</span>);  <span class="cm">// completion signal</span>
+fis.<span class="fn">close</span>();
+
+<span class="cm">// Receiver side (server):</span>
+<span class="cls">FileOutputStream</span> fos = <span class="kw">new</span> <span class="cls">FileOutputStream</span>(<span class="str">"received.pdf"</span>);
+<span class="kw">while</span>(<span class="kw">true</span>) {
+    <span class="cls">Object</span> obj = in.<span class="fn">readObject</span>();
+    <span class="kw">if</span>(obj <span class="kw">instanceof</span> <span class="cls">String</span> && ((<span class="cls">String</span>)obj).<span class="fn">equals</span>(<span class="str">"DONE"</span>)) <span class="kw">break</span>;
+    fos.<span class="fn">write</span>((<span class="kw">byte</span>[]) obj);
+}
+fos.<span class="fn">close</span>();</pre>
+</div>
+
+<!-- ==================== SECTION 8: Q&A ==================== -->
+<div id="qa" class="section-header">
+  <div class="section-icon" style="background:rgba(239,68,68,0.15);">❓</div>
+  <div>
+    <h2>Questions & Answers</h2>
+    <p>Easy থেকে Advanced — সব level-এর প্রশ্ন</p>
+  </div>
+</div>
+
+<div class="info-box tip">
+  <span class="icon">💡</span>
+  <div class="content"><strong>How to use</strong><span>প্রতিটি প্রশ্নে click করলে উত্তর দেখাবে। নিজে আগে চেষ্টা করো!</span></div>
+</div>
+
+<div class="qa-grid">
+
+  <!-- EASY -->
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What is a Socket? What information does a socket need?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Socket হলো দুটো network application-এর মধ্যে একটি connection। একটি socket জানে: Remote IP (অন্য পক্ষের IP), Remote Port, Local Port। Socket-এর দুটো buffer আছে: Input Buffer (receive করা data) ও Output Buffer (পাঠানোর জন্য data)।</div>
+      <p>A socket represents a single TCP connection between two network applications. Number of connections = number of sockets. Each socket needs: Remote IP, Remote Port, Local Port, plus input and output buffers.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What is the difference between ServerSocket and Socket in Java?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">ServerSocket হলো server-এর "welcome door" — এটি শুধু client-এর connection গ্রহণ করে, data transfer করে না। Socket হলো actual connection — এটি দিয়ে data পাঠানো ও পড়া যায়।</div>
+      <p><strong>ServerSocket:</strong> Listens on a port for incoming connections. Calls <code>accept()</code> to wait. Returns a <code>Socket</code> when a client connects.<br>
+      <strong>Socket:</strong> Represents an active connection. Has input/output streams for data transfer. Created on client side with <code>new Socket(host, port)</code> or on server side from <code>accept()</code>.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What does accept() do? Is it blocking?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">accept() হলো একটি blocking call — কোনো client connect না হওয়া পর্যন্ত execution এখানেই থামে। Client connect হলে একটি Socket object return করে।</div>
+      <p>Yes, <code>accept()</code> is a <strong>blocking call</strong>. The server thread pauses at this line until a client connects. When a connection arrives, it returns a new <code>Socket</code> object representing that specific client connection. The ServerSocket continues to listen for more connections.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What is HTTP? What port does it use by default?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">HTTP (HyperText Transfer Protocol) হলো web-এ data transfer-এর protocol। এটি TCP-র উপর কাজ করে। Default port হলো 80। Current version HTTP/1.1 (RFC 2616)।</div>
+      <p>HTTP (HyperText Transfer Protocol) is the application-layer protocol used by web clients and servers to communicate. It runs over TCP. Default port: <strong>80</strong>. HTTPS uses port <strong>443</strong>. Current common version: HTTP/1.1.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What are the HTTP methods? Briefly explain each.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">GET: Static/dynamic content retrieve (arguments URI-তে) — সবচেয়ে বেশি ব্যবহৃত (99%)। POST: Dynamic content (arguments body-তে)। HEAD: GET-এর মতো কিন্তু body নেই। PUT: Server-এ file লেখা। DELETE: Server থেকে file মুছা। OPTIONS: Server/file attributes। TRACE: Debug (request echo করে)।</div>
+      <p><code>GET</code>: Retrieve content (workhorse, 99%). <code>POST</code>: Submit data in body. <code>HEAD</code>: Like GET, no response body. <code>PUT</code>: Write file to server. <code>DELETE</code>: Remove file. <code>OPTIONS</code>: Get attributes. <code>TRACE</code>: Echo request for debugging.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-easy">Easy</span>
+      <span class="qa-q-text">What is MIME type? Give 3 examples.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">MIME (Multipurpose Internet Mail Extensions) type হলো content-এর ধরন জানানোর উপায়। Server response-এ Content-Type header-এ MIME type পাঠায়, browser সেটি দেখে বুঝতে পারে কীভাবে content দেখাবে।</div>
+      <p>MIME type tells the client what kind of content is in the response body. Examples: <code>text/html</code> (HTML doc), <code>image/jpeg</code> (JPEG image), <code>text/plain</code> (plain text), <code>image/gif</code> (GIF), <code>application/postscript</code> (PostScript).</p>
+    </div>
+  </div>
+
+  <!-- MEDIUM -->
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">Why do we need threading in a server? Explain with the time server example.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Threading ছাড়া, server-এর main loop একটি client-এর while(true) loop-এ আটকে থাকবে। দ্বিতীয় client connect করলে accept() কখনো reach হবে না। Thread দিয়ে প্রতিটি client-কে আলাদা thread-এ serve করা হয়, main thread শুধু accept() করতে থাকে।</div>
+      <p>Without threading: Server's main loop gets stuck in a <code>while(true)</code> loop serving Client 1 — Client 2 never gets accepted.<br><br>
+      With threading (time server): Main thread calls <code>accept()</code> → gets socket → creates <code>new Worker(socket)</code> → calls <code>worker.start()</code> → immediately loops back to <code>accept()</code>. Worker handles Client 1 in background. Now both Client.java and Client2.java receive time simultaneously.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">Explain the difference between HTTP/1.0 and HTTP/1.1.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">HTTP/1.0: প্রতিটি request-এর জন্য নতুন TCP connection তৈরি ও বন্ধ করতে হয়।<br>HTTP/1.1: Persistent connection — একই TCP connection-এ multiple request। Connection: Keep-Alive header দিয়ে জানানো হয়। Host header mandatory। Better caching।</div>
+      <p><strong>HTTP/1.0:</strong> New TCP connection for each request/response. <br>
+      <strong>HTTP/1.1:</strong> Persistent connections (Connection: Keep-Alive) — multiple transactions over same TCP. HOST header is required. Enhanced caching with ETag, Cache-Control headers. Chunked transfer encoding supported.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">In the assignment, explain the file upload buffer check mechanism.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Client file upload শুরুর আগে file name ও size পাঠায়। Server দেখে: (usedBufferSize + newFileSize) > MAX_BUFFER_SIZE? যদি বেশি হয় — upload reject। না হলে — random chunk size generate করে (MIN ও MAX এর মধ্যে), fileID তৈরি করে, client-কে জানায়।</div>
+      <p>Before upload starts:<br>
+      1. Client sends: <code>fileName</code>, <code>fileSize</code><br>
+      2. Server checks: <code>usedBufferSize + newFileSize ≤ MAX_BUFFER_SIZE (500MB)</code><br>
+      3. If exceeds: reject with error message<br>
+      4. If OK: generate random chunkSize between <code>MIN_CHUNK_SIZE (10)</code> and <code>MAX_CHUNK_SIZE (100KB)</code>, create a unique <code>fileID</code>, send both to client</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">What is the role of ObjectOutputStream and ObjectInputStream? Why must ObjectOutputStream be created FIRST?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">ObjectOutputStream হলো data পাঠানোর channel (writeObject() ব্যবহার)। ObjectInputStream হলো data পড়ার channel (readObject() ব্যবহার)।<br><br>ObjectOutputStream প্রথমে তৈরি করতে হয় কারণ OOS তৈরির সময় সে stream header পাঠায়। OIS তৈরির সময় সে এই header পড়ে। যদি দুই পাশে OOS-এর আগে OIS তৈরি করা হয়, deadlock হবে।</div>
+      <p><code>ObjectOutputStream</code>: Serializes Java objects and writes to socket's output stream.<br>
+      <code>ObjectInputStream</code>: Reads and deserializes objects from socket's input stream.<br><br>
+      <strong>Order matters:</strong> <code>ObjectOutputStream</code> must be created before <code>ObjectInputStream</code> on BOTH sides, because <code>new ObjectOutputStream()</code> writes a stream header, and <code>new ObjectInputStream()</code> reads that header. Creating OIS first on both sides causes deadlock — each waits for the other's header.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">Explain what happens when a client connects to a server for the first time in the assignment.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">① Server accept() করে নতুন Worker thread তৈরি করে। ② Server "Enter username" message পাঠায়। ③ Client username পাঠায়। ④ Server check করে: username ইতোমধ্যে currentClients-এ আছে? থাকলে "closing" message দিয়ে disconnect। না থাকলে: directory তৈরি করে (প্রথমবার হলে), currentClients-এ add করে, "Welcome" message পাঠায়। ⑤ Client menu দেখে।</div>
+      <p>1. New <code>Worker</code> thread spawned by server<br>
+      2. Worker sends "Enter username" prompt<br>
+      3. Client sends username string<br>
+      4. Server checks <code>currentClients.containsKey(username)</code><br>
+      5. If duplicate: sends "closing" → closes connection<br>
+      6. If new: creates <code>Server/ServerFiles/{username}/</code> directory (if first time), adds to <code>currentClients</code>, removes from <code>offlineClients</code>, sends welcome message<br>
+      7. Client enters menu loop</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-medium">Medium</span>
+      <span class="qa-q-text">What is a Proxy server? What are its uses?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Proxy হলো client এবং origin server-এর মাঝখানের intermediary। Client-এর কাছে proxy = server। Server-এর কাছে proxy = client। ব্যবহার: ① Caching (বারবার একই content server থেকে না নিয়ে cache থেকে দেওয়া), ② Logging, ③ Anonymization (client-এর পরিচয় লুকানো)।</div>
+      <p>A proxy sits between client and origin server, acting as server to the client and as client to the server.<br><br>
+      <strong>Uses:</strong><br>
+      • <strong>Caching:</strong> Store responses locally — Client B gets foo.html from proxy cache without hitting origin server again<br>
+      • <strong>Logging:</strong> Record all requests passing through<br>
+      • <strong>Anonymization:</strong> Hide client's real IP from origin server<br>
+      • <strong>Content filtering:</strong> Block certain content</p>
+    </div>
+  </div>
+
+  <!-- HARD -->
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-hard">Hard</span>
+      <span class="qa-q-text">Why does the assignment use ConcurrentHashMap instead of HashMap? Explain with a scenario.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Multiple thread একই সময়ে HashMap-এ write করলে data corruption বা ConcurrentModificationException হতে পারে। উদাহরণ: Thread A (Client alice) ও Thread B (Client bob) একই সময়ে fileMap.put() করলে HashMap crash করতে পারে। ConcurrentHashMap thread-safe — একাধিক thread একসাথে safely পড়তে ও লিখতে পারে।</div>
+      <p><strong>Problem with HashMap:</strong> Not thread-safe. If Thread-1 (handling alice) and Thread-2 (handling bob) both call <code>fileMap.put()</code> simultaneously, internal state can corrupt → <code>ConcurrentModificationException</code> or data loss.<br><br>
+      <strong>ConcurrentHashMap:</strong> Divides the map into segments, locking only the relevant segment for each write. Reads are lock-free. Multiple threads can safely read and write without explicit synchronization.<br><br>
+      Same reason for <code>CopyOnWriteArraySet</code> for <code>offlineClients</code>: writes create a new copy of the array — reads are never blocked.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-hard">Hard</span>
+      <span class="qa-q-text">Explain the complete file download flow in the assignment. How is it different from upload?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Download flow: Client file ID পাঠায় → Server validate করে → Valid হলে file name পাঠায় → MAX_CHUNK_SIZE (100KB) দিয়ে chunks পাঠায় → শেষে "download completed" message পাঠায়।<br><br>Upload-এর সাথে পার্থক্য: Upload-এ প্রতিটি chunk-এর পর ACK wait করা হয়, কিন্তু download-এ ACK wait করা হয় না — directly সব chunk পাঠিয়ে দেয়। Download আরও fast কিন্তু less reliable।</div>
+      <p><strong>Download flow:</strong><br>
+      1. Client sends fileId to server<br>
+      2. Server validates: exists in fileMap? accessible (own file or other's public)?<br>
+      3. If invalid: sends error message<br>
+      4. If valid: sends "This is valid file." → sends fileName → starts sending chunks<br>
+      5. Uses <code>MAX_CHUNK_SIZE</code> for all chunks (no random)<br>
+      6. <strong>No ACK wait</strong> — sends chunks continuously<br>
+      7. Sends "download completed" string at end<br><br>
+      <strong>Key difference from upload:</strong> Upload is ACK-driven (reliable, slower). Download has no ACK (fire-and-forget, faster). Client just writes bytes to FileOutputStream until it receives the "download completed" signal.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-hard">Hard</span>
+      <span class="qa-q-text">What happens if a client disconnects mid-upload? How does the server handle it?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Client disconnect হলে Worker thread-এর readObject() একটি IOException বা SocketException throw করবে। Server এই exception catch করে incomplete file-এর সব chunks discard করে। FileUploadInfo object থেকে data মুছে ফেলে, usedBufferSize update করে। FileMapStorage.txt-এ কিছু লেখা হয় না (saveFileToServerStorage() call হয়নি তাই)।</div>
+      <p>When client disconnects mid-upload:<br>
+      1. <code>in.readObject()</code> in Worker thread throws <code>SocketException</code> or <code>IOException</code><br>
+      2. Worker's <code>run()</code> catches the exception<br>
+      3. Incomplete <code>FileUploadInfo</code> is discarded — chunks never assembled<br>
+      4. File never written to disk (saveFileToServerStorage not called)<br>
+      5. FileMapStorage.txt not updated<br>
+      6. Worker removes client from <code>currentClients</code>, adds to <code>offlineClients</code><br>
+      7. <code>usedBufferSize</code> must be decremented (cleanup)<br><br>
+      Key: <code>isComplete = false</code> means the upload never completed.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-hard">Hard</span>
+      <span class="qa-q-text">Explain file request (unicast vs broadcast) in the assignment.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Client file request করলে: description ও recipient পাঠায়। Server request ID generate করে, FileRequest object তৈরি করে fileRequestMap-এ রাখে।<br><br>Unicast: Recipient specific username হলে — শুধু সেই client-এর message queue-তে add। Broadcast: Recipient "ALL" হলে — currentClients + offlineClients সবার কাছে পাঠায়।<br><br>কেউ request fulfill করলে: uploader file upload করার সময় valid requestId দেয় → automatically public file → server request করা client-কে message পাঠায়। Multiple clients একই request fulfill করতে পারে।</div>
+      <p><strong>File Request flow:</strong><br>
+      1. Client sends: description + recipient name (or "ALL")<br>
+      2. Server generates unique requestID, creates <code>FileRequest</code> object, adds to <code>fileRequestMap</code><br><br>
+      <strong>Unicast:</strong> If recipient = specific username → add to that client's unread messages (online or offline)<br>
+      <strong>Broadcast:</strong> If recipient = "ALL" → iterate all clients (currentClients + offlineClients), add message to each<br><br>
+      <strong>Fulfilling:</strong> When uploader selects "Yes" to upload as request response → must provide valid requestID → file automatically set to Public → server sends notification message to original requester → multiple fulfillers allowed</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-hard">Hard</span>
+      <span class="qa-q-text">Explain the HTTP request format with a complete GET request example.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">HTTP Request = Request Line + Headers + empty line + (optional body)।<br><br>Request Line format: METHOD URI HTTP/VERSION।<br>GET request-এ body থাকে না — arguments URI-তে যায়।</div>
+      <pre>GET /test.html HTTP/1.1          ← Request line: method URI version
+Accept: */*                       ← Headers শুরু
+Accept-Language: en-us
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0
+Host: euro.ecom.cmu.edu           ← HTTP/1.1-এ HOST mandatory
+Connection: Keep-Alive
+                                  ← Empty line (CRLF) = headers শেষ</pre>
+      <p>Key points: Request line is <code>METHOD URI HTTP/VERSION</code>. Headers are <code>Name: Value</code> pairs. Empty CRLF line terminates headers. GET has no body — arguments go in URI as query string after <code>?</code>.</p>
+    </div>
+  </div>
+
+  <!-- ADVANCED -->
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">Write a complete threaded server that handles multiple clients and broadcasts a message to all connected clients.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Broadcast করতে server সব connected client-এর ObjectOutputStream রাখতে হবে (ConcurrentHashMap-এ)। নতুন client connect হলে সে map-এ add হবে। Broadcast-এর সময় সব map-এর values iterate করে writeObject() করতে হবে।</div>
+      <pre><span class="kw">import</span> java.net.*; <span class="kw">import</span> java.io.*; <span class="kw">import</span> java.util.concurrent.*;
+
+<span class="kw">public class</span> <span class="cls">BroadcastServer</span> {
+    <span class="cm">// Shared map: clientName → their ObjectOutputStream</span>
+    <span class="kw">static</span> ConcurrentHashMap&lt;String, ObjectOutputStream&gt; clients = 
+        <span class="kw">new</span> ConcurrentHashMap&lt;&gt;();
+
+    <span class="kw">public static void</span> <span class="fn">broadcast</span>(<span class="cls">String</span> msg) {
+        clients.<span class="fn">forEach</span>((name, out) -&gt; {
+            <span class="kw">try</span> { out.<span class="fn">writeObject</span>(msg); } 
+            <span class="kw">catch</span> (<span class="cls">IOException</span> e) { clients.<span class="fn">remove</span>(name); }
+        });
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> ss = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">6666</span>);
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">Socket</span> s = ss.<span class="fn">accept</span>();
+            <span class="kw">new</span> <span class="cls">Thread</span>(() -&gt; {
+                <span class="kw">try</span> {
+                    <span class="cls">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="cls">ObjectOutputStream</span>(s.<span class="fn">getOutputStream</span>());
+                    <span class="cls">ObjectInputStream</span> in = <span class="kw">new</span> <span class="cls">ObjectInputStream</span>(s.<span class="fn">getInputStream</span>());
+                    <span class="cls">String</span> name = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();
+                    clients.<span class="fn">put</span>(name, out);
+                    <span class="fn">broadcast</span>(name + <span class="str">" joined!"</span>);
+                    <span class="kw">while</span>(<span class="kw">true</span>) {
+                        <span class="cls">String</span> msg = (<span class="cls">String</span>) in.<span class="fn">readObject</span>();
+                        <span class="fn">broadcast</span>(name + <span class="str">": "</span> + msg);
+                    }
+                } <span class="kw">catch</span>(<span class="cls">Exception</span> e) { e.<span class="fn">printStackTrace</span>(); }
+            }).<span class="fn">start</span>();
+        }
+    }
+}</pre>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">In CommonFunctionUtility.java, explain the byte-by-byte file parsing. Why not use Scanner or BufferedReader?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">fileToHashMap() FileInputStream দিয়ে byte-by-byte পড়ে। যখন '\n' পায়, তখন buffer-এ জমা bytes দিয়ে String তৈরি করে '|' দিয়ে split করে। এটি low-level approach।<br><br>Scanner বা BufferedReader ব্যবহার না করার কারণ হতে পারে: নিজে socket-level byte handling practice, অথবা specific encoding control। Production-এ Scanner/BufferedReader ব্যবহার করাই ভালো।</div>
+      <p>The method reads one byte at a time using <code>FileInputStream.read()</code>. It buffers bytes in an <code>ArrayList&lt;Byte&gt;</code>. On encountering <code>'\n'</code>, it converts the buffer to a <code>byte[]</code>, creates a <code>String</code>, splits by <code>|</code> (pipe), and adds to result.<br><br>
+      <strong>Why not BufferedReader?</strong> This is a manual/educational approach demonstrating low-level I/O. BufferedReader would be simpler: <code>br.readLine()</code> returns each line, then <code>line.split("\\|")</code>. The manual approach gives explicit byte-level control similar to what happens in actual socket streams.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">Why does FileUploadInfo use Collections.synchronizedList() for chunksList?</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">chunksList-এ multiple thread access করতে পারে — Worker thread chunk add করে, অন্য thread চাইলে পড়তে পারে। Regular ArrayList thread-safe নয় — একসাথে add ও iterate করলে ConcurrentModificationException হতে পারে। Collections.synchronizedList() একটি wrapper তৈরি করে যেখানে প্রতিটি operation synchronized।<br><br>saveFileToServerStorage()-এ synchronized(chunksList) block ব্যবহার করা হয়েছে কারণ iteration-এর সময় external synchronization লাগে।</div>
+      <p><code>chunksList</code> stores file chunks as <code>byte[]</code> arrays. In a multi-threaded server, a Worker thread adds chunks during upload, while another operation could potentially read the list simultaneously.<br><br>
+      <code>Collections.synchronizedList(new ArrayList&lt;&gt;())</code> wraps ArrayList so each individual operation (add, size, get) is synchronized.<br><br>
+      However, <strong>iteration is not automatically safe</strong> — that's why <code>saveFileToServerStorage()</code> uses <code>synchronized(chunksList) { for(byte[] chunk : chunksList)... }</code> — to hold the lock during the entire iteration, preventing concurrent modification.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">Describe what initiationOfflineClients() and initiationFileMapStorage() do and why they are needed.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">এই দুটো method server restart-এর পর আগের state restore করে।<br><br>initiationOfflineClients(): Server/ServerFiles/ directory-র সব subdirectory scan করে। প্রতিটি directory একটি client-এর username। এদের offlineClients set-এ add করে। এটি না থাকলে server restart করলে সব previous client-এর record হারিয়ে যাবে।<br><br>initiationFileMapStorage(): FileMapStorage.txt পড়ে, parse করে, প্রতিটি line থেকে FileUploadInfo object তৈরি করে fileMap-এ add করে। এটি না থাকলে server restart করলে কেউ আগে upload করা file download করতে পারবে না।</div>
+      <p><strong>Why needed:</strong> Server can restart. These methods restore state from persistent storage.<br><br>
+      <strong>initiationOfflineClients():</strong> Scans <code>Server/ServerFiles/</code> for subdirectories. Each subdirectory = a client who connected at least once. Adds all to <code>offlineClients</code>. Without this, after restart, the server wouldn't know about previous clients.<br><br>
+      <strong>initiationFileMapStorage():</strong> Reads pipe-delimited <code>FileMapStorage.txt</code> via <code>CommonFunctionUtility.fileToHashMap()</code>. For each row (7 fields), creates <code>FileUploadInfo</code> object and puts in <code>fileMap</code>. Without this, all uploaded files would be inaccessible after restart since fileMap would be empty.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">Analyze a potential deadlock scenario in socket programming and how to avoid it.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">Deadlock scenario: Server এবং Client উভয়ই readObject() call করছে, কেউ writeObject() করছে না। দুজনেই অপরের message-এর জন্য অপেক্ষা করছে — এটি deadlock।<br><br>আরেকটি: OIS তৈরির সমস্যা। দুই পাশে ObjectInputStream আগে তৈরি করলে, OIS তার header পড়তে চাইবে কিন্তু কেউই header পাঠায়নি — deadlock।</div>
+      <p><strong>Scenario 1 — Read-Read deadlock:</strong><br>
+      Server: <code>in.readObject()</code> → waiting for client<br>
+      Client: <code>in.readObject()</code> → waiting for server<br>
+      Both blocked forever. Fix: agree on protocol — one side writes first.<br><br>
+      <strong>Scenario 2 — OIS initialization deadlock:</strong><br>
+      Side A: <code>new ObjectInputStream()</code> → reads stream header, blocks<br>
+      Side B: <code>new ObjectInputStream()</code> → reads stream header, blocks<br>
+      Neither creates <code>ObjectOutputStream</code> to send the header!<br>
+      Fix: Always create <code>ObjectOutputStream</code> first on BOTH sides.<br><br>
+      <strong>Scenario 3 — Buffer full:</strong> TCP send buffer fills up if receiver doesn't read. Fix: use separate reader thread.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="difficulty-badge diff-advanced">Advanced</span>
+      <span class="qa-q-text">Write code to implement a simple HTTP server that serves different responses for GET and returns 404 for unknown paths.</span>
+      <span class="qa-toggle">▼</span>
+    </div>
+    <div class="qa-answer">
+      <div class="bangla-ans">HTTP server-এ: request line parse করে URI বের করা, URI অনুযায়ী response দেওয়া। Unknown path হলে 404 response।</div>
+      <pre><span class="kw">import</span> java.io.*; <span class="kw">import</span> java.net.*;
+
+<span class="kw">public class</span> <span class="cls">SimpleHTTPServer</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) <span class="kw">throws</span> Exception {
+        <span class="cls">ServerSocket</span> ss = <span class="kw">new</span> <span class="cls">ServerSocket</span>(<span class="num">8080</span>);
+        <span class="kw">while</span>(<span class="kw">true</span>) {
+            <span class="cls">Socket</span> s = ss.<span class="fn">accept</span>();
+            <span class="cls">BufferedReader</span> in = <span class="kw">new</span> <span class="cls">BufferedReader</span>(
+                <span class="kw">new</span> <span class="cls">InputStreamReader</span>(s.<span class="fn">getInputStream</span>()));
+            <span class="cls">PrintWriter</span> out = <span class="kw">new</span> <span class="cls">PrintWriter</span>(s.<span class="fn">getOutputStream</span>());
+            
+            <span class="cls">String</span> requestLine = in.<span class="fn">readLine</span>();
+            <span class="kw">if</span>(requestLine == <span class="kw">null</span>) { s.<span class="fn">close</span>(); <span class="kw">continue</span>; }
+            
+            <span class="cls">String</span>[] parts = requestLine.<span class="fn">split</span>(<span class="str">" "</span>);
+            <span class="cls">String</span> method = parts[<span class="num">0</span>];
+            <span class="cls">String</span> uri = parts.<span class="fn">length</span> > <span class="num">1</span> ? parts[<span class="num">1</span>] : <span class="str">"/"</span>;
+            
+            <span class="kw">if</span>(method.<span class="fn">equals</span>(<span class="str">"GET"</span>)) {
+                <span class="kw">if</span>(uri.<span class="fn">equals</span>(<span class="str">"/"</span>) || uri.<span class="fn">equals</span>(<span class="str">"/index.html"</span>)) {
+                    <span class="cls">String</span> body = <span class="str">"&lt;html&gt;&lt;h1&gt;Welcome!&lt;/h1&gt;&lt;/html&gt;"</span>;
+                    out.<span class="fn">print</span>(<span class="str">"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n"</span>);
+                    out.<span class="fn">print</span>(<span class="str">"Content-Length: "</span>+body.<span class="fn">length</span>()+<span class="str">"\r\n\r\n"</span>+body);
+                } <span class="kw">else</span> {
+                    <span class="cls">String</span> body = <span class="str">"&lt;html&gt;&lt;h1&gt;404 Not Found&lt;/h1&gt;&lt;/html&gt;"</span>;
+                    out.<span class="fn">print</span>(<span class="str">"HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n"</span>);
+                    out.<span class="fn">print</span>(<span class="str">"Content-Length: "</span>+body.<span class="fn">length</span>()+<span class="str">"\r\n\r\n"</span>+body);
+                }
+            }
+            out.<span class="fn">flush</span>(); s.<span class="fn">close</span>();
+        }
+    }
+}</pre>
+    </div>
+  </div>
+
+</div><!-- end qa-grid -->
+
+<!-- ==================== QUICK REFERENCE ==================== -->
+<div class="section-header">
+  <div class="section-icon" style="background:rgba(0,212,255,0.15);">⚡</div>
+  <div>
+    <h2>Quick Reference — Exam-এর আগে দেখো</h2>
+    <p>সব important terms এক জায়গায়</p>
+  </div>
+</div>
+
+<div style="overflow-x:auto; margin-bottom:2rem;">
+  <table>
+    <thead><tr><th>Class/Method</th><th>Package</th><th>কাজ</th></tr></thead>
+    <tbody>
+      <tr><td><code>ServerSocket(port)</code></td><td>java.net</td><td>Server-এ port-এ listen শুরু</td></tr>
+      <tr><td><code>accept()</code></td><td>java.net.ServerSocket</td><td>Blocking — client-এর জন্য wait, Socket return করে</td></tr>
+      <tr><td><code>new Socket(host, port)</code></td><td>java.net</td><td>Client থেকে server-এ connect করা</td></tr>
+      <tr><td><code>getOutputStream()</code></td><td>java.net.Socket</td><td>Socket-এর output stream (data পাঠাতে)</td></tr>
+      <tr><td><code>getInputStream()</code></td><td>java.net.Socket</td><td>Socket-এর input stream (data পড়তে)</td></tr>
+      <tr><td><code>ObjectOutputStream</code></td><td>java.io</td><td>Java object serialize করে পাঠায়</td></tr>
+      <tr><td><code>ObjectInputStream</code></td><td>java.io</td><td>Serialized object পড়ে deserialize করে</td></tr>
+      <tr><td><code>writeObject(obj)</code></td><td>ObjectOutputStream</td><td>Object network-এ পাঠায়</td></tr>
+      <tr><td><code>readObject()</code></td><td>ObjectInputStream</td><td>Blocking — Object পড়ে (Object type return)</td></tr>
+      <tr><td><code>Thread.start()</code></td><td>java.lang</td><td>নতুন thread শুরু, run() execute করে</td></tr>
+      <tr><td><code>Thread.sleep(ms)</code></td><td>java.lang</td><td>ms millisecond wait করে</td></tr>
+      <tr><td><code>ConcurrentHashMap</code></td><td>java.util.concurrent</td><td>Thread-safe HashMap</td></tr>
+      <tr><td><code>CopyOnWriteArraySet</code></td><td>java.util.concurrent</td><td>Thread-safe Set</td></tr>
+      <tr><td><code>PrintWriter</code></td><td>java.io</td><td>HTTP text response লেখার জন্য</td></tr>
+      <tr><td><code>BufferedReader</code></td><td>java.io</td><td>HTTP text request পড়ার জন্য</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="overflow-x:auto; margin-bottom:2rem;">
+  <table>
+    <thead><tr><th>HTTP Status Code</th><th>Meaning</th><th>কখন আসে</th></tr></thead>
+    <tbody>
+      <tr><td><code>200 OK</code></td><td>Success</td><td>Request সফলভাবে handle হয়েছে</td></tr>
+      <tr><td><code>301 Moved Permanently</code></td><td>Redirect</td><td>Resource নতুন URL-এ গেছে</td></tr>
+      <tr><td><code>400 Bad Request</code></td><td>Client Error</td><td>Malformed request</td></tr>
+      <tr><td><code>403 Forbidden</code></td><td>No Permission</td><td>Server-এর permission নেই</td></tr>
+      <tr><td><code>404 Not Found</code></td><td>Missing</td><td>File/resource খুঁজে পাওয়া যায়নি</td></tr>
+      <tr><td><code>500 Internal Server Error</code></td><td>Server Error</td><td>Server-এ কোনো সমস্যা</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="highlight-box">
+  <div style="font-size:0.85rem; font-weight:700; color:var(--accent); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:1px;">🎯 Exam-এ সবচেয়ে Important Points</div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:0.75rem; font-size:0.85rem; color:var(--text2); font-family:'Noto Sans Bengali', sans-serif; line-height:1.9;">
+    <div>✅ ObjectOutputStream অবশ্যই ObjectInputStream-এর আগে তৈরি করতে হবে</div>
+    <div>✅ accept() এবং readObject() দুটোই blocking call</div>
+    <div>✅ HTTP response-এ headers ও body-র মধ্যে empty line (\r\n) mandatory</div>
+    <div>✅ Upload: ACK wait করে | Download: ACK wait করে না</div>
+    <div>✅ Thread-safety: ConcurrentHashMap > HashMap (multi-threaded server-এ)</div>
+    <div>✅ HTTP/1.1-এ HOST header mandatory; HTTP/1.0-তে নয়</div>
+    <div>✅ ServerSocket port own করে, Socket connection represent করে</div>
+    <div>✅ Multiple sockets can share same port number</div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function toggleQA(el) {
+  const answer = el.nextElementSibling;
+  const toggle = el.querySelector('.qa-toggle');
+  const isOpen = answer.classList.contains('open');
+  answer.classList.toggle('open', !isOpen);
+  toggle.textContent = isOpen ? '▼' : '▲';
+  toggle.style.transform = isOpen ? '' : 'rotate(0deg)';
+}
+
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
