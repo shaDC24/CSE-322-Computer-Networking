@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT Quiz Study Guide — CSE 322</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0d1b2a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(0,212,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent);
+    padding: 0.3rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  header h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #00d4ff, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  nav a:hover {
+    color: var(--accent);
+    border-color: rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.05);
+  }
+
+  /* LAYOUT */
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    background: var(--surface);
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: var(--surface2); }
+  .section-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(0,212,255,0.15); }
+  .icon-purple { background: rgba(124,58,237,0.15); }
+  .icon-green { background: rgba(16,185,129,0.15); }
+  .icon-amber { background: rgba(245,158,11,0.15); }
+  .icon-red { background: rgba(239,68,68,0.15); }
+
+  .section-title { font-size: 1.1rem; font-weight: 700; flex: 1; }
+  .section-chevron { color: var(--muted); transition: transform 0.3s; font-size: 0.9rem; }
+  .section.open .section-chevron { transform: rotate(90deg); }
+
+  .section-body {
+    display: none;
+    padding: 1.75rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .section.open .section-body { display: block; }
+
+  /* BANGLA EXPLANATION BOX */
+  .bangla-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Noto Sans Bengali', 'Syne', sans-serif;
+    font-size: 0.97rem;
+    line-height: 1.9;
+  }
+  .bangla-box .label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin: 1.25rem 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .code-header {
+    background: var(--surface);
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; }
+  .d-red { background: #ef4444; }
+  .d-yellow { background: #f59e0b; }
+  .d-green { background: #10b981; }
+  .code-body { padding: 1.25rem; overflow-x: auto; }
+  .code-body pre { font-size: 0.82rem; line-height: 1.8; }
+
+  /* SYNTAX COLORS */
+  .kw { color: #c792ea; }     /* keyword */
+  .fn { color: #82aaff; }     /* function */
+  .str { color: #c3e88d; }    /* string */
+  .num { color: #f78c6c; }    /* number */
+  .cm { color: #546e7a; font-style: italic; }   /* comment */
+  .var { color: #eeffff; }    /* variable */
+  .type { color: #ffcb6b; }   /* type */
+  .op { color: #89ddff; }     /* operator */
+
+  /* ANNOTATED CODE */
+  .annotated-line {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    flex-wrap: wrap;
+  }
+  .annotated-line:hover { background: rgba(255,255,255,0.03); }
+  .line-num { color: var(--muted); font-size: 0.75rem; min-width: 1.5rem; text-align: right; padding-top: 0.1rem; }
+  .line-code { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; flex: 1; min-width: 200px; }
+  .line-explain { font-size: 0.78rem; color: #94a3b8; font-family: 'Noto Sans Bengali', sans-serif; flex: 2; min-width: 200px; padding-top: 0.1rem; }
+  .line-explain .arrow { color: var(--accent); margin-right: 0.4rem; }
+
+  /* Q&A */
+  .qa-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .qa-question {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: background 0.2s;
+  }
+  .qa-question:hover { background: var(--surface2); }
+  .qa-level {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.3rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .level-easy { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+  .level-medium { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+  .level-hard { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .level-advanced { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+
+  .qa-q-text { font-size: 0.9rem; font-weight: 600; flex: 1; }
+  .qa-toggle { color: var(--muted); font-size: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; }
+  .qa-answer {
+    display: none;
+    padding: 1.25rem;
+    background: rgba(0,212,255,0.03);
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: #cbd5e1;
+  }
+  .qa-item.open .qa-answer { display: block; }
+  .qa-item.open .qa-toggle { color: var(--accent); }
+
+  .answer-code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  /* DIAGRAM */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+    text-align: center;
+  }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    color: var(--accent);
+    padding: 0.15rem 0.6rem;
+    border-radius: 0.3rem;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0.15rem;
+  }
+
+  h3 { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 1.25rem 0 0.75rem; }
+  h4 { font-size: 0.9rem; font-weight: 700; color: var(--accent4); margin: 1rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; font-size: 0.92rem; }
+  ul { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+  li { font-size: 0.9rem; margin-bottom: 0.3rem; }
+
+  .highlight { color: var(--accent); font-weight: 700; }
+  .highlight2 { color: var(--accent3); font-weight: 700; }
+  .highlight3 { color: var(--accent4); font-weight: 700; }
+
+  /* IMPORTANT NOTE */
+  .note {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-left: 4px solid var(--accent4);
+    border-radius: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+  .note strong { color: var(--accent4); }
+
+  .warning {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-left: 4px solid var(--danger);
+    border-radius: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+  th { background: var(--surface2); color: var(--accent); padding: 0.6rem 0.9rem; text-align: left; border: 1px solid var(--border); font-size: 0.8rem; letter-spacing: 0.5px; }
+  td { padding: 0.6rem 0.9rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">CSE 322 · IoT Lab · Quiz Prep</div>
+  <h1>IoT Quiz Study Guide</h1>
+  <p>ESP32 · MQTT · WiFi · Python paho-mqtt · Wokwi Simulation</p>
+</header>
+
+<nav>
+  <a href="#iot">🌐 IoT Basics</a>
+  <a href="#mqtt">📡 MQTT Protocol</a>
+  <a href="#esp32">🔌 ESP32 Code</a>
+  <a href="#python">🐍 Python Code</a>
+  <a href="#circuit">💡 Circuit</a>
+  <a href="#qa">❓ Q&amp;A Bank</a>
+  <a href="#writecode">✍️ Write Code</a>
+</nav>
+
+<main>
+
+<!-- ===================== SECTION 1: IoT Basics ===================== -->
+<div class="section open" id="iot">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-blue">🌐</div>
+    <span class="section-title">1. IoT (Internet of Things) — মূল ধারণা</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+    <div class="bangla-box">
+      <span class="label">📖 Bangla Explanation</span>
+      <strong>IoT কী?</strong><br>
+      IoT মানে হলো "Internet of Things" — অর্থাৎ physical devices গুলো (যেমন bulb, sensor, motor) কে internet এর সাথে connect করে দেওয়া, যাতে তারা data send/receive করতে পারে এবং remotely control করা যায়।<br><br>
+      <strong>এই assignment এ কী হচ্ছে?</strong><br>
+      একটা ESP32 microcontroller (virtual, Wokwi তে simulate করা) কে WiFi এর মাধ্যমে internet এ connect করা হচ্ছে। তারপর MQTT protocol ব্যবহার করে Python code থেকে message পাঠিয়ে ESP32 এর LED কে ON/OFF করা হচ্ছে। এটাই IoT এর basic example — remote device control!<br><br>
+      <strong>System Architecture:</strong><br>
+      Python (Controller) → MQTT Broker (HiveMQ) → ESP32 (Device) → LED
+    </div>
+
+    <div class="diagram">
+      <svg width="100%" viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="max-width:650px">
+        <!-- Python -->
+        <rect x="10" y="35" width="130" height="60" rx="8" fill="#1a2236" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="75" y="58" text-anchor="middle" fill="#a78bfa" font-size="11" font-family="Syne,sans-serif" font-weight="700">🐍 Python</text>
+        <text x="75" y="75" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">paho-mqtt</text>
+        <text x="75" y="89" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">Publisher</text>
+        <!-- Arrow 1 -->
+        <line x1="142" y1="65" x2="188" y2="65" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <polygon points="188,60 198,65 188,70" fill="#00d4ff"/>
+        <text x="170" y="58" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Syne,sans-serif">PUBLISH</text>
+        <!-- Broker -->
+        <rect x="200" y="25" width="140" height="80" rx="8" fill="#1a2236" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="270" y="52" text-anchor="middle" fill="#00d4ff" font-size="11" font-family="Syne,sans-serif" font-weight="700">📡 MQTT Broker</text>
+        <text x="270" y="67" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">broker.hivemq.com</text>
+        <text x="270" y="82" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">:1883 (TCP)</text>
+        <text x="270" y="97" text-anchor="middle" fill="#64748b" font-size="8">Topic: buet/cse/ID/led</text>
+        <!-- Arrow 2 -->
+        <line x1="342" y1="65" x2="388" y2="65" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <polygon points="388,60 398,65 388,70" fill="#10b981"/>
+        <text x="370" y="58" text-anchor="middle" fill="#10b981" font-size="8" font-family="Syne,sans-serif">DELIVER</text>
+        <!-- ESP32 -->
+        <rect x="400" y="25" width="130" height="80" rx="8" fill="#1a2236" stroke="#10b981" stroke-width="1.5"/>
+        <text x="465" y="50" text-anchor="middle" fill="#10b981" font-size="11" font-family="Syne,sans-serif" font-weight="700">🔌 ESP32</text>
+        <text x="465" y="65" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">Subscriber</text>
+        <text x="465" y="80" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono,monospace">WiFi + PubSub</text>
+        <text x="465" y="97" text-anchor="middle" fill="#64748b" font-size="8">PIN 2 → LED</text>
+        <!-- Arrow 3 -->
+        <line x1="532" y1="65" x2="568" y2="65" stroke="#f59e0b" stroke-width="1.5"/>
+        <polygon points="568,60 578,65 568,70" fill="#f59e0b"/>
+        <!-- LED -->
+        <rect x="580" y="40" width="100" height="50" rx="8" fill="#1a2236" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="630" y="62" text-anchor="middle" fill="#f59e0b" font-size="13" font-family="Syne,sans-serif">💡 LED</text>
+        <text x="630" y="80" text-anchor="middle" fill="#94a3b8" font-size="9">ON / OFF</text>
+      </svg>
+    </div>
+
+    <h3>Key Components</h3>
+    <table>
+      <tr><th>Component</th><th>Role</th><th>বাংলায়</th></tr>
+      <tr><td><span class="tag">ESP32</span></td><td>Microcontroller with WiFi</td><td>ছোট computer যার WiFi আছে, LED control করে</td></tr>
+      <tr><td><span class="tag">MQTT Broker</span></td><td>Message middleman</td><td>Messages আদান-প্রদানের মাঝখানে থাকা server</td></tr>
+      <tr><td><span class="tag">paho-mqtt</span></td><td>Python MQTT library</td><td>Python দিয়ে MQTT use করার library</td></tr>
+      <tr><td><span class="tag">Wokwi</span></td><td>Online ESP32 simulator</td><td>Real hardware ছাড়া online এ simulate করার tool</td></tr>
+      <tr><td><span class="tag">PubSubClient</span></td><td>Arduino MQTT library</td><td>ESP32 এ MQTT use করার library</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== SECTION 2: MQTT Protocol ===================== -->
+<div class="section" id="mqtt">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-purple">📡</div>
+    <span class="section-title">2. MQTT Protocol — বিস্তারিত</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+    <div class="bangla-box">
+      <span class="label">📖 Bangla Explanation</span>
+      <strong>MQTT কী?</strong><br>
+      MQTT (Message Queuing Telemetry Transport) হলো একটা lightweight messaging protocol যেটা IoT devices এর জন্য specially design করা হয়েছে। এটা <strong>publish-subscribe model</strong> follow করে।<br><br>
+      <strong>কেন MQTT?</strong><br>
+      IoT devices সাধারণত কম power এ কাজ করে এবং slow/unstable network এ থাকে। HTTP এর চেয়ে MQTT অনেক lightweight — কম bandwidth লাগে, fast response পাওয়া যায়।<br><br>
+      <strong>Publish-Subscribe কীভাবে কাজ করে?</strong><br>
+      • <strong>Publisher</strong> → কোনো topic এ message পাঠায় (এখানে Python code)<br>
+      • <strong>Broker</strong> → মাঝখানে থেকে message receive করে এবং subscribers দের কাছে deliver করে (এখানে HiveMQ)<br>
+      • <strong>Subscriber</strong> → কোনো topic subscribe করে রাখে, broker থেকে message receive করে (এখানে ESP32)<br><br>
+      <strong>Topic কী?</strong><br>
+      Topic হলো একটা string যেটা দিয়ে message এর address বোঝায়। এখানে topic হলো <code>buet/cse/2105123/led</code> — এটা একটা hierarchical path, যেমন folder structure।
+    </div>
+
+    <h3>MQTT Topic Structure</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Topic Hierarchy</div>
+      <div class="code-body"><pre>buet / cse / 2105123 / led
+ ↑      ↑       ↑       ↑
+ |      |       |       └─ specific device/action
+ |      |       └─ student ID (unique identifier)
+ |      └─ department
+ └─ university
+
+Why hierarchical? → Helps filter messages, multiple students
+can use same broker without interfering.</pre></div>
+    </div>
+
+    <h3>MQTT Key Concepts</h3>
+    <table>
+      <tr><th>Concept</th><th>Explanation</th><th>এই project এ</th></tr>
+      <tr><td><strong>Broker</strong></td><td>Central server that routes messages</td><td>broker.hivemq.com (public, free)</td></tr>
+      <tr><td><strong>Port</strong></td><td>1883 = unencrypted, 8883 = TLS</td><td>1883 ব্যবহার হয়েছে</td></tr>
+      <tr><td><strong>Client ID</strong></td><td>Unique name for each connection</td><td>"ESP32_Wokwi_LED"</td></tr>
+      <tr><td><strong>QoS 0</strong></td><td>Fire and forget (default)</td><td>এজন্য কিছু message drop হতে পারে</td></tr>
+      <tr><td><strong>Subscribe</strong></td><td>Register interest in a topic</td><td>ESP32 subscribes to the topic</td></tr>
+      <tr><td><strong>Publish</strong></td><td>Send message to a topic</td><td>Python publishes "ON"/"OFF"</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>⚠️ Note:</strong> Assignment বলেছে "one or two messages may be dropped" — কারণ আমরা <strong>QoS 0</strong> ব্যবহার করছি যেটা message delivery guarantee দেয় না। Real systems এ QoS 1 বা 2 ব্যবহার করা হয়।
+    </div>
+
+    <h3>MQTT vs HTTP Comparison</h3>
+    <table>
+      <tr><th>Feature</th><th>MQTT</th><th>HTTP</th></tr>
+      <tr><td>Model</td><td>Pub/Sub</td><td>Request/Response</td></tr>
+      <tr><td>Overhead</td><td>Very low (2 byte header)</td><td>High</td></tr>
+      <tr><td>Connection</td><td>Persistent TCP</td><td>Per-request</td></tr>
+      <tr><td>IoT Suitability</td><td>✅ Excellent</td><td>❌ Heavy</td></tr>
+      <tr><td>Real-time</td><td>✅ Yes (push)</td><td>❌ No (pull)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== SECTION 3: ESP32 Code ===================== -->
+<div class="section" id="esp32">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-green">🔌</div>
+    <span class="section-title">3. ESP32 Code (sketch.ino) — Line by Line</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="bangla-box">
+      <span class="label">📖 Overview — Bangla</span>
+      এই code টা ESP32 microcontroller এ চলে। এটা প্রথমে WiFi এ connect হয়, তারপর MQTT broker এ connect হয়, একটা topic subscribe করে, এবং সেই topic এ "ON" বা "OFF" message আসলে LED জ্বালায় বা নেভায়।<br><br>
+      Code এর তিনটা main part: <strong>1) Headers + Variables</strong>, <strong>2) callback() function</strong>, <strong>3) setup() + loop() function</strong>
+    </div>
+
+    <h3>Part 1 — Headers & Variables</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> sketch.ino — Part 1</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">1</span>
+          <span class="line-code"><span class="kw">#include</span> <span class="str">&lt;WiFi.h&gt;</span></span>
+          <span class="line-explain"><span class="arrow">→</span>ESP32 এর WiFi functionality use করার জন্য Arduino এর built-in WiFi library include করা হয়েছে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">2</span>
+          <span class="line-code"><span class="kw">#include</span> <span class="str">&lt;PubSubClient.h&gt;</span></span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT protocol use করার জন্য PubSubClient library include করা হয়েছে। এটা manually install করতে হয় Wokwi তে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">4</span>
+          <span class="line-code"><span class="kw">const char*</span> ssid = <span class="str">"Wokwi-GUEST"</span>;</span>
+          <span class="line-explain"><span class="arrow">→</span>WiFi network এর নাম (SSID)। Wokwi simulator এ "Wokwi-GUEST" নামের একটা default WiFi আছে, password লাগে না</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">5</span>
+          <span class="line-code"><span class="kw">const char*</span> password = <span class="str">""</span>;</span>
+          <span class="line-explain"><span class="arrow">→</span>WiFi password — Wokwi এর guest network এ password নেই তাই empty string</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">8</span>
+          <span class="line-code"><span class="kw">const char*</span> mqtt_server = <span class="str">"broker.hivemq.com"</span>;</span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT broker এর address — HiveMQ একটা public free broker। যে কেউ এখানে connect করতে পারে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">10</span>
+          <span class="line-code"><span class="type">WiFiClient</span> espClient;</span>
+          <span class="line-explain"><span class="arrow">→</span>WiFi TCP connection handle করার জন্য WiFiClient object তৈরি। এটা MQTT এর underlying transport হিসেবে কাজ করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">11</span>
+          <span class="line-code"><span class="type">PubSubClient</span> <span class="fn">client</span>(espClient);</span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT client object তৈরি। espClient কে parameter হিসেবে দেওয়া হয় কারণ MQTT TCP এর উপর চলে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">13</span>
+          <span class="line-code"><span class="kw">const int</span> ledPin = <span class="num">2</span>;</span>
+          <span class="line-explain"><span class="arrow">→</span>LED connected আছে ESP32 এর PIN 2 তে। এই constant দিয়ে পুরো code এ pin refer করা হয়েছে</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Part 2 — callback() Function (Most Important!)</h3>
+    <div class="bangla-box">
+      <span class="label">💡 callback কী?</span>
+      যখনই ESP32 subscribe করা topic এ কোনো message আসে, MQTT library automatically এই callback function কে call করে। এটা একটা <strong>event-driven</strong> approach — মানে continuously check করতে হয় না, message আসলে automatically notify হওয়া যায়।
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> callback() function</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">15</span>
+          <span class="line-code"><span class="kw">void</span> <span class="fn">callback</span>(<span class="kw">char*</span> topic, <span class="kw">byte*</span> payload, <span class="type">unsigned int</span> length)</span>
+          <span class="line-explain"><span class="arrow">→</span>3টা parameter: topic = কোন topic এ এসেছে, payload = message এর bytes, length = কত bytes</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">17</span>
+          <span class="line-code"><span class="type">String</span> message;</span>
+          <span class="line-explain"><span class="arrow">→</span>Empty String variable তৈরি যেখানে byte array থেকে convert করা message রাখা হবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">18</span>
+          <span class="line-code"><span class="kw">for</span> (<span class="type">unsigned int</span> i = <span class="num">0</span>; i &lt; length; i++)</span>
+          <span class="line-explain"><span class="arrow">→</span>Payload টা byte array হিসেবে আসে তাই প্রতিটা byte কে char এ convert করে String এ যোগ করা হচ্ছে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">19</span>
+          <span class="line-code">message += (<span class="kw">char</span>)payload[i];</span>
+          <span class="line-explain"><span class="arrow">→</span>প্রতিটা byte কে char এ cast করে message string এ append করা হচ্ছে। এভাবে "ON" বা "OFF" string তৈরি হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">27</span>
+          <span class="line-code"><span class="kw">if</span> (message == <span class="str">"ON"</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>✅ COMPLETED PART: যদি message "ON" হয় তাহলে LED জ্বালাও। Sample code এ "put appropriate message" ছিল</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">28</span>
+          <span class="line-code"><span class="fn">digitalWrite</span>(ledPin, <span class="num">HIGH</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>PIN 2 কে HIGH (3.3V) করা হয় → LED এ current flow হয় → LED জ্বলে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">29</span>
+          <span class="line-code"><span class="kw">} else if</span> (message == <span class="str">"OFF"</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>✅ COMPLETED PART: যদি message "OFF" হয় তাহলে LED নেভাও</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">30</span>
+          <span class="line-code"><span class="fn">digitalWrite</span>(ledPin, <span class="num">LOW</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>PIN 2 কে LOW (0V) করা হয় → LED তে current flow বন্ধ → LED নেভে</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Part 3 — reconnect() Function</h3>
+    <div class="bangla-box">
+      <span class="label">💡 reconnect কেন?</span>
+      Network connection কখনো হঠাৎ বন্ধ হয়ে যেতে পারে। reconnect() function এটা handle করে — disconnected হলে automatically আবার connect করার চেষ্টা করে।
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> reconnect() function</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">34</span>
+          <span class="line-code"><span class="kw">while</span> (!client.<span class="fn">connected</span>())</span>
+          <span class="line-explain"><span class="arrow">→</span>Connected না হওয়া পর্যন্ত loop চলতে থাকবে। ! মানে "not" — connected না হলে loop চলবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">36</span>
+          <span class="line-code"><span class="kw">const char*</span> topic = <span class="str">"buet/cse/2105123/led"</span>;</span>
+          <span class="line-explain"><span class="arrow">→</span>✅ COMPLETED: Topic string — university/department/studentID/device format এ। প্রতিটা student আলাদা topic use করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">37</span>
+          <span class="line-code"><span class="kw">if</span> (client.<span class="fn">connect</span>(<span class="str">"ESP32_Wokwi_LED"</span>))</span>
+          <span class="line-explain"><span class="arrow">→</span>Broker এ connect করার চেষ্টা। "ESP32_Wokwi_LED" হলো unique client ID — broker এটা দিয়ে device চিনে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">39</span>
+          <span class="line-code">client.<span class="fn">subscribe</span>(topic);</span>
+          <span class="line-explain"><span class="arrow">→</span>Connect হওয়ার পর topic টা subscribe করা হয়। এরপর থেকে এই topic এ message আসলে callback() call হবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">44</span>
+          <span class="line-code"><span class="fn">delay</span>(<span class="num">5000</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>Connect fail হলে 5 second wait করে আবার try করা হয়। অন্যথায় rapid retry তে broker block করতে পারে</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Part 4 — setup() Function (Once at start)</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> setup() — runs once</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">49</span>
+          <span class="line-code"><span class="fn">pinMode</span>(ledPin, <span class="num">OUTPUT</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>PIN 2 কে OUTPUT mode এ set করা হয়। Default INPUT থাকে, তাই explicitly OUTPUT বলে দিতে হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">50</span>
+          <span class="line-code"><span class="fn">digitalWrite</span>(ledPin, <span class="num">LOW</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>শুরুতে LED বন্ধ রাখা হয়। Initial state নির্দিষ্ট করা good practice</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">52</span>
+          <span class="line-code">Serial.<span class="fn">begin</span>(<span class="num">115200</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>Serial monitor চালু করা 115200 baud rate এ। Debug messages দেখার জন্য ব্যবহার হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">55</span>
+          <span class="line-code">WiFi.<span class="fn">begin</span>(ssid, password);</span>
+          <span class="line-explain"><span class="arrow">→</span>WiFi connection শুরু করা। ssid এবং password দিয়ে network এ join করার request পাঠানো হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">57</span>
+          <span class="line-code"><span class="kw">while</span> (WiFi.<span class="fn">status</span>() != WL_CONNECTED)</span>
+          <span class="line-explain"><span class="arrow">→</span>WiFi connect না হওয়া পর্যন্ত loop এ আটকে থাকা। WL_CONNECTED একটা constant যার মানে successfully connected</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">63</span>
+          <span class="line-code">client.<span class="fn">setServer</span>(mqtt_server, <span class="num">1883</span>);</span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT broker এর address এবং port set করা। 1883 হলো standard MQTT port (unencrypted)</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">64</span>
+          <span class="line-code">client.<span class="fn">setCallback</span>(callback);</span>
+          <span class="line-explain"><span class="arrow">→</span>Message আসলে কোন function call হবে সেটা register করা। এখানে আমাদের callback() function এর pointer দেওয়া হয়েছে</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Part 5 — loop() Function (Runs forever)</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> loop() — runs repeatedly</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">68</span>
+          <span class="line-code"><span class="kw">if</span> (!client.<span class="fn">connected</span>()) { <span class="fn">reconnect</span>(); }</span>
+          <span class="line-explain"><span class="arrow">→</span>প্রতিটা loop iteration এ check করা হয় MQTT connected আছে কিনা। না থাকলে reconnect() call করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">71</span>
+          <span class="line-code">client.<span class="fn">loop</span>();</span>
+          <span class="line-explain"><span class="arrow">→</span>⭐ সবচেয়ে গুরুত্বপূর্ণ line! এটা MQTT connection জীবিত রাখে এবং incoming messages check করে। এটা না দিলে callback কখনো fire হবে না!</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ Critical:</strong> <code>client.loop()</code> ছাড়া ESP32 কোনো MQTT message receive করতে পারবে না। এই line-টাই MQTT library কে কাজ করার সুযোগ দেয়।
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION 4: Python Code ===================== -->
+<div class="section" id="python">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-amber">🐍</div>
+    <span class="section-title">4. Python Code (2105123Task2.py) — Line by Line</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+    <div class="bangla-box">
+      <span class="label">📖 Overview — Bangla</span>
+      এই Python code টা MQTT Publisher হিসেবে কাজ করে। User keyboard থেকে 'y', 'n', বা 'q' press করলে সেই অনুযায়ী MQTT topic এ "ON", "OFF" publish করে। ESP32 সেই message receive করে LED control করে।
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> 2105123Task2.py — Completed Solution</div>
+      <div class="code-body">
+        <div class="annotated-line">
+          <span class="line-num">1</span>
+          <span class="line-code"><span class="kw">import</span> paho.mqtt.client <span class="kw">as</span> mqtt</span>
+          <span class="line-explain"><span class="arrow">→</span>paho-mqtt library import করা। এটা Python এর MQTT library। আগে pip install paho-mqtt দিয়ে install করতে হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">3</span>
+          <span class="line-code">broker = <span class="str">"broker.hivemq.com"</span></span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT broker এর hostname। ESP32 code এর mqtt_server এর সাথে same হতে হবে, নইলে communicate করতে পারবে না</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">4</span>
+          <span class="line-code">topic = <span class="str">"buet/cse/2105123/led"</span></span>
+          <span class="line-explain"><span class="arrow">→</span>Topic string — ESP32 এর topic এর সাথে exactly same হতে হবে। এটাই দুটো device এর common "channel"</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">6</span>
+          <span class="line-code">client = mqtt.<span class="fn">Client</span>()</span>
+          <span class="line-explain"><span class="arrow">→</span>MQTT client object তৈরি। এটা Python এ MQTT connection manage করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">7</span>
+          <span class="line-code">client.<span class="fn">connect</span>(broker)</span>
+          <span class="line-explain"><span class="arrow">→</span>Broker এ connect করা। Default port 1883 ব্যবহার হয়। এটা TCP connection establish করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">9</span>
+          <span class="line-code"><span class="kw">while</span> <span class="num">True</span>:</span>
+          <span class="line-explain"><span class="arrow">→</span>✅ COMPLETED: Infinite loop — program চলতে থাকবে যতক্ষণ না user 'q' press করে quit করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">10</span>
+          <span class="line-code">input_user = <span class="fn">input</span>(<span class="str">"Enter y/n/q : "</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>User এর কাছ থেকে keyboard input নেওয়া। Program এখানে block করে থাকবে যতক্ষণ user enter না করে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">11</span>
+          <span class="line-code"><span class="kw">if</span> input_user == <span class="str">'y'</span>:</span>
+          <span class="line-explain"><span class="arrow">→</span>User 'y' press করলে LED ON করার message পাঠানো হবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">12</span>
+          <span class="line-code">client.<span class="fn">publish</span>(topic, <span class="str">"ON"</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>Topic এ "ON" string publish করা। Broker এটা পাবে এবং ESP32 subscriber কে deliver করবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">13</span>
+          <span class="line-code"><span class="kw">elif</span> input_user == <span class="str">'n'</span>:</span>
+          <span class="line-explain"><span class="arrow">→</span>User 'n' press করলে LED OFF করার message পাঠানো হবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">14</span>
+          <span class="line-code">client.<span class="fn">publish</span>(topic, <span class="str">"OFF"</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>Topic এ "OFF" string publish করা</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">15</span>
+          <span class="line-code"><span class="kw">elif</span> input_user == <span class="str">'q'</span>:</span>
+          <span class="line-explain"><span class="arrow">→</span>User 'q' press করলে loop break করে program terminate করা হবে</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">16</span>
+          <span class="line-code"><span class="kw">break</span></span>
+          <span class="line-explain"><span class="arrow">→</span>while True loop থেকে বের হওয়া → program শেষ হয়</span>
+        </div>
+        <div class="annotated-line">
+          <span class="line-num">17</span>
+          <span class="line-code"><span class="kw">else</span>: <span class="fn">print</span>(<span class="str">"Only y/n/q is valid"</span>)</span>
+          <span class="line-explain"><span class="arrow">→</span>অন্য কিছু press করলে error message দেখানো এবং loop continue করা</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Key insight:</strong> Python টা PUBLISHER, ESP32 টা SUBSCRIBER। তারা কখনো directly communicate করে না — সব কিছু MQTT Broker এর মাধ্যমে যায়।
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION 5: Circuit ===================== -->
+<div class="section" id="circuit">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-red">💡</div>
+    <span class="section-title">5. Circuit & Hardware — Wokwi Setup</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+    <div class="bangla-box">
+      <span class="label">📖 Circuit — Bangla</span>
+      <strong>Circuit connection:</strong> ESP32 এর PIN 2 → 1000Ω (1kΩ) Resistor → LED এর Anode (+) → LED এর Cathode (-) → ESP32 এর GND<br><br>
+      <strong>Resistor কেন লাগে?</strong> LED এর কোনো resistance নেই। সরাসরি connect করলে অনেক বেশি current যাবে এবং LED পুড়ে যাবে। Resistor current কে limit করে safe level এ রাখে।<br><br>
+      <strong>Resistor এর মান calculation:</strong> V = IR → R = V/I → ESP32 output ≈ 3.3V, LED voltage drop ≈ 2V, safe LED current ≈ 10-20mA → R = (3.3-2)/0.015 ≈ 87Ω minimum। 1kΩ একটু dim কিন্তু safe।
+    </div>
+
+    <h3>diagram.json Analysis</h3>
+    <table>
+      <tr><th>Component</th><th>ID</th><th>Connection</th><th>বাংলায়</th></tr>
+      <tr><td>ESP32 DevKit C V4</td><td>esp</td><td>Main board</td><td>মূল microcontroller</td></tr>
+      <tr><td>Red LED</td><td>led1</td><td>r1:2 → led1:A (Anode)</td><td>আলো দেওয়ার component</td></tr>
+      <tr><td>1kΩ Resistor</td><td>r1</td><td>esp:2 → r1:1</td><td>Current limiter</td></tr>
+      <tr><td>Wire (green)</td><td>—</td><td>esp:2 → r1:1 → led1:A</td><td>Signal path</td></tr>
+      <tr><td>Wire (black)</td><td>—</td><td>esp:GND.2 → led1:C (Cathode)</td><td>Ground return path</td></tr>
+    </table>
+
+    <h3>PIN Mapping</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Circuit Path</div>
+      <div class="code-body"><pre style="font-size:0.8rem">ESP32 PIN 2 ──(green wire)──► Resistor (1kΩ) ──► LED Anode (+)
+                                                         │
+                                                    LED Cathode (-)
+                                                         │
+ESP32 GND ◄──────────────────────────────(black wire)───┘
+
+digitalWrite(2, HIGH) → 3.3V → current flows → LED ON  💡
+digitalWrite(2, LOW)  → 0V  → no current    → LED OFF ⚫</pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION 6: Q&A Bank ===================== -->
+<div class="section open" id="qa">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-purple">❓</div>
+    <span class="section-title">6. Question & Answer Bank — Easy to Advanced</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+
+    <h3>🟢 Easy Level</h3>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q1. What does MQTT stand for and what is it used for?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        MQTT stands for <strong>Message Queuing Telemetry Transport</strong>. It is a lightweight publish-subscribe messaging protocol designed for IoT (Internet of Things) devices. It is used when low bandwidth and low power consumption is required — for example, controlling devices remotely over the internet using a broker-based architecture.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q2. What are the three roles in MQTT communication?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>1. Publisher</strong> — sends messages to a topic (here: Python code)<br>
+        <strong>2. Broker</strong> — receives messages and routes them to subscribers (here: broker.hivemq.com)<br>
+        <strong>3. Subscriber</strong> — registers interest in a topic and receives messages (here: ESP32)<br><br>
+        The Publisher and Subscriber never communicate directly — all communication goes through the Broker.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q3. What is the MQTT topic used in this assignment and why is it structured that way?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        The topic is <code>buet/cse/2105123/led</code>.<br><br>
+        It is structured hierarchically: <strong>university/department/student_id/device</strong>.<br><br>
+        This structure ensures uniqueness — if every student used just "led", they would all receive each other's messages on the same public broker. The student ID makes each topic unique.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q4. What does pinMode(ledPin, OUTPUT) do and why is it necessary?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <code>pinMode(ledPin, OUTPUT)</code> configures PIN 2 as an output pin. By default, GPIO pins are in INPUT mode. Without this, calling <code>digitalWrite()</code> on the pin would have no effect. Setting it to OUTPUT allows the pin to source or sink current to control the LED.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q5. What library does Python use to connect to MQTT, and how do you install it?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        Python uses the <strong>paho-mqtt</strong> library.<br>
+        Install command: <code>pip install paho-mqtt</code><br><br>
+        It is imported as: <code>import paho.mqtt.client as mqtt</code>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q6. What is Wokwi and why was it used in this assignment?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        Wokwi is an online electronics simulator for Arduino, ESP32, and other microcontrollers. It was used because it allows simulation of ESP32 hardware without needing a physical board. It also provides a simulated WiFi network ("Wokwi-GUEST") that allows real internet connectivity for MQTT testing.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-easy">Easy</span>
+        <span class="qa-q-text">Q7. What is the default MQTT port and what does it mean?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        The default MQTT port is <strong>1883</strong> (unencrypted TCP). Port <strong>8883</strong> is used for MQTT over TLS (encrypted). In this assignment, port 1883 is used: <code>client.setServer(mqtt_server, 1883);</code>
+      </div>
+    </div>
+
+    <h3>🟡 Medium Level</h3>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q8. Explain the callback function signature: void callback(char* topic, byte* payload, unsigned int length)</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        This function is automatically called by the PubSubClient library whenever a message arrives on a subscribed topic.<br><br>
+        <strong>char* topic</strong> — C-string pointer to the topic name that received the message<br>
+        <strong>byte* payload</strong> — pointer to raw bytes of the message body (NOT null-terminated string)<br>
+        <strong>unsigned int length</strong> — number of bytes in the payload<br><br>
+        Since payload is raw bytes, we must manually convert it to a String:
+        <div class="answer-code">String message = "";
+for (unsigned int i = 0; i &lt; length; i++) {
+    message += (char)payload[i];  // cast each byte to char
+}</div>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q9. Why is client.loop() called in the Arduino loop() function? What happens if it's missing?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <code>client.loop()</code> is the heartbeat of the MQTT client. It:<br>
+        1. Keeps the TCP connection alive by sending PINGREQ packets<br>
+        2. Processes incoming messages from the broker<br>
+        3. Triggers the callback() function when messages arrive<br><br>
+        <strong>If missing:</strong> The MQTT connection will time out, no messages will be received, and the callback will never fire. The LED will never respond to commands.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q10. Why is a resistor used in the LED circuit? What would happen without it?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        A resistor is used to <strong>limit current</strong> through the LED. LEDs have very low resistance and no self-regulating current control.<br><br>
+        <strong>Without resistor:</strong> Excessive current (~100mA+) would flow through the LED, causing it to burn out immediately. It could also damage the ESP32's GPIO pin which can typically only source ~12mA safely.<br><br>
+        <strong>Calculation:</strong> With 3.3V supply, 2V LED drop, 1kΩ resistor → I = (3.3-2)/1000 = 1.3mA (safe, slightly dim)
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q11. What is the difference between publish and subscribe in MQTT?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>Publish:</strong> A client sends a message to a specific topic on the broker. Any client subscribed to that topic will receive it. One-to-many is possible.<br><br>
+        <strong>Subscribe:</strong> A client registers with the broker to receive all future messages on a specific topic. The broker remembers this subscription.<br><br>
+        In this project:<br>
+        - Python calls <code>client.publish(topic, "ON")</code> — sends message<br>
+        - ESP32 calls <code>client.subscribe(topic)</code> — receives messages via callback
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q12. Why does the reconnect() function use a while loop instead of an if statement?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        A <code>while</code> loop keeps retrying until the connection is established. An <code>if</code> statement would only attempt once.<br><br>
+        If the broker is temporarily unavailable, a single <code>if</code> would fail and the device would remain disconnected forever. The <code>while (!client.connected())</code> loop ensures that:<br>
+        1. It keeps trying every 5 seconds<br>
+        2. It only exits when the connection succeeds<br>
+        3. It re-subscribes to the topic after reconnecting
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-medium">Medium</span>
+        <span class="qa-q-text">Q13. Why must the topic in Python exactly match the topic in ESP32 code?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        The MQTT broker routes messages based on exact topic string matching. If topics differ even by one character (case-sensitive), the broker will deliver the message to a different set of subscribers.<br><br>
+        Example of mismatch:<br>
+        Python publishes to: <code>buet/cse/2105123/LED</code> (capital L)<br>
+        ESP32 subscribed to: <code>buet/cse/2105123/led</code> (lowercase l)<br>
+        → ESP32 never receives the message → LED never responds
+      </div>
+    </div>
+
+    <h3>🔴 Hard Level</h3>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-hard">Hard</span>
+        <span class="qa-q-text">Q14. Explain the complete flow from pressing 'y' in Python to the LED turning ON. Trace every step.</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>Step 1:</strong> User presses 'y' → <code>input()</code> returns 'y'<br>
+        <strong>Step 2:</strong> Python calls <code>client.publish("buet/cse/2105123/led", "ON")</code><br>
+        <strong>Step 3:</strong> paho-mqtt sends TCP packet to broker.hivemq.com:1883 with MQTT PUBLISH packet containing topic + "ON" payload<br>
+        <strong>Step 4:</strong> HiveMQ broker receives PUBLISH, looks up all clients subscribed to "buet/cse/2105123/led"<br>
+        <strong>Step 5:</strong> Broker finds ESP32 (subscribed in reconnect()), sends MQTT PUBLISH packet to ESP32 over WiFi<br>
+        <strong>Step 6:</strong> ESP32's <code>client.loop()</code> detects incoming packet, calls <code>callback("buet/cse/2105123/led", payload, 2)</code><br>
+        <strong>Step 7:</strong> callback() converts bytes {0x4F, 0x4E} to String "ON"<br>
+        <strong>Step 8:</strong> <code>if (message == "ON")</code> → <code>digitalWrite(2, HIGH)</code><br>
+        <strong>Step 9:</strong> PIN 2 outputs 3.3V → current flows through 1kΩ resistor → LED → GND → LED turns ON 💡
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-hard">Hard</span>
+        <span class="qa-q-text">Q15. What is QoS in MQTT? What level is used here and what are its implications?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>QoS (Quality of Service)</strong> defines message delivery guarantees in MQTT:<br><br>
+        <strong>QoS 0</strong> — "At most once" (fire and forget). No acknowledgment. Message may be lost.<br>
+        <strong>QoS 1</strong> — "At least once". Guaranteed delivery but may be duplicated.<br>
+        <strong>QoS 2</strong> — "Exactly once". Guaranteed, no duplicates. Highest overhead.<br><br>
+        <strong>This assignment uses QoS 0</strong> (default). The assignment note says "one or two messages may be dropped" — this is exactly because QoS 0 provides no delivery guarantee. For LED control this is acceptable, but for critical systems (medical, safety) QoS 1 or 2 would be required.
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-hard">Hard</span>
+        <span class="qa-q-text">Q16. Why is WiFiClient passed to PubSubClient constructor? What is the relationship between them?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        MQTT is an application-layer protocol that runs on top of TCP/IP. <code>PubSubClient</code> implements the MQTT protocol but needs an underlying transport layer to send/receive bytes.<br><br>
+        <code>WiFiClient</code> provides that TCP socket abstraction on ESP32. By passing <code>espClient</code> to <code>PubSubClient client(espClient)</code>, we're telling PubSubClient: "use this WiFi TCP socket for your network I/O".<br><br>
+        This is a dependency injection / layered architecture pattern:<br>
+        <code>Application: PubSubClient (MQTT)</code><br>
+        <code>Transport:    WiFiClient (TCP)</code><br>
+        <code>Network:      ESP32 WiFi Stack (IP)</code><br>
+        <code>Physical:     ESP32 802.11 WiFi Radio</code>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-hard">Hard</span>
+        <span class="qa-q-text">Q17. What would happen if two different ESP32 devices used the same Client ID ("ESP32_Wokwi_LED") and connected to the same broker simultaneously?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        This would cause a <strong>Client ID collision</strong>. MQTT brokers require unique Client IDs. When the second device connects with the same ID:<br><br>
+        1. The broker disconnects the first client<br>
+        2. The first device loses connection and enters the reconnect() loop<br>
+        3. When it reconnects, it kicks out the second device<br>
+        4. This creates an infinite kick-each-other-off loop<br><br>
+        Both devices become unable to maintain a stable connection. <strong>Solution:</strong> Use unique Client IDs, e.g., include student ID: <code>"ESP32_" + studentID</code>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-hard">Hard</span>
+        <span class="qa-q-text">Q18. Why does the ESP32 code use a blocking while loop for WiFi connection in setup(), but uses a non-blocking approach in loop() for MQTT reconnection?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>WiFi in setup():</strong> Uses blocking <code>while (WiFi.status() != WL_CONNECTED)</code> because WiFi is fundamental — without it, nothing else can work. It's acceptable to block here since setup() only runs once at boot.<br><br>
+        <strong>MQTT in loop():</strong> The <code>reconnect()</code> function also uses a blocking while loop, which is actually a design trade-off. The ESP32 blocks until MQTT reconnects. In a more sophisticated implementation, you'd use a non-blocking state machine to allow other tasks to run during reconnection. However for this simple LED control assignment, blocking is acceptable.
+      </div>
+    </div>
+
+    <h3>🟣 Advanced Level</h3>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-advanced">Advanced</span>
+        <span class="qa-q-text">Q19. Compare MQTT's publish-subscribe model with HTTP's request-response model for IoT. When would you choose each?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>MQTT (Pub/Sub):</strong><br>
+        ✅ Push-based: broker pushes to subscribers immediately<br>
+        ✅ Many-to-many: multiple publishers and subscribers possible<br>
+        ✅ Low overhead: 2-byte fixed header, persistent TCP<br>
+        ✅ Decoupled: publisher doesn't know subscribers<br>
+        ❌ Requires persistent broker<br><br>
+        <strong>HTTP (Req/Res):</strong><br>
+        ✅ Stateless, universal, works everywhere<br>
+        ✅ Good for one-time data requests (REST APIs)<br>
+        ❌ Pull-based: device must poll frequently<br>
+        ❌ High overhead for small IoT messages<br><br>
+        <strong>Choose MQTT when:</strong> Real-time control (like LED), battery-powered sensors sending frequent data, many devices communicating<br>
+        <strong>Choose HTTP when:</strong> Occasional large data uploads, web integration, device has no persistent connection
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-advanced">Advanced</span>
+        <span class="qa-q-text">Q20. What security vulnerabilities exist in this implementation and how would you fix them?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>Vulnerabilities:</strong><br>
+        1. <strong>No TLS encryption</strong> — Port 1883 sends messages in plaintext. Anyone on the network can see "ON"/"OFF"<br>
+        2. <strong>No authentication</strong> — Anyone who knows the topic can control the LED<br>
+        3. <strong>Public broker</strong> — HiveMQ public broker allows anyone to connect<br>
+        4. <strong>Predictable topic</strong> — Student ID in topic reveals personal info and is guessable<br><br>
+        <strong>Fixes:</strong><br>
+        1. Use TLS (port 8883) with WiFiClientSecure instead of WiFiClient<br>
+        2. Add username/password: <code>client.connect(ID, username, password)</code><br>
+        3. Use private broker (self-hosted Mosquitto or HiveMQ Cloud)<br>
+        4. Use random unique topic or token-based authentication
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-advanced">Advanced</span>
+        <span class="qa-q-text">Q21. If you wanted to add bi-directional communication (ESP32 also reports LED status back to Python), how would you modify both codes?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>ESP32 changes:</strong> After changing LED state, publish status back on a different topic
+        <div class="answer-code">// In callback(), after changing LED:
+const char* statusTopic = "buet/cse/2105123/led/status";
+if (message == "ON") {
+    digitalWrite(ledPin, HIGH);
+    client.publish(statusTopic, "LED is ON");
+} else if (message == "OFF") {
+    digitalWrite(ledPin, LOW);
+    client.publish(statusTopic, "LED is OFF");
+}</div>
+        <strong>Python changes:</strong> Subscribe to status topic and set up a callback
+        <div class="answer-code">def on_message(client, userdata, msg):
+    print(f"Status: {msg.payload.decode()}")
+
+status_topic = "buet/cse/2105123/led/status"
+client.on_message = on_message
+client.connect(broker)
+client.subscribe(status_topic)
+client.loop_start()  # non-blocking background loop
+
+while True:
+    inp = input("y/n/q: ")
+    if inp == 'y': client.publish(topic, "ON")
+    elif inp == 'n': client.publish(topic, "OFF")
+    elif inp == 'q': break</div>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-level level-advanced">Advanced</span>
+        <span class="qa-q-text">Q22. What is an MQTT "Last Will and Testament" (LWT) and how would it be useful in this project?</span>
+        <span class="qa-toggle">▼</span>
+      </div>
+      <div class="qa-answer">
+        <strong>LWT (Last Will and Testament)</strong> is a message that the broker automatically publishes on behalf of a client if that client disconnects unexpectedly (e.g., power loss, network failure).<br><br>
+        <strong>How it works:</strong> Client registers the LWT message during connection. If the client's TCP connection drops without sending a proper DISCONNECT, the broker sends the LWT.<br><br>
+        <strong>In this project:</strong> You could set ESP32's LWT so that when it goes offline, Python receives a "DEVICE_OFFLINE" notification:
+        <div class="answer-code">// Before connecting:
+client.setWill("buet/cse/2105123/led/status", 
+               "DEVICE_OFFLINE", 0, false);
+client.connect("ESP32_Wokwi_LED");</div>
+        This allows the Python controller to know the ESP32 is unreachable and display an appropriate message instead of silently publishing to a disconnected device.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== SECTION 7: Write Code ===================== -->
+<div class="section" id="writecode">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-icon icon-green">✍️</div>
+    <span class="section-title">7. Write-in-Exam Code Questions & Full Answers</span>
+    <span class="section-chevron">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="bangla-box">
+      <span class="label">📝 Exam Tips — Bangla</span>
+      Written exam এ সাধারণত এই ধরনের questions আসে: (1) কোনো specific function লিখতে বলা, (2) incomplete code complete করা, (3) একটা পুরো simple program লিখতে বলা। নিচের সব questions practice করো।
+    </div>
+
+    <h3>Write Code Q1 — Complete the callback() function</h3>
+    <p><em>Question: Write the complete callback() function for ESP32 that turns LED ON for message "ON" and OFF for "OFF".</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Complete Answer</div>
+      <div class="code-body"><pre><span class="kw">void</span> <span class="fn">callback</span>(<span class="kw">char*</span> topic, <span class="kw">byte*</span> payload, <span class="type">unsigned int</span> length) {
+  <span class="cm">// Step 1: Convert byte payload to String</span>
+  <span class="type">String</span> message;
+  <span class="kw">for</span> (<span class="type">unsigned int</span> i = <span class="num">0</span>; i < length; i++) {
+    message += (<span class="kw">char</span>)payload[i];
+  }
+
+  <span class="cm">// Step 2: Debug print</span>
+  Serial.<span class="fn">print</span>(<span class="str">"Received: "</span>);
+  Serial.<span class="fn">println</span>(message);
+
+  <span class="cm">// Step 3: Act on message</span>
+  <span class="kw">if</span> (message == <span class="str">"ON"</span>) {
+    <span class="fn">digitalWrite</span>(ledPin, HIGH);   <span class="cm">// Turn LED ON</span>
+  } <span class="kw">else if</span> (message == <span class="str">"OFF"</span>) {
+    <span class="fn">digitalWrite</span>(ledPin, LOW);    <span class="cm">// Turn LED OFF</span>
+  }
+}</pre></div>
+    </div>
+
+    <h3>Write Code Q2 — Complete the Python controller</h3>
+    <p><em>Question: Write a Python script using paho-mqtt that connects to broker.hivemq.com and sends "ON" if user presses 'y', "OFF" if 'n', and quits if 'q'.</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Complete Answer</div>
+      <div class="code-body"><pre><span class="kw">import</span> paho.mqtt.client <span class="kw">as</span> mqtt
+
+broker = <span class="str">"broker.hivemq.com"</span>
+topic  = <span class="str">"buet/cse/2105123/led"</span>   <span class="cm"># must match ESP32 topic</span>
+
+client = mqtt.<span class="fn">Client</span>()
+client.<span class="fn">connect</span>(broker)           <span class="cm"># connects on port 1883 by default</span>
+
+<span class="kw">while</span> <span class="num">True</span>:
+    user_input = <span class="fn">input</span>(<span class="str">"Enter y/n/q: "</span>)
+    <span class="kw">if</span> user_input == <span class="str">'y'</span>:
+        client.<span class="fn">publish</span>(topic, <span class="str">"ON"</span>)
+        <span class="fn">print</span>(<span class="str">"Sent: ON"</span>)
+    <span class="kw">elif</span> user_input == <span class="str">'n'</span>:
+        client.<span class="fn">publish</span>(topic, <span class="str">"OFF"</span>)
+        <span class="fn">print</span>(<span class="str">"Sent: OFF"</span>)
+    <span class="kw">elif</span> user_input == <span class="str">'q'</span>:
+        <span class="fn">print</span>(<span class="str">"Quitting..."</span>)
+        <span class="kw">break</span>
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"Invalid input. Only y/n/q allowed."</span>)</pre></div>
+    </div>
+
+    <h3>Write Code Q3 — Write the reconnect() function</h3>
+    <p><em>Question: Write the reconnect() function for ESP32 that connects to MQTT broker and subscribes to the topic.</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Complete Answer</div>
+      <div class="code-body"><pre><span class="kw">void</span> <span class="fn">reconnect</span>() {
+  <span class="kw">const char*</span> topic = <span class="str">"buet/cse/2105123/led"</span>;
+  
+  <span class="kw">while</span> (!client.<span class="fn">connected</span>()) {        <span class="cm">// loop until connected</span>
+    Serial.<span class="fn">print</span>(<span class="str">"Connecting to MQTT..."</span>);
+    
+    <span class="kw">if</span> (client.<span class="fn">connect</span>(<span class="str">"ESP32_Wokwi_LED"</span>)) {  <span class="cm">// unique client ID</span>
+      Serial.<span class="fn">println</span>(<span class="str">"connected!"</span>);
+      client.<span class="fn">subscribe</span>(topic);           <span class="cm">// subscribe after connecting</span>
+    } <span class="kw">else</span> {
+      Serial.<span class="fn">print</span>(<span class="str">"failed, rc="</span>);
+      Serial.<span class="fn">print</span>(client.<span class="fn">state</span>());      <span class="cm">// print error code</span>
+      Serial.<span class="fn">println</span>(<span class="str">" retrying in 5s"</span>);
+      <span class="fn">delay</span>(<span class="num">5000</span>);                         <span class="cm">// wait 5 seconds</span>
+    }
+  }
+}</pre></div>
+    </div>
+
+    <h3>Write Code Q4 — Write the complete setup() function</h3>
+    <p><em>Question: Write the setup() function that initializes LED pin, Serial, connects to WiFi, and sets up MQTT.</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Complete Answer</div>
+      <div class="code-body"><pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="cm">// 1. Configure LED pin</span>
+  <span class="fn">pinMode</span>(ledPin, OUTPUT);
+  <span class="fn">digitalWrite</span>(ledPin, LOW);    <span class="cm">// LED off initially</span>
+
+  <span class="cm">// 2. Start Serial for debugging</span>
+  Serial.<span class="fn">begin</span>(<span class="num">115200</span>);
+
+  <span class="cm">// 3. Connect to WiFi</span>
+  WiFi.<span class="fn">begin</span>(ssid, password);
+  Serial.<span class="fn">print</span>(<span class="str">"Connecting to WiFi"</span>);
+  <span class="kw">while</span> (WiFi.<span class="fn">status</span>() != WL_CONNECTED) {
+    <span class="fn">delay</span>(<span class="num">500</span>);
+    Serial.<span class="fn">print</span>(<span class="str">"."</span>);
+  }
+  Serial.<span class="fn">println</span>(<span class="str">"WiFi connected!"</span>);
+
+  <span class="cm">// 4. Configure MQTT</span>
+  client.<span class="fn">setServer</span>(mqtt_server, <span class="num">1883</span>);
+  client.<span class="fn">setCallback</span>(callback);   <span class="cm">// register callback function</span>
+}</pre></div>
+    </div>
+
+    <h3>Write Code Q5 — Write the complete loop() function</h3>
+    <p><em>Question: Write the loop() function for ESP32 MQTT LED control.</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Complete Answer</div>
+      <div class="code-body"><pre><span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// Check MQTT connection; reconnect if dropped</span>
+  <span class="kw">if</span> (!client.<span class="fn">connected</span>()) {
+    <span class="fn">reconnect</span>();
+  }
+  
+  <span class="cm">// Process incoming MQTT messages & keep connection alive</span>
+  client.<span class="fn">loop</span>();
+}</pre></div>
+    </div>
+
+    <h3>Write Code Q6 — Write the full ESP32 program (headers + all functions)</h3>
+    <p><em>Question: Write the complete ESP32 Arduino sketch for MQTT-controlled LED.</em></p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-dot d-red"></span><span class="code-dot d-yellow"></span><span class="code-dot d-green"></span> Full Complete Program</div>
+      <div class="code-body"><pre><span class="kw">#include</span> <span class="str">&lt;WiFi.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;PubSubClient.h&gt;</span>
+
+<span class="kw">const char*</span> ssid        = <span class="str">"Wokwi-GUEST"</span>;
+<span class="kw">const char*</span> password    = <span class="str">""</span>;
+<span class="kw">const char*</span> mqtt_server = <span class="str">"broker.hivemq.com"</span>;
+<span class="kw">const char*</span> topic       = <span class="str">"buet/cse/YOURID/led"</span>;
+<span class="kw">const int</span>   ledPin      = <span class="num">2</span>;
+
+<span class="type">WiFiClient</span>    espClient;
+<span class="type">PubSubClient</span>  client(espClient);
+
+<span class="kw">void</span> <span class="fn">callback</span>(<span class="kw">char*</span> topic, <span class="kw">byte*</span> payload, <span class="type">unsigned int</span> length) {
+  <span class="type">String</span> message;
+  <span class="kw">for</span> (<span class="type">unsigned int</span> i = <span class="num">0</span>; i &lt; length; i++)
+    message += (<span class="kw">char</span>)payload[i];
+
+  <span class="kw">if</span>      (message == <span class="str">"ON"</span>)  <span class="fn">digitalWrite</span>(ledPin, HIGH);
+  <span class="kw">else if</span> (message == <span class="str">"OFF"</span>) <span class="fn">digitalWrite</span>(ledPin, LOW);
+}
+
+<span class="kw">void</span> <span class="fn">reconnect</span>() {
+  <span class="kw">while</span> (!client.<span class="fn">connected</span>()) {
+    <span class="kw">if</span> (client.<span class="fn">connect</span>(<span class="str">"ESP32_LED_Client"</span>)) {
+      client.<span class="fn">subscribe</span>(topic);
+    } <span class="kw">else</span> {
+      <span class="fn">delay</span>(<span class="num">5000</span>);
+    }
+  }
+}
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ledPin, OUTPUT);
+  <span class="fn">digitalWrite</span>(ledPin, LOW);
+  Serial.<span class="fn">begin</span>(<span class="num">115200</span>);
+
+  WiFi.<span class="fn">begin</span>(ssid, password);
+  <span class="kw">while</span> (WiFi.<span class="fn">status</span>() != WL_CONNECTED) <span class="fn">delay</span>(<span class="num">500</span>);
+  Serial.<span class="fn">println</span>(<span class="str">"WiFi OK"</span>);
+
+  client.<span class="fn">setServer</span>(mqtt_server, <span class="num">1883</span>);
+  client.<span class="fn">setCallback</span>(callback);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (!client.<span class="fn">connected</span>()) <span class="fn">reconnect</span>();
+  client.<span class="fn">loop</span>();
+}</pre></div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>CSE 322 · IoT Lab Quiz Prep · ESP32 + MQTT + Python</p>
+  <p style="margin-top:0.5rem; color:#334155">Best of luck on your exam! 🚀</p>
+</footer>
+
+<script>
+  function toggleSection(header) {
+    const section = header.parentElement;
+    section.classList.toggle('open');
+  }
+  function toggleQA(questionEl) {
+    const item = questionEl.parentElement;
+    item.classList.toggle('open');
+  }
+  // Open all sections initially for printing convenience
+  document.querySelectorAll('.section').forEach(s => s.classList.add('open'));
+</script>
+</body>
+</html>
