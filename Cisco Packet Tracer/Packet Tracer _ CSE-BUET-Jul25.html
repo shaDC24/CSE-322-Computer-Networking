@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Packet Tracer | CSE-BUET-Jul25</title>
+<meta name="generator" content="Jekyll v3.10.0">
+<meta property="og:title" content="Packet Tracer">
+<meta property="og:locale" content="en_US">
+<link rel="canonical" href="https://mahirlabibdihan.github.io/CSE-BUET-Jul25/CSE322%20-%20Computer%20Networks%20Sessional/Packet%20Tracer/">
+<meta property="og:url" content="https://mahirlabibdihan.github.io/CSE-BUET-Jul25/CSE322%20-%20Computer%20Networks%20Sessional/Packet%20Tracer/">
+<meta property="og:site_name" content="CSE-BUET-Jul25">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Packet Tracer">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Packet Tracer","url":"https://mahirlabibdihan.github.io/CSE-BUET-Jul25/CSE322%20-%20Computer%20Networks%20Sessional/Packet%20Tracer/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <style class="anchorjs"></style><link rel="stylesheet" href="Packet%20Tracer%20_%20CSE-BUET-Jul25_files/style.css">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/CSE-BUET-Jul25/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mahirlabibdihan.github.io/CSE-BUET-Jul25/">CSE-BUET-Jul25</a></h1>
+      
+
+      <h1 id="packet-tracer">Packet Tracer</h1>
+
+<h2 id="preliminaries">Preliminaries<a class="anchorjs-link " href="#preliminaries" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<h3 id="ip-address">IP Address<a class="anchorjs-link " href="#ip-address" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h3>
+
+<ul>
+  <li>IP Address = Network ID + Host ID</li>
+  <li>Network Address = IP Address AND Subnet Mask</li>
+</ul>
+
+<h3 id="switch">Switch<a class="anchorjs-link " href="#switch" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h3>
+
+<ul>
+  <li>A switch operates at Layer 2 (Data Link Layer) of the OSI model.</li>
+  <li>It uses MAC addresses to forward data to the correct destination within a local network.</li>
+</ul>
+
+<h3 id="router">Router<a class="anchorjs-link " href="#router" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h3>
+
+<ul>
+  <li>A router operates at Layer 3 (Network Layer) of the OSI model.</li>
+  <li>It uses IP addresses to route data between different networks.</li>
+  <li>Routers can connect multiple networks together and manage traffic between them.</li>
+</ul>
+
+<h3 id="cable">Cable<a class="anchorjs-link " href="#cable" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h3>
+
+<ul>
+  <li>PC ↔ Switch: Straight</li>
+  <li>Switch ↔ Router: Straight, Fiber</li>
+  <li>Router ↔ Router: Cross, Fiber</li>
+  <li>PC ↔ Router: Cross</li>
+  <li>PC ↔ PC: Cross</li>
+  <li>Switch ↔ Switch: Cross, Fiber</li>
+</ul>
+
+<h2 id="pc">PC<a class="anchorjs-link " href="#pc" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<ul>
+  <li>
+    <p>Static IP Configuration:<br>
+<code class="language-plaintext highlighter-rouge">&gt; ipconfig &lt;ip address&gt; &lt;subnet mask&gt; &lt;default gateway&gt;</code></p>
+  </li>
+  <li>
+    <p>Discover PC<br>
+ <code class="language-plaintext highlighter-rouge">&gt; ping &lt;ip address&gt;</code>
+ Ping uses ICMP protocol to test connectivity between devices.</p>
+  </li>
+  <li>
+    <p>Telnet to Router/Switch<br>
+ <code class="language-plaintext highlighter-rouge">&gt; telnet &lt;ip address&gt;</code> → Need to configure VTY and priviledge password.</p>
+  </li>
+</ul>
+
+<h2 id="terminal-routerswitch">Terminal (Router/Switch)<a class="anchorjs-link " href="#terminal-routerswitch" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<ul>
+  <li>
+    <p>Priviledge<br>
+<code class="language-plaintext highlighter-rouge">&gt; en</code></p>
+  </li>
+  <li>
+    <p>Configure<br>
+<code class="language-plaintext highlighter-rouge"># conf t</code></p>
+  </li>
+</ul>
+
+<h2 id="router-1">Router<a class="anchorjs-link " href="#router-1" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<ul>
+  <li>
+    <p>Configure a interface<br>
+<code class="language-plaintext highlighter-rouge">(config) # int &lt;interface&gt;</code> or <code class="language-plaintext highlighter-rouge">(config) # int range &lt;interface range&gt;</code><br>
+Example: <code class="language-plaintext highlighter-rouge">int fa0/0</code>, <code class="language-plaintext highlighter-rouge">int range fa0/1-5</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if) # ip address &lt;ip address&gt; &lt;subnet mask&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if) # no shutdown</code></p>
+  </li>
+  <li>
+    <p>Static routing<br>
+<code class="language-plaintext highlighter-rouge">(config)# ip route &lt;network address&gt; &lt;subnet mask&gt; &lt;interface&gt;</code><br>
+(Network addresses that the router is not directly connected)<br>
+<code class="language-plaintext highlighter-rouge"># show ip route</code><br>
+<code class="language-plaintext highlighter-rouge">(config)# do show ip route</code></p>
+  </li>
+  <li>
+    <p>Dynamic routing<br>
+<code class="language-plaintext highlighter-rouge">(config)# router rip</code><br>
+<code class="language-plaintext highlighter-rouge">(config-router)# network &lt;network address&gt;</code> (Network address that the router is directly connected)</p>
+  </li>
+  <li>
+    <p>Backup<br>
+<code class="language-plaintext highlighter-rouge"># copy running-config startup-config</code> or <code class="language-plaintext highlighter-rouge"># copy run start</code></p>
+  </li>
+  <li>
+    <p>Inter-VLAN routing<br>
+<code class="language-plaintext highlighter-rouge">(config-if)# interface &lt;interface&gt;.&lt;vlan id&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-subif)# encapsulation dot1Q &lt;vlan id&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-subif)# ip address &lt;ip address&gt; &lt;subnet mask&gt;</code></p>
+  </li>
+  <li>
+    <p>Credentials<br>
+<code class="language-plaintext highlighter-rouge">(config)# enable secret &lt;password&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config)# hostname &lt;router name&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config)# line console 0</code><br>
+<code class="language-plaintext highlighter-rouge">(config-line)# password &lt;password&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-line)# login</code><br>
+<code class="language-plaintext highlighter-rouge">(config)# line vty 0 4</code><br>
+<code class="language-plaintext highlighter-rouge">(config-line)# password &lt;password&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-line)# login</code></p>
+  </li>
+</ul>
+
+<h2 id="switch-1">Switch<a class="anchorjs-link " href="#switch-1" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<ul>
+  <li>
+    <p>VLAN Configuration<br>
+<code class="language-plaintext highlighter-rouge">(config)# vlan &lt;vlan id&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-vlan)# name &lt;vlan name&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config)# interface &lt;interface&gt;</code> or <code class="language-plaintext highlighter-rouge">(config)# interface range &lt;interface range&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if)# switchport mode access</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if)# switchport access vlan &lt;vlan id&gt;</code></p>
+  </li>
+  <li>
+    <p>Trunk Configuration (Switch to Switch or Switch to Router)<br>
+<code class="language-plaintext highlighter-rouge">(config)# interface &lt;interface&gt;</code> or <code class="language-plaintext highlighter-rouge">(config)# interface range &lt;interface range&gt;</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if)# switchport mode trunk</code><br>
+<code class="language-plaintext highlighter-rouge">(config-if)# switchport trunk allowed vlan &lt;vlan id list&gt;</code></p>
+  </li>
+</ul>
+
+
+
+      
+    </div>
+    <script src="Packet%20Tracer%20_%20CSE-BUET-Jul25_files/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  
+
+</body></html>

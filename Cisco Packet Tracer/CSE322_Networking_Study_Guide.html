@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE322 Networking Exam Study Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1f3a 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, var(--accent-light) 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .exam-info {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .info-icon {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Control Panel */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 16px;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Difficulty badges */
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty.easy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+
+        .difficulty.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
+
+        .difficulty.hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        /* Question categories */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .question-card:hover::before {
+            left: 100%;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .question-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 1.05em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .question-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .reveal-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .reveal-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.05);
+        }
+
+        .answer-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .answer-box.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .answer-label {
+            color: var(--success);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .answer-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Stats Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-results svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .controls, .filter-btn, .reveal-btn {
+                display: none;
+            }
+
+            .answer-box {
+                display: block !important;
+                background: #f0f0f0;
+                border: 1px solid #ccc;
+            }
+
+            .question-card {
+                page-break-inside: avoid;
+                background: white;
+                border: 1px solid #ccc;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .exam-info {
+                gap: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖥️ CSE322 Networking</h1>
+            <p class="subtitle">Comprehensive Study Guide for Sessional Quiz Exam</p>
+            <div class="exam-info">
+                <div class="info-item">
+                    <span class="info-icon">⏱️</span>
+                    <span>25-30 Minutes Per Section</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📚</span>
+                    <span>Multiple Question Types</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💪</span>
+                    <span>Easy to Advanced Level</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search questions by keyword...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="short-answer">Short Q</button>
+                <button class="filter-btn" data-filter="mcq">MCQ</button>
+                <button class="filter-btn" data-filter="scenario">Scenario</button>
+                <button class="filter-btn" data-filter="packet-tracer">Packet Tracer</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn" data-difficulty="all">All Levels</button>
+                <button class="filter-btn" data-difficulty="easy">Easy</button>
+                <button class="filter-btn" data-difficulty="medium">Medium</button>
+                <button class="filter-btn" data-difficulty="hard">Hard</button>
+            </div>
+        </div>
+
+        <div class="stats-dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalQuestions">0</div>
+                <div class="stat-label">Total Questions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="visibleQuestions">0</div>
+                <div class="stat-label">Visible Questions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="categoryCount">5</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        // Question Database
+        const questionsData = {
+            'vlan-configuration': {
+                title: 'VLAN Configuration & Management',
+                questions: [
+                    {
+                        id: 1,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'What is a VLAN and why is it used in networking?',
+                        answer: 'A VLAN (Virtual Local Area Network) is a group of devices in a LAN that are logically connected despite their physical location. Uses: 1) Network segmentation for security, 2) Improved performance by reducing broadcast domain, 3) Better organization and flexibility, 4) Cost-effective way to manage network without physical hardware changes.'
+                    },
+                    {
+                        id: 2,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'Explain the difference between access ports and trunk ports.',
+                        answer: 'Access Ports: Belong to a single VLAN, transmit untagged frames, used for connecting end devices (PCs, servers). Trunk Ports: Carry traffic for multiple VLANs, transmit tagged frames (802.1Q), used for connecting switches to routers or other switches.'
+                    },
+                    {
+                        id: 3,
+                        type: 'short-answer',
+                        difficulty: 'medium',
+                        text: 'What is the purpose of VLAN tagging (802.1Q)?',
+                        answer: 'VLAN tagging adds a 4-byte tag to the Ethernet frame containing: 1) TPID (Tag Protocol ID) - 2 bytes, 2) Priority Code Point (PCP) - 3 bits, 3) Drop Eligible Indicator (DEI) - 1 bit, 4) VLAN ID (VID) - 12 bits. This allows trunk ports to carry multiple VLANs over a single physical link.'
+                    },
+                    {
+                        id: 4,
+                        type: 'packet-tracer',
+                        difficulty: 'medium',
+                        text: 'How do you configure VLAN 10 on a Cisco switch and assign port Fa0/1 to it?',
+                        answer: 'Switch(config)# vlan 10\nSwitch(config-vlan)# name VLAN10\nSwitch(config-vlan)# exit\nSwitch(config)# interface FastEthernet0/1\nSwitch(config-if)# switchport mode access\nSwitch(config-if)# switchport access vlan 10\nSwitch(config-if)# exit\nSwitch# write memory'
+                    },
+                    {
+                        id: 5,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Configure a trunk port between two switches for VLANs 10, 20, 30.',
+                        answer: 'Switch1(config)# interface GigabitEthernet0/1\nSwitch1(config-if)# switchport mode trunk\nSwitch1(config-if)# switchport trunk allowed vlan 10,20,30\nSwitch1(config-if)# switchport trunk native vlan 1\nSwitch1(config-if)# no shutdown\nSwitch1(config-if)# exit\nSwitch1# show interfaces trunk\n\nRepeat same commands on Switch2 side.'
+                    },
+                    {
+                        id: 6,
+                        type: 'mcq',
+                        difficulty: 'medium',
+                        text: 'Which protocol is used for VLAN tagging in Ethernet frames?\nA) STP\nB) 802.1Q\nC) RSTP\nD) VTP',
+                        answer: 'B) 802.1Q - This is the IEEE standard for VLAN tagging that adds a 4-byte tag to the Ethernet frame containing TPID, PCP, DEI, and VLAN ID.'
+                    }
+                ]
+            },
+            'inter-vlan-routing': {
+                title: 'Inter-VLAN Routing & Communication',
+                questions: [
+                    {
+                        id: 7,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'Why do we need inter-VLAN routing?',
+                        answer: 'Different VLANs are isolated and cannot communicate with each other by default. Inter-VLAN routing enables communication between devices in different VLANs by routing traffic through a router or Layer 3 switch using subinterfaces or SVIs (Switched Virtual Interfaces).'
+                    },
+                    {
+                        id: 8,
+                        type: 'short-answer',
+                        difficulty: 'medium',
+                        text: 'What are Router-on-a-Stick and how does it work?',
+                        answer: 'Router-on-a-Stick: A single physical router interface (trunk port) connected to a switch, configured with multiple subinterfaces for each VLAN. Each subinterface gets an IP address as the gateway for that VLAN. The router decapsulates and routes traffic between VLANs based on VLAN tags.'
+                    },
+                    {
+                        id: 9,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Configure Router-on-a-Stick for VLANs 10, 20, 30 with IPs 10.10.10.1/24, 10.20.20.1/24, 10.30.30.1/24.',
+                        answer: 'Router(config)# interface GigabitEthernet0/0.10\nRouter(config-subif)# encapsulation dot1Q 10\nRouter(config-subif)# ip address 10.10.10.1 255.255.255.0\nRouter(config-subif)# no shutdown\nRouter(config-subif)# exit\n\nRepeat for subif .20 (VLAN 20, IP 10.20.20.1) and .30 (VLAN 30, IP 10.30.30.1)\n\nRouter(config)# interface GigabitEthernet0/0\nRouter(config-if)# no shutdown\nRouter(config-if)# exit\nRouter# write memory'
+                    },
+                    {
+                        id: 10,
+                        type: 'scenario',
+                        difficulty: 'hard',
+                        text: 'In a network with VLAN 10 (PC1), VLAN 20 (PC2), and a server in VLAN 30, PC1 cannot ping the server. What could be wrong?\nA) Missing route to server network\nB) Access list blocking traffic\nC) Subinterface not configured\nD) All of the above',
+                        answer: 'D) All of the above - This is a diagnostic scenario. Possible issues: 1) Router subinterface for VLAN 30 not configured, 2) Router not acting as gateway for VLAN 10, 3) Firewall/ACL blocking traffic, 4) Missing route to reach server network. Always check: interface status, IP configurations, routing table, and ACL rules.'
+                    },
+                    {
+                        id: 11,
+                        type: 'mcq',
+                        difficulty: 'medium',
+                        text: 'What is an SVI (Switched Virtual Interface)?\nA) A subinterface on a router\nB) A virtual interface on a Layer 3 switch representing a VLAN\nC) A VLAN trunk port\nD) A virtual MAC address',
+                        answer: 'B) A virtual interface on a Layer 3 switch representing a VLAN - SVIs allow Layer 3 switches to route traffic between VLANs without needing a separate router. Each VLAN gets one SVI with an IP address.'
+                    }
+                ]
+            },
+            'routing': {
+                title: 'Routing & Dynamic Routing Protocols',
+                questions: [
+                    {
+                        id: 12,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'What is the difference between static and dynamic routing?',
+                        answer: 'Static Routing: Admin manually configures routes, no automatic updates, suitable for small networks. Dynamic Routing: Routers automatically learn and update routes using protocols (RIP, OSPF, EIGRP, BGP), adapts to network changes, suitable for large networks, generates overhead but more scalable.'
+                    },
+                    {
+                        id: 13,
+                        type: 'short-answer',
+                        difficulty: 'medium',
+                        text: 'What is the difference between RIP, OSPF, and EIGRP?',
+                        answer: 'RIP (v2): Distance-vector, metric=hop count, max 15 hops, slow convergence, simple, uses UDP 520. OSPF: Link-state, metric=cost, fast convergence, detailed topology, uses Dijkstra algorithm, complex. EIGRP: Advanced distance-vector (Cisco proprietary), balanced hybrid, fast convergence, metric includes bandwidth/delay, uses DUAL algorithm, better than RIP, almost as good as OSPF.'
+                    },
+                    {
+                        id: 14,
+                        type: 'packet-tracer',
+                        difficulty: 'medium',
+                        text: 'How do you enable OSPF on a router for network 10.0.0.0/8?',
+                        answer: 'Router(config)# router ospf 1\nRouter(config-router)# network 10.0.0.0 0.255.255.255 area 0\nRouter(config-router)# exit\nRouter# show ip ospf neighbors\nRouter# show ip route ospf'
+                    },
+                    {
+                        id: 15,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Configure EIGRP on three routers (AS 100) to route networks 10.0.0.0/8, 172.16.0.0/16, 192.168.0.0/16.',
+                        answer: 'On each router:\nRouter(config)# router eigrp 100\nRouter(config-router)# network 10.0.0.0 0.255.255.255\nRouter(config-router)# network 172.16.0.0 0.0.255.255\nRouter(config-router)# network 192.168.0.0 0.0.0.255\nRouter(config-router)# exit\nRouter# show ip eigrp neighbors\nRouter# show ip route eigrp\nRouter# show ip eigrp topology'
+                    },
+                    {
+                        id: 16,
+                        type: 'scenario',
+                        difficulty: 'hard',
+                        text: 'Two routers running OSPF show neighbor status as "FULL" but cannot exchange routes. What could be the issue?\nA) Hello timer mismatch\nB) Dead timer mismatch\nC) MTU mismatch\nD) OSPF area mismatch',
+                        answer: 'C) MTU mismatch - When MTU is different between neighbors, OSPF neighbors become FULL but fail to exchange LSAs. Other issues: Hello/Dead timer mismatch prevents neighbor formation completely. Troubleshoot: Check show ip ospf interface, check show ip ospf neighbor detail, verify MTU values match.'
+                    }
+                ]
+            },
+            'acl-firewall': {
+                title: 'ACL (Access Control Lists) & Traffic Control',
+                questions: [
+                    {
+                        id: 17,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'What is an ACL and what are its main purposes?',
+                        answer: 'ACL (Access Control List) is a set of rules that permit or deny traffic based on specific criteria. Purposes: 1) Security - control traffic flow, 2) Traffic filtering - block unwanted traffic, 3) QoS - prioritize traffic, 4) Limit network access to resources, 5) Reduce network traffic. Processed top-to-bottom, first match wins, implicit deny at end.'
+                    },
+                    {
+                        id: 18,
+                        type: 'short-answer',
+                        difficulty: 'medium',
+                        text: 'What is the difference between Standard and Extended ACLs?',
+                        answer: 'Standard ACLs (1-99): Filter based on source IP only, placed close to destination. Extended ACLs (100-199): Filter based on source IP, destination IP, protocol, port number, TCP flags, ICMP type; placed close to source. Extended ACLs are more flexible and powerful.'
+                    },
+                    {
+                        id: 19,
+                        type: 'packet-tracer',
+                        difficulty: 'medium',
+                        text: 'Create a standard ACL that denies 192.168.1.5 from accessing the network.',
+                        answer: 'Router(config)# access-list 1 deny host 192.168.1.5\nRouter(config)# access-list 1 permit any\nRouter(config)# interface FastEthernet0/0\nRouter(config-if)# ip access-group 1 in\nRouter(config-if)# exit\nRouter# show access-lists\nRouter# show ip access-lists'
+                    },
+                    {
+                        id: 20,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Create an Extended ACL to allow VLAN 10 (10.10.10.0/24) to SSH to server (10.10.10.100) but deny Telnet.',
+                        answer: 'Router(config)# access-list 101 permit tcp 10.10.10.0 0.0.0.255 host 10.10.10.100 eq 22\nRouter(config)# access-list 101 deny tcp 10.10.10.0 0.0.0.255 host 10.10.10.100 eq 23\nRouter(config)# access-list 101 permit ip any any\nRouter(config)# interface fa0/0.10\nRouter(config-subif)# ip access-group 101 out\n\nAlternatively use named ACLs:\nRouter(config)# ip access-list extended SSH_ACL\nRouter(config-ext-nacl)# permit tcp 10.10.10.0 0.0.0.255 host 10.10.10.100 eq 22\nRouter(config-ext-nacl)# deny tcp 10.10.10.0 0.0.0.255 host 10.10.10.100 eq 23\nRouter(config-ext-nacl)# permit ip any any'
+                    },
+                    {
+                        id: 21,
+                        type: 'mcq',
+                        difficulty: 'medium',
+                        text: 'What does the wildcard mask 0.0.0.255 represent when used in ACL 10.10.10.0 0.0.0.255?\nA) Matches only 10.10.10.0\nB) Matches 10.10.10.0 to 10.10.10.255\nC) Matches 10.10.10.0 to 10.10.10.254\nD) Matches entire 10.10.0.0 range',
+                        answer: 'B) Matches 10.10.10.0 to 10.10.10.255 - Wildcard mask 0.0.0.255 means "don\'t care" for the last octet, so all IPs from .0 to .255 in that subnet match. This is equivalent to subnet mask 255.255.255.0'
+                    }
+                ]
+            },
+            'nat-address-translation': {
+                title: 'NAT (Network Address Translation)',
+                questions: [
+                    {
+                        id: 22,
+                        type: 'short-answer',
+                        difficulty: 'easy',
+                        text: 'What is NAT and why is it used?',
+                        answer: 'NAT (Network Address Translation) translates private IP addresses to public IP addresses and vice versa. Uses: 1) Enables private IP addressing scheme, 2) Conserves public IP addresses, 3) Provides security by hiding internal network structure, 4) Allows multiple internal hosts to share single public IP, 5) Simplifies network migration.'
+                    },
+                    {
+                        id: 23,
+                        type: 'short-answer',
+                        difficulty: 'medium',
+                        text: 'Explain Static NAT, Dynamic NAT, and Port Address Translation (PAT).',
+                        answer: 'Static NAT: One-to-one mapping of private IP to public IP, permanent, suitable for servers. Dynamic NAT: Maps private IPs to pool of public IPs, temporary, used for hosts. PAT (Port Address Translation): Multiple private IPs map to single public IP using different port numbers, most common, allows many internal hosts to access internet with one public IP.'
+                    },
+                    {
+                        id: 24,
+                        type: 'packet-tracer',
+                        difficulty: 'medium',
+                        text: 'Configure Static NAT to map internal server 192.168.1.100 to public IP 200.1.1.100.',
+                        answer: 'Router(config)# ip nat inside source static 192.168.1.100 200.1.1.100\nRouter(config)# interface FastEthernet0/0\nRouter(config-if)# ip nat inside\nRouter(config-if)# exit\nRouter(config)# interface FastEthernet0/1\nRouter(config-if)# ip nat outside\nRouter(config-if)# exit\nRouter# show ip nat translations\nRouter# show ip nat statistics'
+                    },
+                    {
+                        id: 25,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Configure PAT so that internal network 192.168.1.0/24 can access external network using public IP 200.1.1.1.',
+                        answer: 'Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255\nRouter(config)# ip nat inside source list 1 interface FastEthernet0/1 overload\nRouter(config)# interface FastEthernet0/0\nRouter(config-if)# ip nat inside\nRouter(config-if)# exit\nRouter(config)# interface FastEthernet0/1\nRouter(config-if)# ip nat outside\nRouter(config-if)# ip address 200.1.1.1 255.255.255.0\nRouter(config-if)# no shutdown\nRouter# show ip nat translations\nRouter# show ip nat statistics'
+                    },
+                    {
+                        id: 26,
+                        type: 'scenario',
+                        difficulty: 'hard',
+                        text: 'After configuring PAT, internal clients cannot reach external servers. What could be wrong?\nA) ACL not defined properly\nB) Inside/Outside interfaces not marked\nC) NAT translation not enabled on inside interface\nD) All of the above',
+                        answer: 'D) All of the above - Common NAT issues: 1) ACL doesn\'t match internal hosts, 2) Interfaces marked as inside/outside backwards, 3) NAT command references wrong ACL, 4) Firewall blocking translated traffic. Always verify: show ip nat translations, show ip nat statistics, debug ip nat, check ACL with show access-lists.'
+                    }
+                ]
+            },
+            'packet-tracer-practice': {
+                title: 'Comprehensive Packet Tracer Tasks',
+                questions: [
+                    {
+                        id: 27,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Section A Task: Configure 3 VLANs, set up inter-VLAN routing, and verify connectivity between all VLANs.',
+                        answer: 'VLAN CONFIGURATION:\n1. Create VLANs: vlan 10, vlan 20, vlan 30\n2. Assign ports: switchport access vlan 10/20/30\n3. Configure trunk: switchport mode trunk, allowed vlan 10,20,30\n\nINTER-VLAN ROUTING:\n4. Configure router subinterfaces:\n   - int g0/0.10, encapsulation dot1Q 10, ip 10.10.10.1/24\n   - int g0/0.20, encapsulation dot1Q 20, ip 10.20.20.1/24\n   - int g0/0.30, encapsulation dot1Q 30, ip 10.30.30.1/24\n5. Enable main interface: int g0/0, no shutdown\n\nVERIFICATION:\n6. Ping between VLANs should succeed\n7. show ip route, show vlan brief, show interfaces trunk'
+                    },
+                    {
+                        id: 28,
+                        type: 'packet-tracer',
+                        difficulty: 'hard',
+                        text: 'Section B Task: Configure NAT with dynamic routing (OSPF). Use public IPs 20.20.20.10, 20.20.20.11 for two internal networks.',
+                        answer: 'OSPF CONFIGURATION (All routers):\n1. Router# router ospf 1\n2. Router(config-router)# network <internal-network> 0.0.0.255 area 0\n\nNAT ON R0:\n3. R0(config)# access-list 1 permit 10.0.0.0 0.0.0.255\n4. R0(config)# access-list 2 permit 172.16.0.0 0.0.0.255\n5. R0(config)# ip nat inside source list 1 interface Fa0/1 overload\n6. R0(config)# ip nat inside source list 2 interface Fa0/2 overload\n7. Mark interfaces: ip nat inside / ip nat outside\n\nVERIFICATION:\n8. show ip nat translations\n9. show ip ospf neighbors\n10. Ping from internal to external networks'
+                    },
+                    {
+                        id: 29,
+                        type: 'scenario',
+                        difficulty: 'hard',
+                        text: 'In a complex network with 3 VLANs, 2 routers, dynamic routing, and NAT, hosts in VLAN 10 can\'t access external servers. Design troubleshooting steps.',
+                        answer: 'SYSTEMATIC TROUBLESHOOTING:\n1. VLAN Level: show vlan brief, verify VLAN membership\n2. Routing Level: show ip route ospf, ping gateway from VLAN 10 PC\n3. Inter-VLAN: show ip route, verify subinterface config\n4. Router Neighbor: show ip ospf neighbors, check area configuration\n5. NAT Level: show ip nat translations, verify inside/outside interfaces\n6. ACL: show access-lists, confirm ACL permits traffic\n7. External: Can router ping external network?\n8. Debug: debug ip nat, debug ip routing, debug ip ospf adj\nStart from Layer 1 (physical links) and work up through each layer.'
+                    }
+                ]
+            }
+        };
+
+        let currentFilter = 'all';
+        let currentDifficulty = 'all';
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            let totalCount = 0;
+            let visibleCount = 0;
+
+            Object.entries(questionsData).forEach(([key, category]) => {
+                const filtered = filterQuestions(category.questions);
+                totalCount += category.questions.length;
+                visibleCount += filtered.length;
+
+                if (filtered.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'category-section';
+                    
+                    let html = `<h2 class="category-title">${category.title}</h2>
+                        <div class="questions-grid">`;
+                    
+                    filtered.forEach(q => {
+                        const difficultyColor = q.difficulty === 'easy' ? 'easy' : q.difficulty === 'medium' ? 'medium' : 'hard';
+                        html += `
+                            <div class="question-card" data-id="${q.id}">
+                                <div class="question-header">
+                                    <span class="question-type">${q.type.replace('-', ' ')}</span>
+                                    <span class="difficulty ${difficultyColor}">${q.difficulty}</span>
+                                </div>
+                                <div class="question-text">${q.text}</div>
+                                <div class="question-footer">
+                                    <button class="reveal-btn" onclick="toggleAnswer(${q.id})">Show Answer</button>
+                                </div>
+                                <div class="answer-box" id="answer-${q.id}">
+                                    <div class="answer-label">✓ Answer</div>
+                                    <div class="answer-text">${q.answer}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    section.innerHTML = html;
+                    container.appendChild(section);
+                }
+            });
+
+            if (visibleCount === 0) {
+                container.innerHTML = `<div class="no-results">
+                    <svg viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                        <circle cx="50" cy="50" r="40" stroke-width="2"/>
+                        <path d="M35 50h30M50 35v30" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <p>No questions found. Try adjusting your filters.</p>
+                </div>`;
+            }
+
+            document.getElementById('totalQuestions').textContent = totalCount;
+            document.getElementById('visibleQuestions').textContent = visibleCount;
+        }
+
+        function filterQuestions(questions) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            return questions.filter(q => {
+                const matchesSearch = q.text.toLowerCase().includes(searchTerm) || 
+                                     q.answer.toLowerCase().includes(searchTerm);
+                const matchesType = currentFilter === 'all' || q.type === currentFilter;
+                const matchesDifficulty = currentDifficulty === 'all' || q.difficulty === currentDifficulty;
+                
+                return matchesSearch && matchesType && matchesDifficulty;
+            });
+        }
+
+        function toggleAnswer(id) {
+            const answerBox = document.getElementById(`answer-${id}`);
+            answerBox.classList.toggle('show');
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderQuestions);
+
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderQuestions();
+            });
+        });
+
+        document.querySelectorAll('[data-difficulty]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-difficulty]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentDifficulty = this.dataset.difficulty;
+                renderQuestions();
+            });
+        });
+
+        // Initial render
+        renderQuestions();
+    </script>
+</body>
+</html>
